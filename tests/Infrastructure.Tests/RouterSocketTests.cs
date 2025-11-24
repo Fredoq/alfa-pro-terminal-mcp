@@ -77,6 +77,35 @@ public sealed class RouterSocketTests
     }
 
     /// <summary>
+    /// Ensures that RouterSocket yields two delayed messages in order.
+    /// </summary>
+    [Fact]
+    public async Task Router_socket_yields_two_messages_with_delay()
+    {
+        using CancellationTokenSource tokenSource = new(TimeSpan.FromSeconds(9));
+        int port = Pick();
+        Uri http = new($"http://127.0.0.1:{port}/messages-delayed/");
+        await using TestSocketHost host = new(http);
+        await host.Start(tokenSource.Token);
+        await using RouterSocket socket = new();
+        await socket.Connect(host.Endpoint(), tokenSource.Token);
+        string firstPayload = $"первое-{Guid.NewGuid()}-α";
+        string secondPayload = $"второе-{Guid.NewGuid()}-β";
+        await host.Send(firstPayload, tokenSource.Token);
+        await Task.Delay(TimeSpan.FromSeconds(2), tokenSource.Token);
+        await host.Send(secondPayload, tokenSource.Token);
+        await using IAsyncEnumerator<string> enumerator = socket.Messages(tokenSource.Token).GetAsyncEnumerator(tokenSource.Token);
+        bool firstReceived = await enumerator.MoveNextAsync();
+        string firstMessage = firstReceived ? enumerator.Current : string.Empty;
+        bool secondReceived = await enumerator.MoveNextAsync();
+        string secondMessage = secondReceived ? enumerator.Current : string.Empty;
+        Task<WebSocketReceiveResult> acknowledgement = host.Acknowledge(tokenSource.Token);
+        await socket.Close(tokenSource.Token);
+        await acknowledgement;
+        Assert.True(firstReceived && secondReceived && firstMessage == firstPayload && secondMessage == secondPayload, "RouterSocket did not yield two delayed messages in order");
+    }
+
+    /// <summary>
     /// Ensures that RouterSocket issues a close frame to the host.
     /// </summary>
     [Fact]

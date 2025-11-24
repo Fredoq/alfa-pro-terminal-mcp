@@ -7,7 +7,7 @@ using System.Text;
 /// <summary>
 /// Hosts a lightweight WebSocket endpoint for integration tests. Usage example: await using var host = new TestSocketHost(httpUri); await host.Start(token);.
 /// </summary>
-public sealed class TestSocketHost : ITestSocketHost
+internal sealed class TestSocketHost : ITestSocketHost
 {
     private readonly HttpListener listener;
     private readonly Uri endpoint;
@@ -80,7 +80,11 @@ public sealed class TestSocketHost : ITestSocketHost
     /// </summary>
     public async Task<WebSocket> Take(CancellationToken cancellationToken)
     {
-        if (accept is null) throw new InvalidOperationException("Accept was not started");
+        if (accept is null)
+        {
+            throw new InvalidOperationException("Accept was not started");
+        }
+
         return await accept.WaitAsync(cancellationToken);
     }
 
@@ -92,10 +96,18 @@ public sealed class TestSocketHost : ITestSocketHost
         if (accept is not null && accept.IsCompletedSuccessfully)
         {
             WebSocket socket = await accept;
-            if (socket.State == WebSocketState.Open) await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "dispose", CancellationToken.None);
+            if (socket.State == WebSocketState.Open)
+            {
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "dispose", CancellationToken.None);
+            }
+
             socket.Dispose();
         }
-        if (listener.IsListening) listener.Stop();
+        if (listener.IsListening)
+        {
+            listener.Stop();
+        }
+
         listener.Close();
     }
 
@@ -105,7 +117,11 @@ public sealed class TestSocketHost : ITestSocketHost
     private async Task<WebSocket> Accept(CancellationToken cancellationToken)
     {
         HttpListenerContext context = await listener.GetContextAsync().WaitAsync(cancellationToken);
-        if (!context.Request.IsWebSocketRequest) throw new InvalidOperationException("Request is not websocket");
+        if (!context.Request.IsWebSocketRequest)
+        {
+            throw new InvalidOperationException("Request is not websocket");
+        }
+
         HttpListenerWebSocketContext wsContext = await context.AcceptWebSocketAsync(null);
         return wsContext.WebSocket;
     }

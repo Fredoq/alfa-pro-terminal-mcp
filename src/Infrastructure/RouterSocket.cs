@@ -42,7 +42,11 @@ internal sealed class RouterSocket : IRouterSocket
     public async Task Send(string payload, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(payload);
-        if (payload.Length == 0) throw new ArgumentException("Payload is empty", nameof(payload));
+        if (payload.Length == 0)
+        {
+            throw new ArgumentException("Payload is empty", nameof(payload));
+        }
+
         byte[] buffer = Encoding.UTF8.GetBytes(payload);
         ArraySegment<byte> segment = new(buffer);
         await outbound.Writer.WriteAsync(segment, cancellationToken);
@@ -59,11 +63,18 @@ internal sealed class RouterSocket : IRouterSocket
         {
             WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
             builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-            if (!result.EndOfMessage) continue;
+            if (!result.EndOfMessage)
+            {
+                continue;
+            }
+
             string message = builder.ToString();
             builder.Clear();
             yield return message;
-            if (result.CloseStatus.HasValue) yield break;
+            if (result.CloseStatus.HasValue)
+            {
+                yield break;
+            }
         }
     }
 
@@ -73,7 +84,10 @@ internal sealed class RouterSocket : IRouterSocket
     public async Task Close(CancellationToken cancellationToken)
     {
         outbound.Writer.TryComplete();
-        if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived) await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "close requested", cancellationToken);
+        if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
+        {
+            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "close requested", cancellationToken);
+        }
     }
 
     /// <summary>

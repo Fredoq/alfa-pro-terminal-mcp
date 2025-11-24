@@ -5,7 +5,7 @@ using System.Net.WebSockets;
 /// <summary>
 /// Describes a lightweight WebSocket endpoint for integration tests. Usage example: await host.Start(token); Uri endpoint = host.Endpoint();.
 /// </summary>
-public interface ITestSocketHost : IAsyncDisposable
+internal interface ITestSocketHost : IAsyncDisposable
 {
     /// <summary>
     /// Starts listening for a connection. Usage example: await host.Start(token).
