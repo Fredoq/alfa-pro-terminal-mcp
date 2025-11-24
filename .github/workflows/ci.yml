@@ -23,6 +23,8 @@ jobs:
           global-json-file: global.json
       - name: Restore
         run: dotnet restore Alfa.ProTerminal.Mcp.slnx
+      - name: Format check
+        run: dotnet format Alfa.ProTerminal.Mcp.slnx --verify-no-changes --verbosity diagnostic
       - name: Build
         run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore
       - name: Test
