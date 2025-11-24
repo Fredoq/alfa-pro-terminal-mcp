@@ -13,5 +13,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="ModelContextProtocol.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\\Infrastructure\\Infrastructure.csproj" />
+    <ProjectReference Include="..\\Domain\\Domain.csproj" />
   </ItemGroup>
 </Project>
