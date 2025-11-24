@@ -5,7 +5,7 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/src/">
-    <Project Path="src/Alfa.ProTerminal.Mcp/Alfa.ProTerminal.Mcp.csproj" />
+    <Project Path="src/Host/Host.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alfa.ProTerminal.Mcp.Tests/Alfa.ProTerminal.Mcp.Tests.csproj" />

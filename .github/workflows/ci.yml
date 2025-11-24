@@ -22,8 +22,8 @@ jobs:
           dotnet-version: 10.0.x
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore Alfa.ProTerminal.Mcp.sln
+        run: dotnet restore Alfa.ProTerminal.Mcp.slnx
       - name: Build
-        run: dotnet build Alfa.ProTerminal.Mcp.sln --configuration Release --no-restore
+        run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore
       - name: Test
-        run: dotnet test Alfa.ProTerminal.Mcp.sln --configuration Release --no-build --verbosity normal
+        run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --verbosity normal

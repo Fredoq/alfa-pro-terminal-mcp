@@ -23,11 +23,11 @@ jobs:
           dotnet-version: 10.0.x
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore Alfa.ProTerminal.Mcp.sln
+        run: dotnet restore Alfa.ProTerminal.Mcp.slnx
       - name: Build
-        run: dotnet build Alfa.ProTerminal.Mcp.sln --configuration Release --no-restore
+        run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore
       - name: Test
-        run: dotnet test Alfa.ProTerminal.Mcp.sln --configuration Release --no-build --verbosity normal
+        run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --verbosity normal
       - name: Docker login
         uses: docker/login-action@v3
         with:
@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish container via dotnet publish
         run: |
-          dotnet publish src/Alfa.ProTerminal.Mcp/Alfa.ProTerminal.Mcp.csproj \
+          dotnet publish src/Host/Host.csproj \
             -c Release \
             /t:PublishContainer \
             -p ContainerRegistry=docker.io \

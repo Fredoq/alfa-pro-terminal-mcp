@@ -19,6 +19,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Alfa.ProTerminal.Mcp\Alfa.ProTerminal.Mcp.csproj" />
+    <ProjectReference Include="../../src/Host/Host.csproj" />
   </ItemGroup>
 </Project>
