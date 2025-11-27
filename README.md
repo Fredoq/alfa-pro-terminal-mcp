@@ -1,6 +1,6 @@
 # Alfa PRO Terminal MCP
 
-Model Context Protocol server for Alfa Investments PRO Terminal running as a console app over stdio with SDK-based containerization.
+Model Context Protocol server for Alfa Investments PRO Terminal running as a console app over stdio with SDK-based containerization. Router endpoint configured via `Router:Endpoint` (default `ws://127.0.0.1:3366/router/`), overridable by env `ROUTER__ENDPOINT`.
 
 ## Build and run
 - Restore, build, and test: `dotnet restore` then `dotnet test Alfa.ProTerminal.Mcp.sln`

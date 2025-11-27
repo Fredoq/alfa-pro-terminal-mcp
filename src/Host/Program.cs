@@ -6,7 +6,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 builder.Logging.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
 builder.Services
-    .Register()
+    .Register(builder.Configuration)
     .AddMcpServer()
     .WithStdioServerTransport()
     .WithToolsFromAssembly();

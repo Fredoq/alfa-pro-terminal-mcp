@@ -12,18 +12,18 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 /// </summary>
 internal sealed class RouterSocket : IRouterSocket
 {
-    private readonly ClientWebSocket socket;
-    private readonly Channel<ArraySegment<byte>> outbound;
-    private readonly TimeSpan timeout;
+    private readonly ClientWebSocket _socket;
+    private readonly Channel<ArraySegment<byte>> _outbound;
+    private readonly TimeSpan _timeout;
 
     /// <summary>
     /// Initializes the socket wrapper with outbound buffering. Usage example: var socket = new RouterSocket().
     /// </summary>
     public RouterSocket()
     {
-        socket = new ClientWebSocket();
-        outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        timeout = TimeSpan.FromSeconds(5);
+        _socket = new ClientWebSocket();
+        _outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
+        _timeout = TimeSpan.FromSeconds(5);
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ internal sealed class RouterSocket : IRouterSocket
     public async Task Connect(Uri endpoint, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(endpoint);
-        await socket.ConnectAsync(endpoint, cancellationToken);
+        await _socket.ConnectAsync(endpoint, cancellationToken);
         _ = Task.Run(() => Pump(cancellationToken), cancellationToken);
     }
 
@@ -49,7 +49,7 @@ internal sealed class RouterSocket : IRouterSocket
 
         byte[] buffer = Encoding.UTF8.GetBytes(payload);
         ArraySegment<byte> segment = new(buffer);
-        await outbound.Writer.WriteAsync(segment, cancellationToken);
+        await _outbound.Writer.WriteAsync(segment, cancellationToken);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ internal sealed class RouterSocket : IRouterSocket
         StringBuilder builder = new();
         while (!cancellationToken.IsCancellationRequested)
         {
-            WebSocketReceiveResult result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
+            WebSocketReceiveResult result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
             builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
             if (!result.EndOfMessage)
             {
@@ -83,10 +83,10 @@ internal sealed class RouterSocket : IRouterSocket
     /// </summary>
     public async Task Close(CancellationToken cancellationToken)
     {
-        outbound.Writer.TryComplete();
-        if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
+        _outbound.Writer.TryComplete();
+        if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
         {
-            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "close requested", cancellationToken);
+            await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "close requested", cancellationToken);
         }
     }
 
@@ -95,9 +95,9 @@ internal sealed class RouterSocket : IRouterSocket
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        using CancellationTokenSource source = new(timeout);
+        using CancellationTokenSource source = new(_timeout);
         await Close(source.Token);
-        socket.Dispose();
+        _socket.Dispose();
     }
 
     /// <summary>
@@ -105,9 +105,9 @@ internal sealed class RouterSocket : IRouterSocket
     /// </summary>
     private async Task Pump(CancellationToken cancellationToken)
     {
-        await foreach (ArraySegment<byte> segment in outbound.Reader.ReadAllAsync(cancellationToken))
+        await foreach (ArraySegment<byte> segment in _outbound.Reader.ReadAllAsync(cancellationToken))
         {
-            await socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+            await _socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
         }
     }
 }
