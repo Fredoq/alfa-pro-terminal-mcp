@@ -10,5 +10,5 @@ public interface IAccounts
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns>Collection of client accounts.</returns>
-    Task<IAccountsEntries> Entries(CancellationToken cancellationToken);
+    Task<IAccountsEntries> Entries(CancellationToken cancellationToken = default);
 }

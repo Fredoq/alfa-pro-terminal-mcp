@@ -26,10 +26,10 @@ internal sealed class DataQueryResponse : IResponse
     }
 
     public DataQueryResponse(JsonElement element) : this(
-        element.String("id"),
-        element.String("command"),
-        element.String("channel"),
-        element.String("payload"))
+        element.String("Id"),
+        element.String("Command"),
+        element.String("Channel"),
+        element.String("Payload").Trim('"'))
     {
 
     }
@@ -93,6 +93,17 @@ internal static class JsonElementExtensions
                 }
             }
             throw new InvalidOperationException($"Property '{propertyName}' is missing or not a string.");
+        }
+
+#pragma warning disable S2325 // Methods and properties that don't access instance data should be static
+        public int Number(string propertyName)
+#pragma warning restore S2325 // Methods and properties that don't access instance data should be static
+        {
+            if (element.TryGetProperty(propertyName, out JsonElement value) && value.ValueKind == JsonValueKind.Number)
+            {
+                return value.GetInt32();
+            }
+            throw new InvalidOperationException($"Property '{propertyName}' is missing or not a number.");
         }
     }
 }
