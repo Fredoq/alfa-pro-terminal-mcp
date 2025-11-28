@@ -4,8 +4,6 @@ using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 /// <summary>
 /// Registers infrastructure services in the dependency injection container. Usage example: services.Register();

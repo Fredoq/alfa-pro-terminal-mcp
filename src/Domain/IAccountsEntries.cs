@@ -5,4 +5,5 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 /// </summary>
 public interface IAccountsEntries
 {
+    string Json();
 }

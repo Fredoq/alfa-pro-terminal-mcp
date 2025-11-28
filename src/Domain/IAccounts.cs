@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
 /// <summary>

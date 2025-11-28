@@ -1,6 +1,5 @@
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
 
-using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
 /// <summary>
@@ -30,37 +29,13 @@ internal sealed class ClientAccountsEntityResponse : IOutboundMessages
         ICorrelationId id = await _incoming.Send(cancellationToken);
         await foreach (string message in _socket.Messages(cancellationToken))
         {
-            RoutingResponse? response = JsonSerializer.Deserialize<RoutingResponse>(message);
-            if (response is null)
-            {
-                throw new InvalidOperationException("Routing response is missing");
-            }
-            if (response.Id != id.Value())
+            DataQueryResponse response = new(message);
+            if (!response.Accepted(id))
             {
                 continue;
             }
-            if (response.Command != "response")
-            {
-                continue;
-            }
-            if (response.Channel != "#Data.Query")
-            {
-                continue;
-            }
-            if (string.IsNullOrWhiteSpace(response.Payload))
-            {
-                throw new InvalidOperationException("Routing payload is missing");
-            }
-            return response.Payload;
+            return response.Payload();
         }
         throw new InvalidOperationException("Response not received");
-    }
-
-    private sealed class RoutingResponse
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Command { get; set; } = string.Empty;
-        public string Channel { get; set; } = string.Empty;
-        public string Payload { get; set; } = string.Empty;
     }
 }

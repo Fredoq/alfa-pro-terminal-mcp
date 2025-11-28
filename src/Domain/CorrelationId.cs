@@ -12,10 +12,7 @@ public sealed class CorrelationId : ICorrelationId
     /// </summary>
     public CorrelationId(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException("Correlation id is empty", nameof(value));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(value);
         _value = value;
     }
 
