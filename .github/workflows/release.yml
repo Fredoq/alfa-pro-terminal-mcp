@@ -42,6 +42,4 @@ jobs:
           dotnet publish src/Host/Host.csproj \
             -c Release \
             /t:PublishContainer \
-            -p ContainerRegistry=docker.io \
-            -p ContainerImageTags="latest;${{ github.sha }}" \
-            -p ContinuousIntegrationBuild=true
+            -p ContainerRegistry=docker.io
