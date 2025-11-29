@@ -63,6 +63,9 @@ jobs:
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
             -Dsonar.projectName=${{ vars.SONAR_PROJECT_NAME }}
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.exclusions=**/bin/**,**/obj/**,**/artifacts/**
             -Dsonar.cs.vscoveragexml.reportsPaths=**/coverage.cobertura.xml
             -Dsonar.verbose=true
       - name: Upload test results
