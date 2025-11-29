@@ -1,14 +1,23 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+  DOTNET_NOLOGO: true
 
 jobs:
   build:
@@ -16,16 +25,58 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
           global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            Directory.Packages.props
+            **/*.csproj
       - name: Restore
         run: dotnet restore Alfa.ProTerminal.Mcp.slnx
       - name: Format check
         run: dotnet format Alfa.ProTerminal.Mcp.slnx --verify-no-changes --verbosity diagnostic
       - name: Build
-        run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore
-      - name: Test
-        run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --verbosity normal
+        run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore --no-incremental
+      - name: Test with coverage
+        run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./artifacts/tests --collect:"XPlat Code Coverage"
+      - name: Generate coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@dcdfb6e704e87df6b2ed0cf123a6c9f69e364869 # 5.5.0
+        with:
+          reports: '**/coverage.cobertura.xml'
+          targetdir: 'artifacts/coverage-report'
+          reporttypes: 'TextSummary;Cobertura;HtmlSummary'
+          assemblyfilters: '+Fredoqw.*'
+      - name: Display coverage summary
+        run: cat artifacts/coverage-report/Summary.txt
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@e44258b109568baa0df60ed515909fc6c72cba92 # v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.projectName=${{ vars.SONAR_PROJECT_NAME }}
+            -Dsonar.cs.vscoveragexml.reportsPaths=**/coverage.cobertura.xml
+            -Dsonar.verbose=true
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            artifacts/tests/**/*.trx
+            artifacts/tests/**/*.xml
+            **/coverage.cobertura.xml
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: artifacts/coverage-report
