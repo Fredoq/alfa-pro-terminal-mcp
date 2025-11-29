@@ -41,7 +41,7 @@ jobs:
       - name: Test with coverage
         run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./artifacts/tests --collect:"XPlat Code Coverage"
       - name: Generate coverage report
-        uses: danielpalme/ReportGenerator-GitHub-Action@v5
+        uses: danielpalme/ReportGenerator-GitHub-Action@dcdfb6e704e87df6b2ed0cf123a6c9f69e364869 # 5.5.0
         with:
           reports: '**/coverage.cobertura.xml'
           targetdir: 'artifacts/coverage-report'
@@ -50,7 +50,7 @@ jobs:
       - name: Display coverage summary
         run: cat artifacts/coverage-report/Summary.txt
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@e44258b109568baa0df60ed515909fc6c72cba92 # v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
