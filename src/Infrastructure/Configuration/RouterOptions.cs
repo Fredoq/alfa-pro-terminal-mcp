@@ -1,4 +1,4 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
 
 /// <summary>
 /// Configuration options for router connectivity. Usage example: bound from configuration section "Router"; override via env variable ROUTER__ENDPOINT.

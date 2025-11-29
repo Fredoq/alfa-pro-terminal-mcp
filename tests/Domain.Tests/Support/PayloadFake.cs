@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests.Support;
 
 using System.Text.Json;

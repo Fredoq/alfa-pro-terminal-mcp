@@ -1,4 +1,4 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 /// <summary>
 /// Represents a correlation identifier for routing requests. Usage example: string value = id.Value();.

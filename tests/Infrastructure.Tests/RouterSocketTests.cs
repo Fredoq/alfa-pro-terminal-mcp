@@ -1,10 +1,12 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 /// <summary>
 /// Verifies RouterSocket behavior against a real WebSocket endpoint. Usage example: executed via xUnit.

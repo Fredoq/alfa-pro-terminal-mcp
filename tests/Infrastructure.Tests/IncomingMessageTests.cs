@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
@@ -18,7 +20,7 @@ public sealed class IncomingMessageTests
         RoutingFake routing = new(text);
         await using RouterSocketSpy socket = new();
         LoggerFake logger = new();
-        IncomingMessage message = new(routing, socket, logger);
+        Messaging.Requests.IncomingMessage message = new(routing, socket, logger);
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         ICorrelationId id = await message.Send(source.Token);
         bool sent = socket.Payload == routing.AsString() && id.Value() == routing.Id();

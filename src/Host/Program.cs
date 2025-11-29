@@ -1,8 +1,8 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 {

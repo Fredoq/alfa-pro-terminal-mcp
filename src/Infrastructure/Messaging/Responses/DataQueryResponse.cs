@@ -1,7 +1,8 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
-
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
 /// <summary>
 /// Reads router responses for data queries. Usage example: var response = new DataQueryResponse(message); if (response.Accepted(id)) { string payload = response.Payload(); }

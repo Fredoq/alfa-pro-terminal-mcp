@@ -1,3 +1,6 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;

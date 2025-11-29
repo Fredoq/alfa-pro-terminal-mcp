@@ -1,4 +1,8 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

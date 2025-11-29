@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Collections.Concurrent;

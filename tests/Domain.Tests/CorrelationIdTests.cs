@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
 
 /// <summary>

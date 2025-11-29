@@ -1,4 +1,4 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 
 public interface IRouting
 {

@@ -1,4 +1,6 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 
 /// <summary>
 /// Describes a router response that can be validated and read. Usage example: bool accepted = response.Accepted(id).

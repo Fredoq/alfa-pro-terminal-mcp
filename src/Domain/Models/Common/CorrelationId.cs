@@ -1,4 +1,6 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 /// <summary>
 /// Immutable correlation id value object. Usage example: var id = new CorrelationId("123"); string value = id.Value();.

@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
 
 using System.Text.Json;

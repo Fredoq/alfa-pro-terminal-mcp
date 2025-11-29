@@ -1,3 +1,6 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 using System.ComponentModel;

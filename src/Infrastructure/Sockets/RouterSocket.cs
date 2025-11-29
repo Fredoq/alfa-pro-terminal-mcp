@@ -1,11 +1,10 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
-
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Channels;
 using System.Runtime.CompilerServices;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using System.Text;
+using System.Threading.Channels;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
 
 /// <summary>
 /// Maintains a single WebSocket connection to the terminal router. Usage example: var socket = new RouterSocket(); await socket.Connect(new Uri("ws://127.0.0.1:3366/router/"), token); await socket.Send("{\"Command\":\"listen\",\"Channel\":\"#Data.Bus.ObjectEntity\"}", token); await foreach (var message in socket.Messages(token)) { /* process */ }; await socket.Close(token).

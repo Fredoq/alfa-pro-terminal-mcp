@@ -1,7 +1,9 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
-
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Microsoft.Extensions.Logging;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
 /// <summary>
 /// Retrieves a response for client accounts request. Usage example: IPayload payload = await response.Next(token);.

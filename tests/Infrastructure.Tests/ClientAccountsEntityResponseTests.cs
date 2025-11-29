@@ -25,7 +25,7 @@ public sealed class ClientAccountsEntityResponseTests
         await using RouterSocketSequence socket = new([other, message]);
         IncomingStub incoming = new(id);
         LoggerFake logger = new();
-        ClientAccountsEntityResponse response = new(incoming, socket, logger);
+        Messaging.Responses.ClientAccountsEntityResponse response = new(incoming, socket, logger);
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         string value = await response.NextMessage(source.Token);
         Assert.True(value == payload, "ClientAccountsEntityResponse does not return matching payload");
@@ -44,7 +44,7 @@ public sealed class ClientAccountsEntityResponseTests
         await using RouterSocketSequence socket = new([other]);
         IncomingStub incoming = new(id);
         LoggerFake logger = new();
-        ClientAccountsEntityResponse response = new(incoming, socket, logger);
+        Messaging.Responses.ClientAccountsEntityResponse response = new(incoming, socket, logger);
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         Task<string> action = response.NextMessage(source.Token);
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);

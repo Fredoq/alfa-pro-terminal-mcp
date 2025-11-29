@@ -1,7 +1,11 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
-
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 using Microsoft.Extensions.Logging;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Requests;
 
 /// <summary>
 /// Sends routing request and returns its correlation id. Usage example: ICorrelationId id = await message.Send(token);.

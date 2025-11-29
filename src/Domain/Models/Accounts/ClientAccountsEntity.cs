@@ -1,4 +1,6 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
 
 public sealed record ClientAccountsEntity : IPayload
 {

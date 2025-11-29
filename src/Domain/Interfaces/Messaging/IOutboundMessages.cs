@@ -1,4 +1,4 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
 
 /// <summary>
 /// Supplies outbound responses for previously sent requests. Usage example: IPayload payload = await outbound.Response(token);.

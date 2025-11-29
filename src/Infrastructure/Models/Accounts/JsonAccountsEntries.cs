@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
 /// <summary>
 /// Builds account entries from JSON payload. Usage example: string json = new JsonAccountsEntries(payload).Json().
 /// </summary>

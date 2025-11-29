@@ -1,3 +1,6 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
 
 using System.Collections.Concurrent;

@@ -1,3 +1,7 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;

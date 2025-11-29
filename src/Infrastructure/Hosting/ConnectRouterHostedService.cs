@@ -1,8 +1,9 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
-
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
 /// Ensures router connection is established at startup. Usage example: registered as hosted service.
