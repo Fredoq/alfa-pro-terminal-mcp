@@ -8,7 +8,7 @@ public sealed class WsAccounts : IAccounts
     private readonly IOutboundMessages _outbound;
 
     public WsAccounts(IRouterSocket routerSocket, ILogger logger)
-        : this(new ClientAccountsEntityResponse(new IncomingMessage(new QueryRequest(new QuotedPayload(new ClientAccountsEntity())), routerSocket, logger), routerSocket))
+        : this(new ClientAccountsEntityResponse(new IncomingMessage(new DataQueryRequest(new ClientAccountsEntity()), routerSocket, logger), routerSocket, logger))
     {
     }
 

@@ -15,7 +15,6 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
     .AddEnvironmentVariables();
 builder.Logging
-    .SetMinimumLevel(LogLevel.Debug)
     .AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
 builder.Services
     .Register(builder.Configuration)

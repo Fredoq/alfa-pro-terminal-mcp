@@ -1,17 +1,17 @@
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
-public sealed record QueryRequest : IRouting
+public sealed record DataQueryRequest : IRouting
 {
     private readonly string _id;
     private readonly string _command;
     private readonly string _channel;
     private readonly IPayload _payload;
 
-    public QueryRequest(IPayload payload) : this(Guid.NewGuid().ToString(), "request", "#Data.Query", payload)
+    public DataQueryRequest(IPayload payload) : this(Guid.NewGuid().ToString(), "request", "#Data.Query", payload)
     {
     }
 
-    private QueryRequest(string id, string command, string channel, IPayload payload)
+    private DataQueryRequest(string id, string command, string channel, IPayload payload)
     {
         _id = id;
         _command = command;
@@ -26,5 +26,6 @@ public sealed record QueryRequest : IRouting
         Channel = _channel,
         Payload = _payload.AsString()
     });
+
     public string Id() => _id;
 }

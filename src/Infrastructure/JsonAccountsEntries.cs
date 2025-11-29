@@ -28,7 +28,7 @@ internal sealed class JsonAccountsEntries : IAccountsEntries
         JsonElement root = doc.RootElement;
         if (!root.TryGetProperty("Data", out JsonElement data))
         {
-            throw new InvalidOperationException("Response data array is missing. Root: " + root.ToString());
+            throw new InvalidOperationException("Response data array is missing.");
         }
         if (data.ValueKind != JsonValueKind.Array)
         {
