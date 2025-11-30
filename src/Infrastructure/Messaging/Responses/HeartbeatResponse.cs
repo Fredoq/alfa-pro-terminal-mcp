@@ -39,5 +39,5 @@ internal sealed class HeartbeatResponse : IResponse
     /// <summary>
     /// Returns the payload fragment of the message. Usage example: string payload = response.Payload();
     /// </summary>
-    public string Payload() => string.Empty;
+    public string Payload() => _response.Payload();
 }

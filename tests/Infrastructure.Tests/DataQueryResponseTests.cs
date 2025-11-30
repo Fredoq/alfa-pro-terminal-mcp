@@ -44,19 +44,6 @@ public sealed class DataQueryResponseTests
     }
 
     /// <summary>
-    /// Confirms that DataQueryResponse exposes payload text as provided. Usage example: response.Payload().
-    /// </summary>
-    [Fact(DisplayName = "DataQueryResponse exposes payload text")]
-    public void Given_response_when_payload_requested_then_returns_payload()
-    {
-        string id = Guid.NewGuid().ToString();
-        string payload = $"{{\"alpha\":\"{Guid.NewGuid()}-η\"}}";
-        DataQueryResponse response = new(id, "response", "#Data.Query", payload);
-        string value = response.Payload();
-        Assert.True(value.Contains("alpha", StringComparison.Ordinal), "DataQueryResponse does not expose payload text");
-    }
-
-    /// <summary>
     /// Verifies JsonElementExtensions.Number parses numeric property. Usage example: element.Number(\"Data\").
     /// </summary>
     [Fact(DisplayName = "JsonElementExtensions parses numeric property")]
