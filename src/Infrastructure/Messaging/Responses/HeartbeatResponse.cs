@@ -11,7 +11,7 @@ internal sealed class HeartbeatResponse : IResponse
 {
     private readonly string _message;
     private readonly IResponse _response;
-    
+
     /// <summary>
     /// Creates a heartbeat-aware response. Usage example: var response = new HeartbeatResponse(message, factory).
     /// </summary>
