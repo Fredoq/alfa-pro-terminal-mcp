@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "description": "MCP server for Alfa PRO Terminal exposing LLM tools for accounts, portfolio and tickers over stdio.",
+  "name": "io.github.Fredoq/alfa-pro-terminal-mcp",
+  "packages": [
+    {
+      "registryType": "nuget",
+      "identifier": "Fredoqw.Alfa.ProTerminal.Mcp",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [],
+      "environmentVariables": []
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/Fredoq/alfa-pro-terminal-mcp",
+    "source": "github"
+  }
+}

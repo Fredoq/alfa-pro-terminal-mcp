@@ -16,3 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - MCP tool for fetching balance
 - MCP tool for fetching position for specific account
 - MCP tool for fetching asset info
+
+## [0.3.0] - 2025-11-30
+### Added
+- Nuget publish and dnx support for mcp
+### Removed
+- Docker publish
