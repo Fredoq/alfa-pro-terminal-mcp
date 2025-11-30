@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812", Justification = "Instantiated by MCP tool discovery")]
 /// <summary>
 /// MCP tool wrapper over terminal behavior. Usage example: var terminal = new McpTerminal(origin); IAccounts accounts = await terminal.Accounts(token);.
 /// </summary>

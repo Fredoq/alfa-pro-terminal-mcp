@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812", Justification = "Instantiated by MCP tool discovery")]
 /// <summary>
 /// MCP tool wrapper for account positions. Usage example: string json = await new McpPositions(socket, logger).Positions(123).
 /// </summary>
