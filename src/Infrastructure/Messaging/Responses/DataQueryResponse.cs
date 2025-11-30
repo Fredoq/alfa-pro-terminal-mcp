@@ -93,7 +93,7 @@ internal static class JsonElementExtensions
                         return string.Empty;
                 }
             }
-            throw new InvalidOperationException($"Property '{propertyName}' is missing or not a string.");
+            throw new InvalidOperationException($"Property '{propertyName}' is missing or not a string. JsonElement: {element}");
         }
 
 #pragma warning disable S2325 // Methods and properties that don't access instance data should be static
