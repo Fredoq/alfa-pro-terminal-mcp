@@ -32,7 +32,15 @@ internal sealed class McpAccounts
         _logger = logger;
     }
 
-
+    /// <summary>
+    /// Returns client account entries with identifiers and IIA type. Usage example: string json = await new McpAccounts(socket, logger).Entries().
+    /// </summary>
     [McpServerTool, Description("Returns a collection of client accounts. Each account contains an identifier and IIA type.")]
     public async Task<string> Entries() => (await new WsAccounts(_routerSocket, _logger).Entries()).Json();
+
+    /// <summary>
+    /// Returns account balance with field descriptions for the specified account id. Usage example: string json = await new McpAccounts(socket, logger).Balance(123).
+    /// </summary>
+    [McpServerTool, Description("Returns account balance with field descriptions for the given account id.")]
+    public async Task<string> Balance(long accountId) => (await new WsBalance(_routerSocket, _logger).Balance(accountId)).Json();
 }
