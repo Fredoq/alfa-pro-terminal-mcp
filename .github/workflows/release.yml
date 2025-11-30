@@ -13,7 +13,6 @@ permissions:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  IMAGE_NAME: alfa-pro-terminal-mcp
 
 jobs:
   publish:
@@ -32,14 +31,10 @@ jobs:
         run: dotnet build Alfa.ProTerminal.Mcp.slnx --configuration Release --no-restore
       - name: Test
         run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --verbosity normal
-      - name: Docker login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish container via dotnet publish
-        run: |
-          dotnet publish src/Host/Host.csproj \
-            -c Release \
-            /t:PublishContainer \
-            -p ContainerRegistry=docker.io
+      - name: Pack NuGet
+        run: dotnet pack src/Host/Host.csproj --configuration Release --no-build --output artifacts
+      - name: Publish NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_SOURCE: https://api.nuget.org/v3/index.json
+        run: dotnet nuget push artifacts/*.nupkg --source "$NUGET_SOURCE" --api-key "$NUGET_API_KEY" --skip-duplicate
