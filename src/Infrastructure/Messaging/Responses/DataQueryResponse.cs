@@ -9,42 +9,14 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 /// </summary>
 internal sealed class DataQueryResponse : IResponse
 {
-    private readonly string _payload;
-    private readonly string _id;
-    private readonly string _command;
-    private readonly string _channel;
+    private readonly string _message;
 
     /// <summary>
     /// Stores the raw message for parsing. Usage example: var response = new DataQueryResponse(message).
     /// </summary>
-    public DataQueryResponse(string message) : this(JsonDocument.Parse(message))
+    public DataQueryResponse(string message)
     {
-    }
-
-    public DataQueryResponse(JsonDocument document) : this(document.RootElement)
-    {
-
-    }
-
-    public DataQueryResponse(JsonElement element) : this(
-        element.String("Id"),
-        element.String("Command"),
-        element.String("Channel"),
-        element.String("Payload").Trim('"'))
-    {
-
-    }
-
-    public DataQueryResponse(string id, string command, string channel, string payload)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(id);
-        ArgumentException.ThrowIfNullOrEmpty(command);
-        ArgumentException.ThrowIfNullOrEmpty(channel);
-        ArgumentException.ThrowIfNullOrEmpty(payload);
-        _id = id;
-        _command = command;
-        _channel = channel;
-        _payload = payload;
+        _message = message;
     }
 
     /// <summary>
@@ -53,15 +25,17 @@ internal sealed class DataQueryResponse : IResponse
     public bool Accepted(ICorrelationId id)
     {
         ArgumentNullException.ThrowIfNull(id);
-        if (_id != id.Value())
+        using JsonDocument document = JsonDocument.Parse(_message);
+        JsonElement root = document.RootElement;
+        if (root.String("Id") != id.Value())
         {
             return false;
         }
-        if (_command != "response")
+        if (root.String("Command") != "response")
         {
             return false;
         }
-        if (_channel != "#Data.Query")
+        if (root.String("Channel") != "#Data.Query")
         {
             return false;
         }
@@ -71,7 +45,12 @@ internal sealed class DataQueryResponse : IResponse
     /// <summary>
     /// Provides the payload fragment when the message has been accepted. Usage example: string payload = response.Payload();
     /// </summary>
-    public string Payload() => _payload;
+    public string Payload()
+    {
+        using JsonDocument document = JsonDocument.Parse(_message);
+        JsonElement root = document.RootElement;
+        return root.String("Payload").Trim('"');
+    }
 }
 
 
@@ -93,7 +72,7 @@ internal static class JsonElementExtensions
                         return string.Empty;
                 }
             }
-            throw new InvalidOperationException($"Property '{propertyName}' is missing or not a string. JsonElement: {element}");
+            throw new InvalidOperationException($"Property '{propertyName}' is missing or not a string.");
         }
 
 #pragma warning disable S2325 // Methods and properties that don't access instance data should be static

@@ -2,9 +2,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
-using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// Verifies ClientBalanceEntityResponse retrieves payloads from router stream. Usage example: executed by xUnit runner.

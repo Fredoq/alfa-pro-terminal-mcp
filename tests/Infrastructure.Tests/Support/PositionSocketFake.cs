@@ -6,17 +6,17 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 /// <summary>
-/// Simulates router behavior for balance requests by echoing a crafted response. Usage example: new BalanceSocketFake(payload).
+/// Simulates router behavior for position requests by echoing a crafted response. Usage example: new PositionSocketFake(payload).
 /// </summary>
-internal sealed class BalanceSocketFake : IRouterSocket
+internal sealed class PositionSocketFake : IRouterSocket
 {
     private readonly string responsePayload;
     private readonly TaskCompletionSource<string> requestId;
 
     /// <summary>
-    /// Initializes the fake with response payload. Usage example: new BalanceSocketFake(payload).
+    /// Initializes the fake with response payload. Usage example: new PositionSocketFake(payload).
     /// </summary>
-    public BalanceSocketFake(string payload)
+    public PositionSocketFake(string payload)
     {
         ArgumentNullException.ThrowIfNull(payload);
         responsePayload = payload;

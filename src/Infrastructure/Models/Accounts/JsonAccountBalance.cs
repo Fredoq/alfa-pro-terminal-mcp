@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
@@ -8,6 +7,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
 /// <summary>
 /// Builds account balance JSON with field descriptions. Usage example: string json = new JsonAccountBalance(payload, accountId).Json().
 /// </summary>
+/// TODO: Refactor static methods
 internal sealed class JsonAccountBalance : IAccountBalance
 {
     private readonly string _payload;

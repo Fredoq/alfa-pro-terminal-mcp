@@ -5,7 +5,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using Microsoft.Extensions.Configuration;

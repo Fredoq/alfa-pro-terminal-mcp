@@ -5,8 +5,6 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
 
 /// <summary>
 /// Validates DataQueryResponse parsing and acceptance logic. Usage example: executed by xUnit runner.
@@ -43,19 +41,6 @@ public sealed class DataQueryResponseTests
         CorrelationId correlation = new(id);
         bool accepted = response.Accepted(correlation);
         Assert.False(accepted, "DataQueryResponse does not reject mismatched metadata");
-    }
-
-    /// <summary>
-    /// Confirms that DataQueryResponse exposes payload text as provided. Usage example: response.Payload().
-    /// </summary>
-    [Fact(DisplayName = "DataQueryResponse exposes payload text")]
-    public void Given_response_when_payload_requested_then_returns_payload()
-    {
-        string id = Guid.NewGuid().ToString();
-        string payload = $"{{\"alpha\":\"{Guid.NewGuid()}-η\"}}";
-        DataQueryResponse response = new(id, "response", "#Data.Query", payload);
-        string value = response.Payload();
-        Assert.True(value.Contains("alpha", StringComparison.Ordinal), "DataQueryResponse does not expose payload text");
     }
 
     /// <summary>

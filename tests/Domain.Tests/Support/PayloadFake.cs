@@ -3,7 +3,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests.Support;
 
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
 /// <summary>
 /// Supplies deterministic payload text for routing tests. Usage example: new PayloadFake("abc").AsString().

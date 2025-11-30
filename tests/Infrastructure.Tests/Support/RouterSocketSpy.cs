@@ -3,7 +3,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 using System.Runtime.CompilerServices;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
 /// <summary>
 /// Captures payloads sent through IRouterSocket. Usage example: new RouterSocketSpy().

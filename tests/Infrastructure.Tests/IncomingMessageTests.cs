@@ -2,7 +2,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 /// <summary>
