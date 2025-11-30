@@ -1,9 +1,6 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
-
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
-
 /// <summary>
 /// Supplies routing data for IncomingMessage tests. Usage example: new RoutingFake("text").
 /// </summary>

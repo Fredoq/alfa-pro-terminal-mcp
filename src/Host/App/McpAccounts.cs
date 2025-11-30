@@ -4,10 +4,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 using System.ComponentModel;
-using System.Threading;
 using System.Threading.Tasks;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 

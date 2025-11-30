@@ -3,9 +3,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
-
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
-
 /// <summary>
 /// Supplies correlation identifier for outbound requests. Usage example: new IncomingStub(id).
 /// </summary>

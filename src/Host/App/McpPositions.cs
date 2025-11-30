@@ -34,4 +34,10 @@ internal sealed class McpPositions
     /// </summary>
     [McpServerTool, Description("Returns positions for the given account id with field descriptions.")]
     public async Task<string> Positions(long accountId) => (await new WsPositions(_routerSocket, _logger).Entries(accountId)).Json();
+
+    /// <summary>
+    /// Returns asset infos for the provided identifiers with field descriptions. Usage example: string json = await tool.Info(new[] { 1L, 2L }).
+    /// </summary>
+    [McpServerTool, Description("Returns asset info list for the given object identifiers with field descriptions.")]
+    public async Task<string> Info(long[] idObjects) => (await new WsAssetsInfo(_routerSocket, _logger).Info(idObjects)).Json();
 }

@@ -6,18 +6,18 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
 /// <summary>
-/// Retrieves a response for client positions request. Usage example: string payload = await response.NextMessage(token);.
+/// Retrieves a response for asset info request. Usage example: string payload = await response.NextMessage(token);.
 /// </summary>
-internal sealed partial class ClientPositionEntityResponse : IOutboundMessages
+internal sealed partial class AssetInfoEntityResponse : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
     private readonly IRouterSocket _socket;
     private readonly ILogger _logger;
 
     /// <summary>
-    /// Builds the response reader. Usage example: var response = new ClientPositionEntityResponse(incoming, socket, logger).
+    /// Builds the response reader. Usage example: var response = new AssetInfoEntityResponse(incoming, socket, logger).
     /// </summary>
-    public ClientPositionEntityResponse(IIncomingMessage incoming, IRouterSocket socket, ILogger logger)
+    public AssetInfoEntityResponse(IIncomingMessage incoming, IRouterSocket socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(incoming);
         ArgumentNullException.ThrowIfNull(socket);

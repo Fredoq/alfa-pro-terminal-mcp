@@ -5,7 +5,6 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 /// <summary>

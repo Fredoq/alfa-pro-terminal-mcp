@@ -4,7 +4,6 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 
 /// <summary>
 /// Simulates router behavior for position requests by echoing a crafted response. Usage example: new PositionSocketFake(payload).

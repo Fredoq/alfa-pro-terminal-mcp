@@ -36,7 +36,7 @@ internal sealed partial class ClientBalanceEntityResponse : IOutboundMessages
         await foreach (string message in _socket.Messages(cancellationToken))
         {
             Received(_logger, message);
-            DataQueryResponse response = new(message);
+            HeartbeatResponse response = new(message, new DataQueryResponse(message));
             if (!response.Accepted(id))
             {
                 continue;

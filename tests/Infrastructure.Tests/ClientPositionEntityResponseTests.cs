@@ -2,9 +2,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
-using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// Verifies ClientPositionEntityResponse retrieves payloads from router stream. Usage example: executed by xUnit runner.
@@ -48,6 +46,26 @@ public sealed class ClientPositionEntityResponseTests
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         Task<string> action = response.NextMessage(source.Token);
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
+    }
+
+    /// <summary>
+    /// Ensures that ClientPositionEntityResponse skips heartbeat messages. Usage example: await response.NextMessage(token).
+    /// </summary>
+    [Fact(DisplayName = "ClientPositionEntityResponse ignores heartbeat messages")]
+    public async Task Given_heartbeat_before_response_when_next_message_then_returns_payload()
+    {
+        string id = Guid.NewGuid().ToString();
+        long account = RandomNumberGenerator.GetInt32(5_000, 15_000);
+        string payload = JsonSerializer.Serialize(new { Account = account, Name = $"сердцебиение-{Guid.NewGuid()}-ι" });
+        string heartbeat = "{\"heartbeat\":\"\"}";
+        string message = Build(id, payload, "#Data.Query");
+        await using RouterSocketSequence socket = new([heartbeat, message]);
+        IncomingStub incoming = new(id);
+        LoggerFake logger = new();
+        Messaging.Responses.ClientPositionEntityResponse response = new(incoming, socket, logger);
+        using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
+        string value = await response.NextMessage(source.Token);
+        Assert.True(value == payload, "ClientPositionEntityResponse does not ignore heartbeat messages");
     }
 
     /// <summary>
