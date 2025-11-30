@@ -32,7 +32,7 @@ jobs:
       - name: Test
         run: dotnet test Alfa.ProTerminal.Mcp.slnx --configuration Release --no-build --verbosity normal
       - name: Pack NuGet
-        run: dotnet pack src/Host/Host.csproj --configuration Release --no-build --output artifacts
+        run: dotnet pack src/Host/Host.csproj --configuration Release --output artifacts
       - name: Publish NuGet
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
