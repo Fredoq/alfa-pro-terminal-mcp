@@ -39,4 +39,17 @@ internal sealed class McpPositions
     /// </summary>
     [McpServerTool, Description("Returns asset info list for the given object identifiers with field descriptions.")]
     public async Task<string> Info(long[] idObjects) => (await new WsAssetsInfo(_routerSocket, _logger).Info(idObjects)).Json();
+
+    /// <summary>
+    /// Returns archive candles for the specified parameters with field descriptions. Usage example: string json = await tool.History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow).
+    /// </summary>
+    [McpServerTool, Description("Returns archive candles for given instrument, candle type, interval, period, first day and last day with field descriptions.")]
+    public async Task<string> History(
+        [Description("Financial instrument identifier.")] long idFi,
+        [Description("Candle kind: 0 for OHLCV, 2 for MPV.")] int candleType,
+        [Description("Timeframe unit: second, minute, hour, day, week or month.")] string interval,
+        [Description("Interval multiplier matching the interval unit.")] int period,
+        [Description("First requested trading day inclusive.")] DateTime firstDay,
+        [Description("Last requested trading day inclusive.")] DateTime lastDay)
+        => (await new WsArchive(_routerSocket, _logger).History(idFi, candleType, interval, period, firstDay, lastDay)).Json();
 }
