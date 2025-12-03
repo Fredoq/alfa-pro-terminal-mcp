@@ -5,12 +5,12 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
 
 /// <summary>
-/// Builds asset infos from JSON payload. Usage example: string json = new JsonAssetInfosEntries(payload, ids).Json().
+/// Builds asset infos from JSON payload. Usage example: string json = new JsonAssetInfosEntries(payload, filter).Json().
 /// </summary>
 internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
 {
     private readonly string _payload;
-    private readonly HashSet<long> _ids;
+    private readonly IAssetFilter _filter;
     private static readonly Dictionary<string, string> _descriptions = new Dictionary<string, string>
     {
         ["IdObject"] = "Asset identifier",
@@ -32,14 +32,13 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
     };
 
     /// <summary>
-    /// Creates parsing behavior for asset infos. Usage example: var infos = new JsonAssetInfosEntries(payload, ids).
+    /// Creates parsing behavior for asset infos. Usage example: var infos = new JsonAssetInfosEntries(payload, filter).
     /// </summary>
-    public JsonAssetInfosEntries(string payload, IEnumerable<long> ids)
+    public JsonAssetInfosEntries(string payload, IAssetFilter filter)
     {
         ArgumentException.ThrowIfNullOrEmpty(payload);
-        ArgumentNullException.ThrowIfNull(ids);
         _payload = payload;
-        _ids = new HashSet<long>(ids);
+        _filter = filter ?? throw new ArgumentNullException(nameof(filter));
     }
 
     /// <summary>
@@ -60,8 +59,7 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         JsonArray list = [];
         foreach (JsonElement node in data.EnumerateArray())
         {
-            long id = Integer(node, "IdObject");
-            if (!_ids.Contains(id))
+            if (!_filter.Filtered(node))
             {
                 continue;
             }
@@ -74,6 +72,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return JsonSerializer.Serialize(list);
     }
 
+    /// <summary>
+    /// Builds described JSON entry from payload node. Usage example: JsonObject entry = Entry(node);.
+    /// </summary>
     private static JsonObject Entry(JsonElement node)
     {
         JsonObject entry = new();
@@ -92,6 +93,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return entry;
     }
 
+    /// <summary>
+    /// Builds instruments collection with descriptions. Usage example: JsonArray array = Instruments(node);.
+    /// </summary>
     private static JsonArray Instruments(JsonElement node)
     {
         JsonArray array = [];
@@ -111,6 +115,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return array;
     }
 
+    /// <summary>
+    /// Creates described field node. Usage example: JsonObject field = Field(value, description);.
+    /// </summary>
     private static JsonObject Field<T>(T value, string description) where T : notnull
     {
         JsonObject field = new();
@@ -119,6 +126,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return field;
     }
 
+    /// <summary>
+    /// Extracts integer property from payload. Usage example: long id = Integer(node, "IdObject");.
+    /// </summary>
     private static long Integer(JsonElement node, string property)
     {
         if (!node.TryGetProperty(property, out JsonElement value))
@@ -132,6 +142,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return value.GetInt64();
     }
 
+    /// <summary>
+    /// Extracts string property from payload. Usage example: string ticker = String(node, "Ticker");.
+    /// </summary>
     private static string String(JsonElement node, string property)
     {
         if (!node.TryGetProperty(property, out JsonElement value))
@@ -149,6 +162,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         throw new InvalidOperationException($"{property} is missing");
     }
 
+    /// <summary>
+    /// Extracts double property from payload. Usage example: double nominal = Double(node, "Nominal");.
+    /// </summary>
     private static double Double(JsonElement node, string property)
     {
         if (!node.TryGetProperty(property, out JsonElement value))
@@ -162,6 +178,9 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         return value.GetDouble();
     }
 
+    /// <summary>
+    /// Extracts boolean property from payload. Usage example: bool liquid = Bool(node, "IsLiquid");.
+    /// </summary>
     private static bool Bool(JsonElement node, string property)
     {
         if (!node.TryGetProperty(property, out JsonElement value))

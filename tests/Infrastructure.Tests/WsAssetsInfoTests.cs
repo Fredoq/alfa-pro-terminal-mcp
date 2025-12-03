@@ -89,4 +89,63 @@ public sealed class WsAssetsInfoTests
         Task<string> action = Task.Run(async () => (await infos.Info(new[] { id })).Json());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
+
+    /// <summary>
+    /// Ensures that WsAssetsInfo returns JSON containing requested assets by ticker. Usage example: await infos.InfoByTickers(tickers, token).
+    /// </summary>
+    [Fact(DisplayName = "WsAssetsInfo returns asset infos json for matching tickers")]
+    public async Task Given_asset_response_when_ticker_requested_then_returns_json()
+    {
+        string ticker = $"tk{RandomNumberGenerator.GetInt32(901, 999)}z";
+        string payload = JsonSerializer.Serialize(new
+        {
+            Data = new object[]
+            {
+                new
+                {
+                    IdObject = RandomNumberGenerator.GetInt32(90_100, 90_999),
+                    Ticker = ticker,
+                    ISIN = "I1",
+                    Name = "N1",
+                    Description = "D1",
+                    Nominal = 2.5,
+                    IdObjectType = 2,
+                    IdObjectGroup = 3,
+                    IdObjectBase = 4,
+                    IdObjectFaceUnit = 5,
+                    MatDateObject = "2026-07-07",
+                    Instruments = new object[]
+                    {
+                        new { IdFi = 12, RCode = "R12", IsLiquid = true, IdMarketBoard = 8 }
+                    }
+                },
+                new
+                {
+                    IdObject = RandomNumberGenerator.GetInt32(91_000, 91_900),
+                    Ticker = "SKIP99",
+                    ISIN = "I2",
+                    Name = "N2",
+                    Description = "D2",
+                    Nominal = 1.1,
+                    IdObjectType = 1,
+                    IdObjectGroup = 1,
+                    IdObjectBase = 1,
+                    IdObjectFaceUnit = 1,
+                    MatDateObject = "2026-08-08",
+                    Instruments = new object[]
+                    {
+                        new { IdFi = 99, RCode = "R99", IsLiquid = false, IdMarketBoard = 1 }
+                    }
+                }
+            }
+        });
+        await using AssetSocketFake socket = new(payload);
+        LoggerFake logger = new();
+        WsAssetsInfo infos = new(socket, logger);
+        string json = (await infos.InfoByTickers(new[] { ticker.ToUpperInvariant() })).Json();
+        using JsonDocument document = JsonDocument.Parse(json);
+        JsonElement entry = document.RootElement[0];
+        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetProperty("value").GetInt64() == 12;
+        Assert.True(result, "WsAssetsInfo does not return asset infos json for matching tickers");
+    }
 }
