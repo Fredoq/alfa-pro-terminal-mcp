@@ -63,7 +63,7 @@ public sealed class JsonAssetInfosEntriesTests
                 }
             }
         });
-        JsonAssetInfosEntries entries = new(payload, new[] { id });
+        JsonAssetInfosEntries entries = new(payload, new AssetIdsScope([id]));
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
@@ -103,8 +103,8 @@ public sealed class JsonAssetInfosEntriesTests
                 }
             }
         });
-        JsonAssetInfosEntries entries = new(payload, new[] { id });
-        ConcurrentBag<string> results = new();
+        JsonAssetInfosEntries entries = new(payload, new AssetIdsScope([id]));
+        ConcurrentBag<string> results = [];
         Parallel.For(0, 5, _ => results.Add(entries.Json()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
@@ -142,7 +142,7 @@ public sealed class JsonAssetInfosEntriesTests
                 }
             }
         });
-        JsonAssetInfosEntries entries = new(payload, new[] { id });
+        JsonAssetInfosEntries entries = new(payload, new AssetIdsScope(new[] { id }));
         Assert.Throws<InvalidOperationException>(() => entries.Json());
     }
 }

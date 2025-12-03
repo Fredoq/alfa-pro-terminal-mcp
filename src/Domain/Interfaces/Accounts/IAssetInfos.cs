@@ -12,4 +12,12 @@ public interface IAssetInfos
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Asset infos entries.</returns>
     Task<IAssetInfosEntries> Info(IEnumerable<long> ids, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns asset infos for given tickers. Usage example: var assets = await infos.InfoByTickers(tickers, token);.
+    /// </summary>
+    /// <param name="tickers">Collection of asset tickers.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Asset infos entries.</returns>
+    Task<IAssetInfosEntries> InfoByTickers(IEnumerable<string> tickers, CancellationToken cancellationToken = default);
 }

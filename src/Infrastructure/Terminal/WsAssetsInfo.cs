@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
@@ -28,6 +29,12 @@ public sealed class WsAssetsInfo : IAssetInfos
     /// <summary>
     /// Returns asset infos for the given identifiers. Usage example: string json = (await info.Info(ids)).Json();.
     /// </summary>
-    public async Task<IAssetInfosEntries> Info(IEnumerable<long> ids, CancellationToken cancellationToken = default)
-        => new JsonAssetInfosEntries(await _outbound.NextMessage(cancellationToken), ids);
+    public async Task<IAssetInfosEntries> Info([Description("Collection of IdObject values to extract")] IEnumerable<long> ids, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
+        => new JsonAssetInfosEntries(await _outbound.NextMessage(cancellationToken), new AssetIdsScope(ids));
+
+    /// <summary>
+    /// Returns asset infos for the given tickers. Usage example: string json = (await info.InfoByTickers(tickers)).Json();.
+    /// </summary>
+    public async Task<IAssetInfosEntries> InfoByTickers([Description("Tickers of assets to extract")] IEnumerable<string> tickers, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
+        => new JsonAssetInfosEntries(await _outbound.NextMessage(cancellationToken), new AssetTickersScope(tickers));
 }
