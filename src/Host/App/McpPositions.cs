@@ -38,12 +38,18 @@ internal sealed class McpPositions
     /// Returns asset infos for the provided identifiers with field descriptions. Usage example: string json = await tool.Info(new[] { 1L, 2L }).
     /// </summary>
     [McpServerTool, Description("Returns asset info list for the given object identifiers with field descriptions.")]
-    public async Task<string> Info(long[] idObjects) => (await new WsAssetsInfo(_routerSocket, _logger).Info(idObjects)).Json();
+    public async Task<string> Info([Description("Collection of IdObject values to extract.")] long[] idObjects) => (await new WsAssetsInfo(_routerSocket, _logger).Info(idObjects)).Json();
+
+    /// <summary>
+    /// Returns asset infos for the provided tickers with field descriptions. Usage example: string json = await tool.InfoByTickers(new[] { "AFLT", "GAZP" }).
+    /// </summary>
+    [McpServerTool, Description("Returns asset info list for the given ticker symbols with field descriptions.")]
+    public async Task<string> InfoByTickers([Description("Collection of ticker symbols to extract.")] string[] tickers) => (await new WsAssetsInfo(_routerSocket, _logger).InfoByTickers(tickers)).Json();
 
     /// <summary>
     /// Returns archive candles for the specified parameters with field descriptions. Usage example: string json = await tool.History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow).
     /// </summary>
-    [McpServerTool, Description("Returns archive candles for given instrument, candle type, interval, period, first day and last day with field descriptions.")]
+    [McpServerTool, Description("Returns archive candles for given instrument, candle type, interval, period, first day and last day with field descriptions. Prefer explicit timestamps for firstDay/lastDay, for example \"lastDay\": \"2025-12-08T23:59:00+03:00\".")]
     public async Task<string> History(
         [Description("Financial instrument identifier.")] long idFi,
         [Description("Candle kind: 0 for OHLCV, 2 for MPV.")] int candleType,
