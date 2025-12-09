@@ -1,5 +1,3 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
-
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Net;

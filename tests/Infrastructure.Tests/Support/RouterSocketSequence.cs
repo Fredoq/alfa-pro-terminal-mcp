@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Yields a predefined sequence of router messages. Usage example: new RouterSocketSequence(list).
 /// </summary>
-internal sealed class RouterSocketSequence : IRouterSocket
+internal sealed class RouterSocketSequence : ITerminal
 {
     private readonly Queue<string> messages;
 

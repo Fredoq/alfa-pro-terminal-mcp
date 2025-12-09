@@ -14,13 +14,13 @@ using ModelContextProtocol.Server;
 [McpServerToolType]
 internal sealed class McpPositions
 {
-    private readonly IRouterSocket _routerSocket;
+    private readonly ITerminal _routerSocket;
     private readonly ILogger<McpPositions> _logger;
 
     /// <summary>
     /// Creates a MCP positions tool. Usage example: var tool = new McpPositions(socket, logger).
     /// </summary>
-    public McpPositions(IRouterSocket routerSocket, ILogger<McpPositions> logger)
+    public McpPositions(ITerminal routerSocket, ILogger<McpPositions> logger)
     {
         ArgumentNullException.ThrowIfNull(routerSocket);
         ArgumentNullException.ThrowIfNull(logger);

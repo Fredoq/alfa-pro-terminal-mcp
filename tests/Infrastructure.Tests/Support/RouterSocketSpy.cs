@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Captures payloads sent through IRouterSocket. Usage example: new RouterSocketSpy().
 /// </summary>
-internal sealed class RouterSocketSpy : IRouterSocket
+internal sealed class RouterSocketSpy : ITerminal
 {
     private readonly TaskCompletionSource<string> payload;
 

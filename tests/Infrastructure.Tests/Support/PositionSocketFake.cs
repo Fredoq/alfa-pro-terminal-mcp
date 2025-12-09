@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for position requests by echoing a crafted response. Usage example: new PositionSocketFake(payload).
 /// </summary>
-internal sealed class PositionSocketFake : IRouterSocket
+internal sealed class PositionSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly TaskCompletionSource<string> requestId;

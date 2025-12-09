@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Captures router connection attempts without network traffic. Usage example: new RouterSocketProbe().
 /// </summary>
-internal sealed class RouterSocketProbe : IRouterSocket
+internal sealed class RouterSocketProbe : ITerminal
 {
     private readonly TaskCompletionSource<Uri> endpoint;
 

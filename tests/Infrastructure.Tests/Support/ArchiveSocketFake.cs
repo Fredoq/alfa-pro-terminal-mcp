@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for archive requests by echoing crafted responses. Usage example: new ArchiveSocketFake(payload, true).
 /// </summary>
-internal sealed class ArchiveSocketFake : IRouterSocket
+internal sealed class ArchiveSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly bool includeHeartbeat;

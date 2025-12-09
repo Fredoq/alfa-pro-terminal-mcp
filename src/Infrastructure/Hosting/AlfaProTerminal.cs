@@ -3,36 +3,43 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
-/// Maintains a single WebSocket connection to the terminal router. Usage example: var socket = new RouterSocket(); await socket.Connect(new Uri("ws://127.0.0.1:3366/router/"), token); await socket.Send("{\"Command\":\"listen\",\"Channel\":\"#Data.Bus.ObjectEntity\"}", token); await foreach (var message in socket.Messages(token)) { /* process */ }; await socket.Close(token).
+/// Ensures router connection is established at startup. Usage example: registered as hosted service.
 /// </summary>
-internal sealed class RouterSocket : IRouterSocket
+internal sealed class AlfaProTerminal : IHostedService, ITerminal
 {
+    private readonly IOptions<TerminalOptions> _options;
     private readonly ClientWebSocket _socket;
     private readonly Channel<ArraySegment<byte>> _outbound;
-    private readonly TimeSpan _timeout;
 
     /// <summary>
-    /// Initializes the socket wrapper with outbound buffering. Usage example: var socket = new RouterSocket().
+    /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(options).
     /// </summary>
-    public RouterSocket()
+    /// <param name="options">Terminal options</param>
+    public AlfaProTerminal(IOptions<TerminalOptions> options) : this(options, new ClientWebSocket(), Channel.CreateUnbounded<ArraySegment<byte>>())
     {
-        _socket = new ClientWebSocket();
-        _outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        _timeout = TimeSpan.FromSeconds(5);
     }
 
     /// <summary>
-    /// Opens a connection to the router endpoint. Usage example: await socket.Connect(new Uri("ws://127.0.0.1:3366/router/"), token).
+    /// Creates the hosted service with a custom socket. Usage example: new AlfaProTerminal(options, socket).
     /// </summary>
-    public async Task Connect(Uri endpoint, CancellationToken cancellationToken)
+    /// <param name="options">Terminal options</param>
+    /// <param name="socket">Client WebSocket instance</param>
+    /// <param name="outbound">Outbound message channel</param>
+    public AlfaProTerminal(IOptions<TerminalOptions> options, ClientWebSocket socket, Channel<ArraySegment<byte>> outbound)
     {
-        ArgumentNullException.ThrowIfNull(endpoint);
-        await _socket.ConnectAsync(endpoint, cancellationToken);
-        _ = Task.Run(() => Pump(cancellationToken), cancellationToken);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(socket);
+        ArgumentNullException.ThrowIfNull(outbound);
+        _options = options;
+        _socket = socket;
+        _outbound = outbound;
     }
 
     /// <summary>
@@ -78,9 +85,22 @@ internal sealed class RouterSocket : IRouterSocket
     }
 
     /// <summary>
-    /// Closes the connection gracefully. Usage example: await socket.Close(token).
+    /// Connects to the router when the host starts. Usage example: called by infrastructure.
     /// </summary>
-    public async Task Close(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (!Uri.TryCreate(_options.Value.Endpoint, UriKind.Absolute, out Uri? parsed))
+        {
+            throw new InvalidOperationException("Terminal endpoint is invalid");
+        }
+        await _socket.ConnectAsync(parsed, cancellationToken);
+        _ = Pump(cancellationToken);
+    }
+
+    /// <summary>
+    /// Closes terminal connection on shutdown. Usage example: called by infrastructure.
+    /// </summary>
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
         _outbound.Writer.TryComplete();
         if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
@@ -90,17 +110,17 @@ internal sealed class RouterSocket : IRouterSocket
     }
 
     /// <summary>
-    /// Disposes the socket by requesting closure first. Usage example: await socket.DisposeAsync().
+    /// Disposes the WebSocket instance. Usage example: called by infrastructure.
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        using CancellationTokenSource source = new(_timeout);
-        await Close(source.Token);
+        using CancellationTokenSource source = new(_options.Value.Timeout);
+        await StopAsync(source.Token);
         _socket.Dispose();
     }
 
     /// <summary>
-    /// Pumps queued outbound messages to the router. Usage example: invoked automatically after Connect.
+    /// Pumps queued outbound messages to the terminal. Usage example: invoked automatically after Connect.
     /// </summary>
     private async Task Pump(CancellationToken cancellationToken)
     {

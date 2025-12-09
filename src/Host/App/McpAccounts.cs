@@ -14,13 +14,13 @@ using ModelContextProtocol.Server;
 [McpServerToolType]
 internal sealed class McpAccounts
 {
-    private readonly IRouterSocket _routerSocket;
+    private readonly ITerminal _routerSocket;
     private readonly ILogger<McpAccounts> _logger;
 
     /// <summary>
     /// Creates a MCP terminal decorator. Usage example: var terminal = new McpTerminal(origin).
     /// </summary>
-    public McpAccounts(IRouterSocket routerSocket, ILogger<McpAccounts> logger)
+    public McpAccounts(ITerminal routerSocket, ILogger<McpAccounts> logger)
     {
         ArgumentNullException.ThrowIfNull(routerSocket);
         ArgumentNullException.ThrowIfNull(logger);

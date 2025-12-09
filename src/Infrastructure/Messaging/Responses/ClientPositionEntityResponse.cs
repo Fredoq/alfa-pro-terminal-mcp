@@ -11,13 +11,13 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 internal sealed partial class ClientPositionEntityResponse : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
-    private readonly IRouterSocket _socket;
+    private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
     /// <summary>
     /// Builds the response reader. Usage example: var response = new ClientPositionEntityResponse(incoming, socket, logger).
     /// </summary>
-    public ClientPositionEntityResponse(IIncomingMessage incoming, IRouterSocket socket, ILogger logger)
+    public ClientPositionEntityResponse(IIncomingMessage incoming, ITerminal socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(incoming);
         ArgumentNullException.ThrowIfNull(socket);

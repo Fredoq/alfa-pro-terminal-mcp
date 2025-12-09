@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for balance requests by echoing a crafted response. Usage example: new BalanceSocketFake(payload).
 /// </summary>
-internal sealed class BalanceSocketFake : IRouterSocket
+internal sealed class BalanceSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly TaskCompletionSource<string> requestId;

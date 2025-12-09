@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for asset info requests by echoing a crafted response. Usage example: new AssetSocketFake(payload).
 /// </summary>
-internal sealed class AssetSocketFake : IRouterSocket
+internal sealed class AssetSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly TaskCompletionSource<string> requestId;

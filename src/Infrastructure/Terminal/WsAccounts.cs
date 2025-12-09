@@ -12,7 +12,7 @@ public sealed class WsAccounts : IAccounts
 {
     private readonly IOutboundMessages _outbound;
 
-    public WsAccounts(IRouterSocket routerSocket, ILogger logger)
+    public WsAccounts(ITerminal routerSocket, ILogger logger)
         : this(new Messaging.Responses.ClientAccountsEntityResponse(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ClientAccountsEntity()), routerSocket, logger), routerSocket, logger))
     {
     }

@@ -29,8 +29,8 @@ public sealed class ServiceCollectionExtensionsTests
         ServiceCollection services = new();
         services.Register(configuration);
         await using ServiceProvider provider = services.BuildServiceProvider(true);
-        IRouterSocket socket = provider.GetRequiredService<IRouterSocket>();
-        RouterOptions options = provider.GetRequiredService<IOptions<RouterOptions>>().Value;
+        ITerminal socket = provider.GetRequiredService<ITerminal>();
+        TerminalOptions options = provider.GetRequiredService<IOptions<TerminalOptions>>().Value;
         bool registered = socket is not null && options.Endpoint == endpoint;
         Assert.True(registered, "ServiceCollectionExtensions does not register router socket and options");
     }
@@ -44,8 +44,8 @@ public sealed class ServiceCollectionExtensionsTests
         int port = RandomNumberGenerator.GetInt32(11_000, 58_000);
         Uri endpoint = new($"ws://127.0.0.1:{port}/router/");
         await using RouterSocketProbe socket = new();
-        IOptions<RouterOptions> options = Options.Create(new RouterOptions { Endpoint = endpoint.ToString() });
-        ConnectRouterHostedService service = new(socket, options);
+        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = endpoint.ToString() });
+        AlfaProTerminal service = new(socket, options);
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         await service.StartAsync(source.Token);
         bool connected = socket.Endpoint == endpoint;
@@ -60,8 +60,8 @@ public sealed class ServiceCollectionExtensionsTests
     public async Task Given_invalid_endpoint_when_host_starts_then_throws()
     {
         await using RouterSocketProbe socket = new();
-        IOptions<RouterOptions> options = Options.Create(new RouterOptions { Endpoint = "not-a-uri" });
-        ConnectRouterHostedService service = new(socket, options);
+        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = "not-a-uri" });
+        AlfaProTerminal service = new(socket, options);
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await service.StartAsync(CancellationToken.None));
     }
 }
