@@ -21,11 +21,6 @@ internal sealed class RouterSocketSequence : ITerminal
     }
 
     /// <summary>
-    /// Simulates router connection. Usage example: await socket.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
-
-    /// <summary>
     /// Ignores outbound payloads. Usage example: await socket.Send(text, token).
     /// </summary>
     public Task Send(string payload, CancellationToken cancellationToken) => payload is null ? throw new ArgumentNullException(nameof(payload)) : Task.CompletedTask;
@@ -42,11 +37,6 @@ internal sealed class RouterSocketSequence : ITerminal
             yield return message;
         }
     }
-
-    /// <summary>
-    /// Simulates closure of router connection. Usage example: await socket.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes the sequence. Usage example: await socket.DisposeAsync().

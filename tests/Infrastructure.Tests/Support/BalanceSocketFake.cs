@@ -24,11 +24,6 @@ internal sealed class BalanceSocketFake : ITerminal
     }
 
     /// <summary>
-    /// Simulates router connection. Usage example: await socket.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
-
-    /// <summary>
     /// Captures routing request identifier. Usage example: await socket.Send(json, token).
     /// </summary>
     public Task Send(string payload, CancellationToken cancellationToken)
@@ -49,11 +44,6 @@ internal sealed class BalanceSocketFake : ITerminal
         string message = Build(id, responsePayload);
         yield return message;
     }
-
-    /// <summary>
-    /// Simulates closure. Usage example: await socket.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes resources. Usage example: await socket.DisposeAsync().

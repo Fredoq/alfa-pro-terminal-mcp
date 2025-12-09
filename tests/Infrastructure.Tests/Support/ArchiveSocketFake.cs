@@ -22,8 +22,6 @@ internal sealed class ArchiveSocketFake : ITerminal
         requestId = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
-
     public Task Send(string payload, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(payload);
@@ -43,8 +41,6 @@ internal sealed class ArchiveSocketFake : ITerminal
         string message = Build(id, responsePayload);
         yield return message;
     }
-
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 

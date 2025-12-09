@@ -25,11 +25,6 @@ internal sealed class RouterSocketSpy : ITerminal
     public string Payload => payload.Task.IsCompleted ? payload.Task.Result : string.Empty;
 
     /// <summary>
-    /// Simulates router connection. Usage example: await spy.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
-
-    /// <summary>
     /// Records outbound payload. Usage example: await spy.Send("text", token).
     /// </summary>
     public Task Send(string payload, CancellationToken cancellationToken)
@@ -47,11 +42,6 @@ internal sealed class RouterSocketSpy : ITerminal
         await Task.CompletedTask;
         yield break;
     }
-
-    /// <summary>
-    /// Simulates close operation. Usage example: await spy.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes the spy. Usage example: await spy.DisposeAsync().
