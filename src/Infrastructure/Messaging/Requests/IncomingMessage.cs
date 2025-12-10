@@ -13,13 +13,13 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Requests;
 internal sealed partial class IncomingMessage : IIncomingMessage
 {
     private readonly IRouting _routing;
-    private readonly IRouterSocket _socket;
+    private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
     /// <summary>
     /// Builds the incoming message sender. Usage example: var sender = new IncomingMessage(routing, socket).
     /// </summary>
-    public IncomingMessage(IRouting routing, IRouterSocket socket, ILogger logger)
+    public IncomingMessage(IRouting routing, ITerminal socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(routing);
         ArgumentNullException.ThrowIfNull(socket);

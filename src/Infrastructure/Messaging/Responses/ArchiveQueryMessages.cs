@@ -11,10 +11,10 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 internal sealed partial class ArchiveQueryMessages : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
-    private readonly IRouterSocket _socket;
+    private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
-    public ArchiveQueryMessages(IIncomingMessage incoming, IRouterSocket socket, ILogger logger)
+    public ArchiveQueryMessages(IIncomingMessage incoming, ITerminal socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(incoming);
         ArgumentNullException.ThrowIfNull(socket);

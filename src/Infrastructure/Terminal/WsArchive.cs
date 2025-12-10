@@ -14,10 +14,10 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 /// </summary>
 public sealed class WsArchive : IArchive
 {
-    private readonly IRouterSocket _socket;
+    private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
-    public WsArchive(IRouterSocket routerSocket, ILogger logger)
+    public WsArchive(ITerminal routerSocket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(routerSocket);
         ArgumentNullException.ThrowIfNull(logger);

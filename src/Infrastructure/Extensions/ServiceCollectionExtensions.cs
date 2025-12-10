@@ -1,9 +1,10 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Sockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
 /// <summary>
@@ -19,12 +20,17 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
         return services
-            .AddOptions<RouterOptions>()
-            .Bind(configuration.GetSection("Router"))
-            .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _), "Router endpoint is invalid")
+            .AddOptions<TerminalOptions>()
+            .Bind(configuration.GetSection("Terminal"))
+            .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _), "Terminal endpoint is invalid")
             .ValidateOnStart()
             .Services
-            .AddSingleton<IRouterSocket, RouterSocket>()
-            .AddHostedService<ConnectRouterHostedService>();
+            .AddSingleton(sp =>
+            {
+                IOptions<TerminalOptions> options = sp.GetRequiredService<IOptions<TerminalOptions>>();
+                return new AlfaProTerminal(options);
+            })
+            .AddSingleton<ITerminal>(sp => sp.GetRequiredService<AlfaProTerminal>())
+            .AddSingleton<IHostedService>(sp => sp.GetRequiredService<AlfaProTerminal>());
     }
 }

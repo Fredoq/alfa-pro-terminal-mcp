@@ -11,13 +11,13 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 internal sealed partial class ClientAccountsEntityResponse : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
-    private readonly IRouterSocket _socket;
+    private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
     /// <summary>
     /// Builds the response reader. Usage example: var response = new ClientAccountsEntityResponse(incoming, messages, logger).
     /// </summary>
-    public ClientAccountsEntityResponse(IIncomingMessage incoming, IRouterSocket socket, ILogger logger)
+    public ClientAccountsEntityResponse(IIncomingMessage incoming, ITerminal socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(incoming);
         ArgumentNullException.ThrowIfNull(socket);

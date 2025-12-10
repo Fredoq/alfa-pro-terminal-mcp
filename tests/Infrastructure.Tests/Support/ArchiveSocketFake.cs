@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for archive requests by echoing crafted responses. Usage example: new ArchiveSocketFake(payload, true).
 /// </summary>
-internal sealed class ArchiveSocketFake : IRouterSocket
+internal sealed class ArchiveSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly bool includeHeartbeat;
@@ -21,8 +21,6 @@ internal sealed class ArchiveSocketFake : IRouterSocket
         this.includeHeartbeat = includeHeartbeat;
         requestId = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
-
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
 
     public Task Send(string payload, CancellationToken cancellationToken)
     {
@@ -43,8 +41,6 @@ internal sealed class ArchiveSocketFake : IRouterSocket
         string message = Build(id, responsePayload);
         yield return message;
     }
-
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 

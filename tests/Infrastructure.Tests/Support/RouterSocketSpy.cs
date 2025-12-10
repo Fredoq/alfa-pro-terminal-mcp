@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Captures payloads sent through IRouterSocket. Usage example: new RouterSocketSpy().
 /// </summary>
-internal sealed class RouterSocketSpy : IRouterSocket
+internal sealed class RouterSocketSpy : ITerminal
 {
     private readonly TaskCompletionSource<string> payload;
 
@@ -23,11 +23,6 @@ internal sealed class RouterSocketSpy : IRouterSocket
     /// Gets the last payload sent. Usage example: var payload = spy.Payload.
     /// </summary>
     public string Payload => payload.Task.IsCompleted ? payload.Task.Result : string.Empty;
-
-    /// <summary>
-    /// Simulates router connection. Usage example: await spy.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
 
     /// <summary>
     /// Records outbound payload. Usage example: await spy.Send("text", token).
@@ -47,11 +42,6 @@ internal sealed class RouterSocketSpy : IRouterSocket
         await Task.CompletedTask;
         yield break;
     }
-
-    /// <summary>
-    /// Simulates close operation. Usage example: await spy.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes the spy. Usage example: await spy.DisposeAsync().

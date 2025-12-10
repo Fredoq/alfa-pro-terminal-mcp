@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Yields a predefined sequence of router messages. Usage example: new RouterSocketSequence(list).
 /// </summary>
-internal sealed class RouterSocketSequence : IRouterSocket
+internal sealed class RouterSocketSequence : ITerminal
 {
     private readonly Queue<string> messages;
 
@@ -19,11 +19,6 @@ internal sealed class RouterSocketSequence : IRouterSocket
         ArgumentNullException.ThrowIfNull(messages);
         this.messages = new Queue<string>(messages);
     }
-
-    /// <summary>
-    /// Simulates router connection. Usage example: await socket.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
 
     /// <summary>
     /// Ignores outbound payloads. Usage example: await socket.Send(text, token).
@@ -42,11 +37,6 @@ internal sealed class RouterSocketSequence : IRouterSocket
             yield return message;
         }
     }
-
-    /// <summary>
-    /// Simulates closure of router connection. Usage example: await socket.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes the sequence. Usage example: await socket.DisposeAsync().

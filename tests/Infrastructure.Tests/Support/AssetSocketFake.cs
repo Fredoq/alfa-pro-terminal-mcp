@@ -8,7 +8,7 @@ using System.Text.Json;
 /// <summary>
 /// Simulates router behavior for asset info requests by echoing a crafted response. Usage example: new AssetSocketFake(payload).
 /// </summary>
-internal sealed class AssetSocketFake : IRouterSocket
+internal sealed class AssetSocketFake : ITerminal
 {
     private readonly string responsePayload;
     private readonly TaskCompletionSource<string> requestId;
@@ -22,11 +22,6 @@ internal sealed class AssetSocketFake : IRouterSocket
         responsePayload = payload;
         requestId = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
-
-    /// <summary>
-    /// Simulates router connection. Usage example: await socket.Connect(uri, token).
-    /// </summary>
-    public Task Connect(Uri endpoint, CancellationToken cancellationToken) => endpoint is null ? throw new ArgumentNullException(nameof(endpoint)) : Task.CompletedTask;
 
     /// <summary>
     /// Captures routing request identifier. Usage example: await socket.Send(json, token).
@@ -49,11 +44,6 @@ internal sealed class AssetSocketFake : IRouterSocket
         string message = Build(id, responsePayload);
         yield return message;
     }
-
-    /// <summary>
-    /// Simulates closure. Usage example: await socket.Close(token).
-    /// </summary>
-    public Task Close(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Disposes resources. Usage example: await socket.DisposeAsync().
