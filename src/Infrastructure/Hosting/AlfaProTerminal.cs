@@ -94,7 +94,7 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
             throw new InvalidOperationException("Terminal endpoint is invalid");
         }
         await _socket.ConnectAsync(parsed, cancellationToken);
-        _ = Pump(cancellationToken);
+        _ = Pump(CancellationToken.None);
     }
 
     /// <summary>
@@ -103,6 +103,7 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         _outbound.Writer.TryComplete();
+        await _outbound.Reader.Completion.WaitAsync(cancellationToken);
         if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
         {
             await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "close requested", cancellationToken);
