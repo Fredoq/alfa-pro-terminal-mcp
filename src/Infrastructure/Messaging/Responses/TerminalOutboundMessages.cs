@@ -6,18 +6,18 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
 /// <summary>
-/// Retrieves a response for client accounts request. Usage example: IPayload payload = await response.Next(token);.
+/// Supplies outbound messages from the terminal stream. Usage example: var outbound = new TerminalOutboundMessages(incoming, socket, logger); string payload = await outbound.NextMessage(token);.
 /// </summary>
-internal sealed partial class ClientAccountsEntityResponse : IOutboundMessages
+internal sealed partial class TerminalOutboundMessages : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
     private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
     /// <summary>
-    /// Builds the response reader. Usage example: var response = new ClientAccountsEntityResponse(incoming, messages, logger).
+    /// Creates an outbound message reader. Usage example: var outbound = new TerminalOutboundMessages(incoming, socket, logger);.
     /// </summary>
-    public ClientAccountsEntityResponse(IIncomingMessage incoming, ITerminal socket, ILogger logger)
+    public TerminalOutboundMessages(IIncomingMessage incoming, ITerminal socket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(incoming);
         ArgumentNullException.ThrowIfNull(socket);
@@ -28,7 +28,7 @@ internal sealed partial class ClientAccountsEntityResponse : IOutboundMessages
     }
 
     /// <summary>
-    /// Returns payload of the response. Usage example: IPayload payload = await Next(token);.
+    /// Returns the next matching message payload. Usage example: string payload = await NextMessage(token);.
     /// </summary>
     public async Task<string> NextMessage(CancellationToken cancellationToken)
     {

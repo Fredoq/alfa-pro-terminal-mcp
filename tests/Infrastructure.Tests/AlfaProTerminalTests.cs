@@ -63,6 +63,32 @@ public sealed class AlfaProTerminalTests
     }
 
     /// <summary>
+    /// Verifies that pump keeps running after startup token cancellation. Usage example: cancel startup token then send payload.
+    /// </summary>
+    [Fact(DisplayName = "AlfaProTerminal pump ignores startup cancellation")]
+    public async Task Given_cancelled_startup_token_when_sending_then_pump_runs()
+    {
+        using CancellationTokenSource startup = new(TimeSpan.FromSeconds(5));
+        Uri http = new($"http://127.0.0.1:{Pick()}/pump/");
+        await using TestSocketHost host = new(http);
+        await host.Start(startup.Token);
+        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = host.Endpoint().ToString() });
+        using ClientWebSocket socket = new();
+        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
+        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        await terminal.StartAsync(startup.Token);
+        await startup.CancelAsync();
+        using CancellationTokenSource flow = new(TimeSpan.FromSeconds(5));
+        string payload = $"передача-{Guid.NewGuid()}-λ";
+        await terminal.Send(payload, flow.Token);
+        string received = await host.Read(flow.Token);
+        Task<WebSocketReceiveResult> acknowledgement = host.Acknowledge(flow.Token);
+        await terminal.StopAsync(flow.Token);
+        await acknowledgement;
+        Assert.True(received == payload, "AlfaProTerminal cancels pump after startup token");
+    }
+
+    /// <summary>
     /// Ensures that AlfaProTerminal yields incoming messages from host. Usage example: await foreach (var message in terminal.Messages(token)) { }.
     /// </summary>
     [Fact(DisplayName = "AlfaProTerminal yields incoming messages from host")]
@@ -113,3 +139,5 @@ public sealed class AlfaProTerminalTests
         return port;
     }
 }
+
+
