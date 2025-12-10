@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         return services
             .AddOptions<TerminalOptions>()
-            .Bind(configuration.GetSection("Router"))
+            .Bind(configuration.GetSection("Terminal"))
             .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _), "Router endpoint is invalid")
             .ValidateOnStart()
             .Services
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
                 IOptions<TerminalOptions> options = sp.GetRequiredService<IOptions<TerminalOptions>>();
                 return new AlfaProTerminal(options);
             })
-            .AddSingleton<ITerminal, AlfaProTerminal>()
+            .AddSingleton<ITerminal>(sp => sp.GetRequiredService<AlfaProTerminal>())
             .AddSingleton<IHostedService>(sp => sp.GetRequiredService<AlfaProTerminal>());
     }
 }
