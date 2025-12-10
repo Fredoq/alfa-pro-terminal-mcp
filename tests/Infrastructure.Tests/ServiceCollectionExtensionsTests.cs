@@ -25,7 +25,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         int port = RandomNumberGenerator.GetInt32(10_000, 60_000);
         string endpoint = $"ws://127.0.0.1:{port}/router/";
-        Dictionary<string, string?> settings = new() { ["Router:Endpoint"] = endpoint };
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = endpoint };
         IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
         ServiceCollection services = new();
         services.Register(configuration);
@@ -48,7 +48,7 @@ public sealed class ServiceCollectionExtensionsTests
         Uri http = new($"http://127.0.0.1:{RandomNumberGenerator.GetInt32(11_000, 58_000)}/router/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
-        Dictionary<string, string?> settings = new() { ["Router:Endpoint"] = host.Endpoint().ToString() };
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
         IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
         ServiceCollection services = new();
         services.Register(configuration);
