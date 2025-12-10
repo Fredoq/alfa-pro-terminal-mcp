@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
         return services
             .AddOptions<TerminalOptions>()
             .Bind(configuration.GetSection("Terminal"))
-            .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _), "Router endpoint is invalid")
+            .Validate(options => Uri.TryCreate(options.Endpoint, UriKind.Absolute, out _), "Terminal endpoint is invalid")
             .ValidateOnStart()
             .Services
             .AddSingleton(sp =>
