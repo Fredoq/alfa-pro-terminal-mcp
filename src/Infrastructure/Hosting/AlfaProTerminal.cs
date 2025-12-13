@@ -3,41 +3,40 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
 /// Ensures router connection is established at startup. Usage example: registered as hosted service.
 /// </summary>
-internal sealed class AlfaProTerminal : IHostedService, ITerminal
+public sealed class AlfaProTerminal : IHostedService, ITerminal
 {
-    private readonly IOptions<TerminalOptions> _options;
+    private readonly IConfigurationRoot _config;
     private readonly ClientWebSocket _socket;
     private readonly Channel<ArraySegment<byte>> _outbound;
 
     /// <summary>
-    /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(options).
+    /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(configuration).
     /// </summary>
-    /// <param name="options">Terminal options</param>
-    public AlfaProTerminal(IOptions<TerminalOptions> options) : this(options, new ClientWebSocket(), Channel.CreateUnbounded<ArraySegment<byte>>())
+    /// <param name="config">Application configuration root</param>
+    public AlfaProTerminal(IConfigurationRoot config) : this(config, new ClientWebSocket(), Channel.CreateUnbounded<ArraySegment<byte>>())
     {
     }
 
     /// <summary>
-    /// Creates the hosted service with a custom socket. Usage example: new AlfaProTerminal(options, socket).
+    /// Creates the hosted service with a custom socket. Usage example: new AlfaProTerminal(configuration, socket, outbound).
     /// </summary>
-    /// <param name="options">Terminal options</param>
+    /// <param name="config">Application configuration root</param>
     /// <param name="socket">Client WebSocket instance</param>
     /// <param name="outbound">Outbound message channel</param>
-    public AlfaProTerminal(IOptions<TerminalOptions> options, ClientWebSocket socket, Channel<ArraySegment<byte>> outbound)
+    public AlfaProTerminal(IConfigurationRoot config, ClientWebSocket socket, Channel<ArraySegment<byte>> outbound)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(socket);
         ArgumentNullException.ThrowIfNull(outbound);
-        _options = options;
+        _config = config;
         _socket = socket;
         _outbound = outbound;
     }
@@ -89,11 +88,8 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (!Uri.TryCreate(_options.Value.Endpoint, UriKind.Absolute, out Uri? parsed))
-        {
-            throw new InvalidOperationException("Terminal endpoint is invalid");
-        }
-        await _socket.ConnectAsync(parsed, cancellationToken);
+        Uri uri = Endpoint();
+        await _socket.ConnectAsync(uri, cancellationToken);
         _ = Pump(CancellationToken.None);
     }
 
@@ -115,9 +111,42 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        using CancellationTokenSource source = new(_options.Value.Timeout);
+        using CancellationTokenSource source = new(Timeout());
         await StopAsync(source.Token);
         _socket.Dispose();
+    }
+
+    /// <summary>
+    /// Returns the terminal endpoint from configuration or defaults. Usage example: Uri uri = Endpoint().
+    /// </summary>
+    private Uri Endpoint()
+    {
+        IConfiguration section = _config.GetSection("Terminal");
+        string? value = section["Endpoint"];
+        string text = value is null || value.Length == 0 ? "ws://127.0.0.1:3366/router/" : value;
+        if (!Uri.TryCreate(text, UriKind.Absolute, out Uri? uri))
+        {
+            throw new InvalidOperationException("Terminal endpoint is invalid");
+        }
+        return uri;
+    }
+
+    /// <summary>
+    /// Returns the terminal timeout from configuration or defaults. Usage example: TimeSpan timeout = Timeout().
+    /// </summary>
+    private TimeSpan Timeout()
+    {
+        IConfiguration section = _config.GetSection("Terminal");
+        string? text = section["Timeout"];
+        if (text is null || text.Length == 0)
+        {
+            return TimeSpan.FromMilliseconds(5000);
+        }
+        if (!int.TryParse(text, out int value) || value <= 0)
+        {
+            throw new InvalidOperationException("Terminal timeout is invalid");
+        }
+        return TimeSpan.FromMilliseconds(value);
     }
 
     /// <summary>

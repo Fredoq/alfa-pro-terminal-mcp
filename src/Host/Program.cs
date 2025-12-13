@@ -1,4 +1,5 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Extensions;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,10 +17,13 @@ builder.Configuration
     .AddEnvironmentVariables();
 builder.Logging
     .AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
+builder.Services.AddSingleton(_ => new AlfaProTerminal(builder.Configuration))
+            .AddSingleton<ITerminal>(sp => sp.GetRequiredService<AlfaProTerminal>())
+            .AddSingleton<IHostedService>(sp => sp.GetRequiredService<AlfaProTerminal>());
 builder.Services
-    .Register(builder.Configuration)
     .AddMcpServer()
     .WithStdioServerTransport()
     .WithToolsFromAssembly();
 IHost host = builder.Build();
+
 await host.RunAsync();
