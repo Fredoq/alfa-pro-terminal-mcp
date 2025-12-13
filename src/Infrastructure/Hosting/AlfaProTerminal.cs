@@ -3,43 +3,45 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
 /// Ensures router connection is established at startup. Usage example: registered as hosted service.
 /// </summary>
-internal sealed class AlfaProTerminal : IHostedService, ITerminal
+public sealed class AlfaProTerminal : IHostedService, ITerminal
 {
-    private readonly IOptions<TerminalOptions> _options;
     private readonly ClientWebSocket _socket;
     private readonly Channel<ArraySegment<byte>> _outbound;
+    private readonly ITerminalEndpoint _endpoint;
+    private readonly ITerminalTimeout _timeout;
 
     /// <summary>
-    /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(options).
+    /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(configuration).
     /// </summary>
-    /// <param name="options">Terminal options</param>
-    public AlfaProTerminal(IOptions<TerminalOptions> options) : this(options, new ClientWebSocket(), Channel.CreateUnbounded<ArraySegment<byte>>())
+    /// <param name="config">Application configuration root</param>
+    public AlfaProTerminal(IConfigurationRoot config) : this(new ClientWebSocket(), new CfgTerminalEndpoint(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")), new CfgTerminalTimeout(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")))
     {
     }
 
     /// <summary>
-    /// Creates the hosted service with a custom socket. Usage example: new AlfaProTerminal(options, socket).
+    /// Creates the hosted service with custom dependencies.
+    /// Usage example: new AlfaProTerminal(socket, outbound, endpoint, timeout).
     /// </summary>
-    /// <param name="options">Terminal options</param>
     /// <param name="socket">Client WebSocket instance</param>
-    /// <param name="outbound">Outbound message channel</param>
-    public AlfaProTerminal(IOptions<TerminalOptions> options, ClientWebSocket socket, Channel<ArraySegment<byte>> outbound)
+    /// <param name="endpoint">Terminal endpoint</param>
+    /// <param name="timeout">Terminal timeout</param>
+    public AlfaProTerminal(ClientWebSocket socket, ITerminalEndpoint endpoint, ITerminalTimeout timeout)
     {
-        ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(socket);
-        ArgumentNullException.ThrowIfNull(outbound);
-        _options = options;
+        ArgumentNullException.ThrowIfNull(endpoint);
+        ArgumentNullException.ThrowIfNull(timeout);
         _socket = socket;
-        _outbound = outbound;
+        _endpoint = endpoint;
+        _timeout = timeout;
+        _outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
     }
 
     /// <summary>
@@ -89,11 +91,7 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (!Uri.TryCreate(_options.Value.Endpoint, UriKind.Absolute, out Uri? parsed))
-        {
-            throw new InvalidOperationException("Terminal endpoint is invalid");
-        }
-        await _socket.ConnectAsync(parsed, cancellationToken);
+        await _socket.ConnectAsync(_endpoint.Address(), cancellationToken);
         _ = Pump(CancellationToken.None);
     }
 
@@ -115,7 +113,7 @@ internal sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        using CancellationTokenSource source = new(_options.Value.Timeout);
+        using CancellationTokenSource source = new(_timeout.Duration());
         await StopAsync(source.Token);
         _socket.Dispose();
     }

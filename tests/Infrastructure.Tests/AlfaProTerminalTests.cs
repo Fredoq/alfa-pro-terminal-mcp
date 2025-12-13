@@ -1,11 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
-using System.Threading.Channels;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Configuration;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
@@ -24,10 +22,9 @@ public sealed class AlfaProTerminalTests
         Uri http = new($"http://127.0.0.1:{Pick()}/terminal/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
-        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = host.Endpoint().ToString() });
-        using ClientWebSocket socket = new();
-        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
+        IConfigurationRoot config = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
+        await using AlfaProTerminal terminal = new(config);
         await terminal.StartAsync(source.Token);
         WebSocket accepted = await host.Take(source.Token);
         bool connected = accepted.State == WebSocketState.Open;
@@ -48,10 +45,9 @@ public sealed class AlfaProTerminalTests
         Uri http = new($"http://127.0.0.1:{Pick()}/send/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
-        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = host.Endpoint().ToString() });
-        using ClientWebSocket socket = new();
-        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
+        IConfigurationRoot config = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
+        await using AlfaProTerminal terminal = new(config);
         await terminal.StartAsync(source.Token);
         string payload = $"данные-{Guid.NewGuid()}-γ";
         await terminal.Send(payload, source.Token);
@@ -72,10 +68,9 @@ public sealed class AlfaProTerminalTests
         Uri http = new($"http://127.0.0.1:{Pick()}/pump/");
         await using TestSocketHost host = new(http);
         await host.Start(startup.Token);
-        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = host.Endpoint().ToString() });
-        using ClientWebSocket socket = new();
-        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
+        IConfigurationRoot config = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
+        await using AlfaProTerminal terminal = new(config);
         await terminal.StartAsync(startup.Token);
         await startup.CancelAsync();
         using CancellationTokenSource flow = new(TimeSpan.FromSeconds(5));
@@ -98,10 +93,9 @@ public sealed class AlfaProTerminalTests
         Uri http = new($"http://127.0.0.1:{Pick()}/messages/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
-        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = host.Endpoint().ToString() });
-        using ClientWebSocket socket = new();
-        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
+        IConfigurationRoot config = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
+        await using AlfaProTerminal terminal = new(config);
         await terminal.StartAsync(source.Token);
         string payload = $"ответ-{Guid.NewGuid()}-δ";
         await host.Send(payload, source.Token);
@@ -120,10 +114,9 @@ public sealed class AlfaProTerminalTests
     [Fact(DisplayName = "AlfaProTerminal throws for invalid endpoint")]
     public async Task Given_invalid_endpoint_when_started_then_throws()
     {
-        IOptions<TerminalOptions> options = Options.Create(new TerminalOptions { Endpoint = "not-a-uri" });
-        using ClientWebSocket socket = new();
-        Channel<ArraySegment<byte>> outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
-        await using AlfaProTerminal terminal = new(options, socket, outbound);
+        Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = "not-a-uri" };
+        IConfigurationRoot config = new ConfigurationBuilder().AddInMemoryCollection(settings!).Build();
+        await using AlfaProTerminal terminal = new(config);
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await terminal.StartAsync(CancellationToken.None));
     }
 
@@ -139,5 +132,3 @@ public sealed class AlfaProTerminalTests
         return port;
     }
 }
-
-
