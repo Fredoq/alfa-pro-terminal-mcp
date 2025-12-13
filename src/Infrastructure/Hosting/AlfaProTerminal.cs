@@ -13,32 +13,34 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 /// </summary>
 public sealed class AlfaProTerminal : IHostedService, ITerminal
 {
-    private readonly IConfigurationRoot _config;
     private readonly ClientWebSocket _socket;
     private readonly Channel<ArraySegment<byte>> _outbound;
     private readonly ITerminalEndpoint _endpoint;
+    private readonly ITerminalTimeout _timeout;
 
     /// <summary>
     /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(configuration).
     /// </summary>
     /// <param name="config">Application configuration root</param>
-    public AlfaProTerminal(IConfigurationRoot config) : this(config, new ClientWebSocket(), new CfgTerminalEndpoint(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")))
+    public AlfaProTerminal(IConfigurationRoot config) : this(new ClientWebSocket(), new CfgTerminalEndpoint(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")), new CfgTerminalTimeout(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")))
     {
     }
 
     /// <summary>
-    /// Creates the hosted service with a custom socket. Usage example: new AlfaProTerminal(configuration, socket, outbound).
+    /// Creates the hosted service with custom dependencies.
+    /// Usage example: new AlfaProTerminal(socket, outbound, endpoint, timeout).
     /// </summary>
-    /// <param name="config">Application configuration root</param>
     /// <param name="socket">Client WebSocket instance</param>
-    public AlfaProTerminal(IConfigurationRoot config, ClientWebSocket socket, ITerminalEndpoint endpoint)
+    /// <param name="endpoint">Terminal endpoint</param>
+    /// <param name="timeout">Terminal timeout</param>
+    public AlfaProTerminal(ClientWebSocket socket, ITerminalEndpoint endpoint, ITerminalTimeout timeout)
     {
-        ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(socket);
         ArgumentNullException.ThrowIfNull(endpoint);
-        _config = config;
+        ArgumentNullException.ThrowIfNull(timeout);
         _socket = socket;
         _endpoint = endpoint;
+        _timeout = timeout;
         _outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
     }
 
@@ -111,27 +113,9 @@ public sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        using CancellationTokenSource source = new(Timeout());
+        using CancellationTokenSource source = new(_timeout.Duration());
         await StopAsync(source.Token);
         _socket.Dispose();
-    }
-
-    /// <summary>
-    /// Returns the terminal timeout from configuration or defaults. Usage example: TimeSpan timeout = Timeout().
-    /// </summary>
-    private TimeSpan Timeout()
-    {
-        IConfiguration section = _config.GetSection("Terminal");
-        string? text = section["Timeout"];
-        if (text is null || text.Length == 0)
-        {
-            return TimeSpan.FromMilliseconds(5000);
-        }
-        if (!int.TryParse(text, out int value) || value <= 0)
-        {
-            throw new InvalidOperationException("Terminal timeout is invalid");
-        }
-        return TimeSpan.FromMilliseconds(value);
     }
 
     /// <summary>

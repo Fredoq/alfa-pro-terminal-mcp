@@ -10,7 +10,7 @@ internal record CfgTerminalEndpoint : ITerminalEndpoint
 {
     private readonly string _endpoint;
 
-    public CfgTerminalEndpoint(IConfiguration configuration) : this(configuration["Endpoint"] ?? "ws://127.0.0.1:3366/router/")
+    public CfgTerminalEndpoint(IConfiguration configuration) : this(configuration["Endpoint"] is { Length: > 0 } value ? value : "ws://127.0.0.1:3366/router/")
     {
     }
 
