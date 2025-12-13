@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Channels;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
