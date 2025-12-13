@@ -16,12 +16,13 @@ public sealed class AlfaProTerminal : IHostedService, ITerminal
     private readonly IConfigurationRoot _config;
     private readonly ClientWebSocket _socket;
     private readonly Channel<ArraySegment<byte>> _outbound;
+    private readonly ITerminalEndpoint _endpoint;
 
     /// <summary>
     /// Creates the hosted service that connects the router. Usage example: new AlfaProTerminal(configuration).
     /// </summary>
     /// <param name="config">Application configuration root</param>
-    public AlfaProTerminal(IConfigurationRoot config) : this(config, new ClientWebSocket(), Channel.CreateUnbounded<ArraySegment<byte>>())
+    public AlfaProTerminal(IConfigurationRoot config) : this(config, new ClientWebSocket(), new CfgTerminalEndpoint(config?.GetSection("Terminal") ?? throw new ArgumentException("Configuration root is null")))
     {
     }
 
@@ -30,15 +31,15 @@ public sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     /// <param name="config">Application configuration root</param>
     /// <param name="socket">Client WebSocket instance</param>
-    /// <param name="outbound">Outbound message channel</param>
-    public AlfaProTerminal(IConfigurationRoot config, ClientWebSocket socket, Channel<ArraySegment<byte>> outbound)
+    public AlfaProTerminal(IConfigurationRoot config, ClientWebSocket socket, ITerminalEndpoint endpoint)
     {
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(socket);
-        ArgumentNullException.ThrowIfNull(outbound);
+        ArgumentNullException.ThrowIfNull(endpoint);
         _config = config;
         _socket = socket;
-        _outbound = outbound;
+        _endpoint = endpoint;
+        _outbound = Channel.CreateUnbounded<ArraySegment<byte>>();
     }
 
     /// <summary>
@@ -88,8 +89,7 @@ public sealed class AlfaProTerminal : IHostedService, ITerminal
     /// </summary>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        Uri uri = Endpoint();
-        await _socket.ConnectAsync(uri, cancellationToken);
+        await _socket.ConnectAsync(_endpoint.Address(), cancellationToken);
         _ = Pump(CancellationToken.None);
     }
 
@@ -114,21 +114,6 @@ public sealed class AlfaProTerminal : IHostedService, ITerminal
         using CancellationTokenSource source = new(Timeout());
         await StopAsync(source.Token);
         _socket.Dispose();
-    }
-
-    /// <summary>
-    /// Returns the terminal endpoint from configuration or defaults. Usage example: Uri uri = Endpoint().
-    /// </summary>
-    private Uri Endpoint()
-    {
-        IConfiguration section = _config.GetSection("Terminal");
-        string? value = section["Endpoint"];
-        string text = value is null || value.Length == 0 ? "ws://127.0.0.1:3366/router/" : value;
-        if (!Uri.TryCreate(text, UriKind.Absolute, out Uri? uri))
-        {
-            throw new InvalidOperationException("Terminal endpoint is invalid");
-        }
-        return uri;
     }
 
     /// <summary>
