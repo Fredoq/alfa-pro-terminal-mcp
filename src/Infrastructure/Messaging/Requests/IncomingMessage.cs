@@ -12,20 +12,33 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Requests;
 /// </summary>
 internal sealed partial class IncomingMessage : IIncomingMessage
 {
-    private readonly IRouting _routing;
-    private readonly ITerminal _socket;
+    private readonly ITerminal _terminal;
     private readonly ILogger _logger;
+    private readonly string _message;
+    private readonly ICorrelationId _id;
 
     /// <summary>
     /// Builds the incoming message sender. Usage example: var sender = new IncomingMessage(routing, socket).
     /// </summary>
-    public IncomingMessage(IRouting routing, ITerminal socket, ILogger logger)
+    public IncomingMessage(IRouting routing, ITerminal terminal, ILogger logger)
+        : this(logger, routing.AsString(), routing.Id(), terminal)
     {
-        ArgumentNullException.ThrowIfNull(routing);
-        ArgumentNullException.ThrowIfNull(socket);
+    }
+
+    public IncomingMessage(ILogger logger, string message, string id, ITerminal terminal)
+        : this(logger, message, new CorrelationId(id), terminal)
+    {
+    }
+
+    public IncomingMessage(ILogger logger, string message, ICorrelationId id, ITerminal terminal)
+    {
         ArgumentNullException.ThrowIfNull(logger);
-        _routing = routing;
-        _socket = socket;
+        ArgumentException.ThrowIfNullOrWhiteSpace(message);
+        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(terminal);
+        _message = message;
+        _id = id;
+        _terminal = terminal;
         _logger = logger;
     }
 
@@ -34,10 +47,9 @@ internal sealed partial class IncomingMessage : IIncomingMessage
     /// </summary>
     public async Task<ICorrelationId> Send(CancellationToken cancellationToken)
     {
-        string routing = _routing.AsString();
-        Log(_logger, routing);
-        await _socket.Send(routing, cancellationToken);
-        return new CorrelationId(_routing.Id());
+        Log(_logger, _message);
+        await _terminal.Send(_message, cancellationToken);
+        return _id;
     }
 
     /// <summary>
