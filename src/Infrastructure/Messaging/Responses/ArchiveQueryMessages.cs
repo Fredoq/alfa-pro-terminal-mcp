@@ -8,7 +8,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 /// <summary>
 /// Retrieves archive query responses through the router. Usage example: string payload = await new ArchiveQueryMessages(incoming, socket, logger).NextMessage(token);.
 /// </summary>
-internal sealed partial class ArchiveQueryMessages : IOutboundMessages
+internal sealed class ArchiveQueryMessages : IOutboundMessages
 {
     private readonly IIncomingMessage _incoming;
     private readonly ITerminal _socket;
@@ -29,7 +29,7 @@ internal sealed partial class ArchiveQueryMessages : IOutboundMessages
         ICorrelationId id = await _incoming.Send(cancellationToken);
         await foreach (string message in _socket.Messages(cancellationToken))
         {
-            Received(_logger, message);
+            _logger.LogDebug("Received routing message {Message}", message);
             HeartbeatResponse response = new(message, new ArchiveQueryResponse(message));
             if (!response.Accepted(id))
             {
@@ -39,7 +39,4 @@ internal sealed partial class ArchiveQueryMessages : IOutboundMessages
         }
         throw new InvalidOperationException("Response not received");
     }
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Received routing message {Message}")]
-    private static partial void Received(ILogger logger, string message);
 }

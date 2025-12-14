@@ -10,7 +10,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Requests;
 /// <summary>
 /// Sends routing request and returns its correlation id. Usage example: ICorrelationId id = await message.Send(token);.
 /// </summary>
-internal sealed partial class IncomingMessage : IIncomingMessage
+internal sealed class IncomingMessage : IIncomingMessage
 {
     private readonly ITerminal _terminal;
     private readonly ILogger _logger;
@@ -47,16 +47,8 @@ internal sealed partial class IncomingMessage : IIncomingMessage
     /// </summary>
     public async Task<ICorrelationId> Send(CancellationToken cancellationToken)
     {
-        Log(_logger, _message);
+        _logger.LogDebug("Sending routing message {Message} with correlation id {CorrelationId}", _message, _id.Value());
         await _terminal.Send(_message, cancellationToken);
         return _id;
     }
-
-    /// <summary>
-    /// Logs sending of routing payload. Usage example: Log(logger, payload).
-    /// </summary>
-    /// <param name="logger">Target logger.</param>
-    /// <param name="message">Serialized routing payload.</param>
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Sending routing message {Message}")]
-    private static partial void Log(ILogger logger, string message);
 }
