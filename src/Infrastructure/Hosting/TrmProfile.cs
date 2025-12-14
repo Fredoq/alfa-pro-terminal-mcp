@@ -17,7 +17,7 @@ public sealed record TrmProfile : ITerminalProfile
     /// Usage example: new CfgTerminalProfile(configuration.GetSection("Terminal")).
     /// </summary>
     /// <param name="config">Configuration section</param>
-    public TrmProfile(IConfiguration config) 
+    public TrmProfile(IConfiguration config)
         : this((config ?? throw new ArgumentNullException(nameof(config)))["Endpoint"] is { Length: > 0 } endpoint ? endpoint : "ws://127.0.0.1:3366/router/",
                 config["Timeout"] is { Length: > 0 } timeout ? timeout : "5000")
     {
