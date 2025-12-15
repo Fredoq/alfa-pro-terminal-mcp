@@ -29,7 +29,7 @@ public sealed class WsArchive : IArchive
     {
         ArchiveQueryPayload payload = new(idFi, candleType, interval, period, firstDay, lastDay);
         ArchiveQueryRequest routing = new(payload);
-        ArchiveQueryMessages outbound = new(new IncomingMessage(routing, _socket, _logger), _socket, _logger);
+        TerminalOutboundMessages outbound = new(new IncomingMessage(routing, _socket, _logger), _socket, _logger, new HeartbeatResponse(new QueryResponse("#Archive.Query")));
         return new JsonArchiveEntries(await outbound.NextMessage(cancellationToken));
     }
 }
