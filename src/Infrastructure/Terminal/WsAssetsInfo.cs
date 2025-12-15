@@ -17,7 +17,7 @@ public sealed class WsAssetsInfo : IAssetInfos
     private readonly IOutboundMessages _outbound;
 
     public WsAssetsInfo(ITerminal routerSocket, ILogger logger)
-        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new AssetInfoEntity()), routerSocket, logger), routerSocket, logger))
+        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new AssetInfoEntity()), routerSocket, logger), routerSocket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
     }
 

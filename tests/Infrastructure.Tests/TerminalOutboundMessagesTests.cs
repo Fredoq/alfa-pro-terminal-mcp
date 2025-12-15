@@ -23,7 +23,7 @@ public sealed class TerminalOutboundMessagesTests
         await using RouterSocketSequence socket = new([other, message]);
         IncomingStub incoming = new(id);
         LoggerFake logger = new();
-        Messaging.Responses.TerminalOutboundMessages outbound = new(incoming, socket, logger);
+        Messaging.Responses.TerminalOutboundMessages outbound = new(incoming, socket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query")));
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         string value = await outbound.NextMessage(source.Token);
         Assert.True(value == payload, "TerminalOutboundMessages does not return matching payload");
@@ -42,7 +42,7 @@ public sealed class TerminalOutboundMessagesTests
         await using RouterSocketSequence socket = new([other]);
         IncomingStub incoming = new(id);
         LoggerFake logger = new();
-        Messaging.Responses.TerminalOutboundMessages outbound = new(incoming, socket, logger);
+        Messaging.Responses.TerminalOutboundMessages outbound = new(incoming, socket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query")));
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
         Task<string> action = outbound.NextMessage(source.Token);
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);

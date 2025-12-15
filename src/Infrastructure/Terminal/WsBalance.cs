@@ -16,7 +16,7 @@ public sealed class WsBalance : IBalances
     private readonly IOutboundMessages _outbound;
 
     public WsBalance(ITerminal routerSocket, ILogger logger)
-        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ClientBalanceEntity()), routerSocket, logger), routerSocket, logger))
+        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ClientBalanceEntity()), routerSocket, logger), routerSocket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
     }
 

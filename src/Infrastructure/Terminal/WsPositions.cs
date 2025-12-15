@@ -16,7 +16,7 @@ public sealed class WsPositions : IPositions
     private readonly IOutboundMessages _outbound;
 
     public WsPositions(ITerminal routerSocket, ILogger logger)
-        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ClientPositionEntity()), routerSocket, logger), routerSocket, logger))
+        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ClientPositionEntity()), routerSocket, logger), routerSocket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
     }
 

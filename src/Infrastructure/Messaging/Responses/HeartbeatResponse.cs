@@ -5,39 +5,41 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
 /// <summary>
-/// Decorates responses to ignore heartbeat messages. Usage example: var response = new HeartbeatResponse(message, payload => new DataQueryResponse(payload)).
+/// Decorates responses to ignore heartbeat messages. Usage example: IResponse response = new HeartbeatResponse(original); bool accepted = response.Accepted(message, id);.
 /// </summary>
 internal sealed class HeartbeatResponse : IResponse
 {
-    private readonly string _message;
     private readonly IResponse _response;
 
     /// <summary>
-    /// Creates a heartbeat-aware response. Usage example: var response = new HeartbeatResponse(message, factory).
+    /// Creates a heartbeat-aware response. Usage example: IResponse response = new HeartbeatResponse(original).
     /// </summary>
-    /// <param name="message">Raw router message.</param>
     /// <param name="original">Original non-heartbeat response.</param>
-    public HeartbeatResponse(string message, IResponse original)
+    public HeartbeatResponse(IResponse original)
     {
-        ArgumentException.ThrowIfNullOrEmpty(message);
         ArgumentNullException.ThrowIfNull(original);
-        _message = message;
         _response = original;
     }
 
     /// <summary>
-    /// States whether the message matches the expected identifiers. Usage example: bool accepted = response.Accepted(id).
+    /// States whether the message matches the expected identifiers. Usage example: bool accepted = response.Accepted(message, id).
     /// </summary>
-    public bool Accepted(ICorrelationId id)
+    public bool Accepted(string message, ICorrelationId id)
     {
-        using JsonDocument document = JsonDocument.Parse(_message);
+        ArgumentException.ThrowIfNullOrEmpty(message);
+        ArgumentNullException.ThrowIfNull(id);
+        using JsonDocument document = JsonDocument.Parse(message);
         JsonElement root = document.RootElement;
         bool heartbeat = root.ValueKind == JsonValueKind.Object && root.TryGetProperty("heartbeat", out _);
-        return !heartbeat && _response.Accepted(id);
+        return !heartbeat && _response.Accepted(message, id);
     }
 
     /// <summary>
-    /// Returns the payload fragment of the message. Usage example: string payload = response.Payload();
+    /// Returns the payload fragment of the message. Usage example: string payload = response.Payload(message).
     /// </summary>
-    public string Payload() => _response.Payload();
+    public string Payload(string message)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(message);
+        return _response.Payload(message);
+    }
 }
