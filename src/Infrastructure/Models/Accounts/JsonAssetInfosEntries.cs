@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
 
@@ -78,17 +79,17 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
     private static JsonObject Entry(JsonElement node)
     {
         JsonObject entry = new();
-        entry["IdObject"] = Field(Integer(node, "IdObject"), _descriptions["IdObject"]);
-        entry["Ticker"] = Field(String(node, "Ticker"), _descriptions["Ticker"]);
-        entry["ISIN"] = Field(String(node, "ISIN"), _descriptions["ISIN"]);
-        entry["Name"] = Field(String(node, "Name"), _descriptions["Name"]);
-        entry["Description"] = Field(String(node, "Description"), _descriptions["Description"]);
-        entry["Nominal"] = Field(Double(node, "Nominal"), _descriptions["Nominal"]);
-        entry["IdObjectType"] = Field(Integer(node, "IdObjectType"), _descriptions["IdObjectType"]);
-        entry["IdObjectGroup"] = Field(Integer(node, "IdObjectGroup"), _descriptions["IdObjectGroup"]);
-        entry["IdObjectBase"] = Field(Integer(node, "IdObjectBase"), _descriptions["IdObjectBase"]);
-        entry["IdObjectFaceUnit"] = Field(Integer(node, "IdObjectFaceUnit"), _descriptions["IdObjectFaceUnit"]);
-        entry["MatDateObject"] = Field(String(node, "MatDateObject"), _descriptions["MatDateObject"]);
+        entry["IdObject"] = Field(new JsonInteger(node, "IdObject").Value(), _descriptions["IdObject"]);
+        entry["Ticker"] = Field(new JsonString(node, "Ticker").Value(), _descriptions["Ticker"]);
+        entry["ISIN"] = Field(new JsonString(node, "ISIN").Value(), _descriptions["ISIN"]);
+        entry["Name"] = Field(new JsonString(node, "Name").Value(), _descriptions["Name"]);
+        entry["Description"] = Field(new JsonString(node, "Description").Value(), _descriptions["Description"]);
+        entry["Nominal"] = Field(new JsonDouble(node, "Nominal").Value(), _descriptions["Nominal"]);
+        entry["IdObjectType"] = Field(new JsonInteger(node, "IdObjectType").Value(), _descriptions["IdObjectType"]);
+        entry["IdObjectGroup"] = Field(new JsonInteger(node, "IdObjectGroup").Value(), _descriptions["IdObjectGroup"]);
+        entry["IdObjectBase"] = Field(new JsonInteger(node, "IdObjectBase").Value(), _descriptions["IdObjectBase"]);
+        entry["IdObjectFaceUnit"] = Field(new JsonInteger(node, "IdObjectFaceUnit").Value(), _descriptions["IdObjectFaceUnit"]);
+        entry["MatDateObject"] = Field(new JsonString(node, "MatDateObject").Value(), _descriptions["MatDateObject"]);
         entry["Instruments"] = Instruments(node);
         return entry;
     }
@@ -106,10 +107,10 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         foreach (JsonElement instrument in instruments.EnumerateArray())
         {
             JsonObject item = new();
-            item["IdFi"] = Field(Integer(instrument, "IdFi"), _descriptions["IdFi"]);
-            item["RCode"] = Field(String(instrument, "RCode"), _descriptions["RCode"]);
-            item["IsLiquid"] = Field(Bool(instrument, "IsLiquid"), _descriptions["IsLiquid"]);
-            item["IdMarketBoard"] = Field(Integer(instrument, "IdMarketBoard"), _descriptions["IdMarketBoard"]);
+            item["IdFi"] = Field(new JsonInteger(instrument, "IdFi").Value(), _descriptions["IdFi"]);
+            item["RCode"] = Field(new JsonString(instrument, "RCode").Value(), _descriptions["RCode"]);
+            item["IsLiquid"] = Field(new JsonBool(instrument, "IsLiquid").Value(), _descriptions["IsLiquid"]);
+            item["IdMarketBoard"] = Field(new JsonInteger(instrument, "IdMarketBoard").Value(), _descriptions["IdMarketBoard"]);
             array.Add(item);
         }
         return array;
@@ -124,73 +125,5 @@ internal sealed class JsonAssetInfosEntries : IAssetInfosEntries
         field["value"] = JsonValue.Create(value);
         field["description"] = description;
         return field;
-    }
-
-    /// <summary>
-    /// Extracts integer property from payload. Usage example: long id = Integer(node, "IdObject");.
-    /// </summary>
-    private static long Integer(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetInt64();
-    }
-
-    /// <summary>
-    /// Extracts string property from payload. Usage example: string ticker = String(node, "Ticker");.
-    /// </summary>
-    private static string String(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind == JsonValueKind.String)
-        {
-            return value.GetString() ?? string.Empty;
-        }
-        if (value.ValueKind == JsonValueKind.Null)
-        {
-            return string.Empty;
-        }
-        throw new InvalidOperationException($"{property} is missing");
-    }
-
-    /// <summary>
-    /// Extracts double property from payload. Usage example: double nominal = Double(node, "Nominal");.
-    /// </summary>
-    private static double Double(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetDouble();
-    }
-
-    /// <summary>
-    /// Extracts boolean property from payload. Usage example: bool liquid = Bool(node, "IsLiquid");.
-    /// </summary>
-    private static bool Bool(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.True && value.ValueKind != JsonValueKind.False)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetBoolean();
     }
 }

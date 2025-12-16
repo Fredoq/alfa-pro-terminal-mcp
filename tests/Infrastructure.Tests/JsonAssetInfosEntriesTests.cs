@@ -30,7 +30,7 @@ public sealed class JsonAssetInfosEntriesTests
                     Ticker = ticker,
                     ISIN = "ISIN123",
                     Name = "Name",
-                    Description = "Desc",
+                    Description = (string?)null,
                     Nominal = 10.5,
                     IdObjectType = 1,
                     IdObjectGroup = 2,
@@ -68,7 +68,7 @@ public sealed class JsonAssetInfosEntriesTests
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         JsonElement instruments = entry.GetProperty("Instruments");
-        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetProperty("value").GetBoolean();
+        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && string.IsNullOrEmpty(entry.GetProperty("Description").GetProperty("value").GetString()) && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetProperty("value").GetBoolean();
         Assert.True(result, "JsonAssetInfosEntries does not filter and describe assets");
     }
 

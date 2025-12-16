@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Archive;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive;
 
@@ -65,23 +66,23 @@ internal sealed class JsonArchiveEntries : IArchiveEntries
     private static JsonObject Ohlcv(JsonElement node)
     {
         JsonObject entry = new();
-        entry["Open"] = Field(Double(node, "Open"), _descriptions["Open"]);
-        entry["Close"] = Field(Double(node, "Close"), _descriptions["Close"]);
-        entry["Low"] = Field(Double(node, "Low"), _descriptions["Low"]);
-        entry["High"] = Field(Double(node, "High"), _descriptions["High"]);
-        entry["Volume"] = Field(Long(node, "Volume"), _descriptions["Volume"]);
-        entry["VolumeAsk"] = Field(Long(node, "VolumeAsk"), _descriptions["VolumeAsk"]);
-        entry["OpenInt"] = Field(Long(node, "OpenInt"), _descriptions["OpenInt"]);
-        entry["Time"] = Field(String(node, "DT"), _descriptions["Time"]);
+        entry["Open"] = Field(new JsonDouble(node, "Open").Value(), _descriptions["Open"]);
+        entry["Close"] = Field(new JsonDouble(node, "Close").Value(), _descriptions["Close"]);
+        entry["Low"] = Field(new JsonDouble(node, "Low").Value(), _descriptions["Low"]);
+        entry["High"] = Field(new JsonDouble(node, "High").Value(), _descriptions["High"]);
+        entry["Volume"] = Field(new JsonInteger(node, "Volume").Value(), _descriptions["Volume"]);
+        entry["VolumeAsk"] = Field(new JsonInteger(node, "VolumeAsk").Value(), _descriptions["VolumeAsk"]);
+        entry["OpenInt"] = Field(new JsonInteger(node, "OpenInt").Value(), _descriptions["OpenInt"]);
+        entry["Time"] = Field(new JsonString(node, "DT").Value(), _descriptions["Time"]);
         return entry;
     }
 
     private static JsonObject Mpv(JsonElement node)
     {
         JsonObject entry = new();
-        entry["Open"] = Field(Double(node, "Open"), _descriptions["Open"]);
-        entry["Close"] = Field(Double(node, "Close"), _descriptions["Close"]);
-        entry["Time"] = Field(String(node, "DT"), _descriptions["Time"]);
+        entry["Open"] = Field(new JsonDouble(node, "Open").Value(), _descriptions["Open"]);
+        entry["Close"] = Field(new JsonDouble(node, "Close").Value(), _descriptions["Close"]);
+        entry["Time"] = Field(new JsonString(node, "DT").Value(), _descriptions["Time"]);
         entry["Levels"] = Levels(node);
         return entry;
     }
@@ -123,48 +124,5 @@ internal sealed class JsonArchiveEntries : IArchiveEntries
         field["value"] = JsonValue.Create(value);
         field["description"] = description;
         return field;
-    }
-
-    private static long Long(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetInt64();
-    }
-
-    private static double Double(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetDouble();
-    }
-
-    private static string String(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind == JsonValueKind.String)
-        {
-            return value.GetString() ?? string.Empty;
-        }
-        if (value.ValueKind == JsonValueKind.Null)
-        {
-            return string.Empty;
-        }
-        throw new InvalidOperationException($"{property} is missing");
     }
 }

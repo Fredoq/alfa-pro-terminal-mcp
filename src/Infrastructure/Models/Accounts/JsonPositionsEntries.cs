@@ -1,13 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
 
 /// <summary>
 /// Builds position entries from JSON payload. Usage example: string json = new JsonPositionsEntries(payload, accountId).Json().
 /// </summary>
-/// TODO: Refactor static methods
 internal sealed class JsonPositionsEntries : IPositionsEntries
 {
     private readonly string _payload;
@@ -75,7 +75,7 @@ internal sealed class JsonPositionsEntries : IPositionsEntries
         JsonArray list = [];
         foreach (JsonElement node in data.EnumerateArray())
         {
-            long account = Integer(node, "IdAccount");
+            long account = new JsonInteger(node, "IdAccount").Value();
             if (account != _accountId)
             {
                 continue;
@@ -92,37 +92,37 @@ internal sealed class JsonPositionsEntries : IPositionsEntries
     private static JsonObject Entry(JsonElement node)
     {
         JsonObject entry = new();
-        entry["IdPosition"] = Field(Integer(node, "IdPosition"), _descriptions["IdPosition"]);
-        entry["IdAccount"] = Field(Integer(node, "IdAccount"), _descriptions["IdAccount"]);
-        entry["IdSubAccount"] = Field(Integer(node, "IdSubAccount"), _descriptions["IdSubAccount"]);
-        entry["IdRazdel"] = Field(Integer(node, "IdRazdel"), _descriptions["IdRazdel"]);
-        entry["IdObject"] = Field(Integer(node, "IdObject"), _descriptions["IdObject"]);
-        entry["IdFiBalance"] = Field(Integer(node, "IdFiBalance"), _descriptions["IdFiBalance"]);
-        entry["IdBalanceGroup"] = Field(Integer(node, "IdBalanceGroup"), _descriptions["IdBalanceGroup"]);
-        entry["AssetsPercent"] = Field(Double(node, "AssetsPercent"), _descriptions["AssetsPercent"]);
-        entry["PSTNKD"] = Field(Double(node, "PSTNKD"), _descriptions["PSTNKD"]);
-        entry["IsMoney"] = Field(Bool(node, "IsMoney"), _descriptions["IsMoney"]);
-        entry["IsRur"] = Field(Bool(node, "IsRur"), _descriptions["IsRur"]);
-        entry["UchPrice"] = Field(Double(node, "UchPrice"), _descriptions["UchPrice"]);
-        entry["TorgPos"] = Field(Double(node, "TorgPos"), _descriptions["TorgPos"]);
-        entry["Price"] = Field(Double(node, "Price"), _descriptions["Price"]);
-        entry["DailyPL"] = Field(Double(node, "DailyPL"), _descriptions["DailyPL"]);
-        entry["DailyPLPercentToMarketCurPrice"] = Field(Double(node, "DailyPLPercentToMarketCurPrice"), _descriptions["DailyPLPercentToMarketCurPrice"]);
-        entry["BackPos"] = Field(Double(node, "BackPos"), _descriptions["BackPos"]);
-        entry["PrevQuote"] = Field(Double(node, "PrevQuote"), _descriptions["PrevQuote"]);
-        entry["TrnIn"] = Field(Double(node, "TrnIn"), _descriptions["TrnIn"]);
-        entry["TrnOut"] = Field(Double(node, "TrnOut"), _descriptions["TrnOut"]);
-        entry["DailyBuyVolume"] = Field(Double(node, "DailyBuyVolume"), _descriptions["DailyBuyVolume"]);
-        entry["DailySellVolume"] = Field(Double(node, "DailySellVolume"), _descriptions["DailySellVolume"]);
-        entry["DailyBuyQuantity"] = Field(Double(node, "DailyBuyQuantity"), _descriptions["DailyBuyQuantity"]);
-        entry["DailySellQuantity"] = Field(Double(node, "DailySellQuantity"), _descriptions["DailySellQuantity"]);
-        entry["NKD"] = Field(Double(node, "NKD"), _descriptions["NKD"]);
-        entry["PriceStep"] = Field(Double(node, "PriceStep"), _descriptions["PriceStep"]);
-        entry["Lot"] = Field(Integer(node, "Lot"), _descriptions["Lot"]);
-        entry["NPLtoMarketCurPrice"] = Field(Double(node, "NPLtoMarketCurPrice"), _descriptions["NPLtoMarketCurPrice"]);
-        entry["NPLPercent"] = Field(Double(node, "NPLPercent"), _descriptions["NPLPercent"]);
-        entry["PlanLong"] = Field(Double(node, "PlanLong"), _descriptions["PlanLong"]);
-        entry["PlanShort"] = Field(Double(node, "PlanShort"), _descriptions["PlanShort"]);
+        entry["IdPosition"] = Field(new JsonInteger(node, "IdPosition").Value(), _descriptions["IdPosition"]);
+        entry["IdAccount"] = Field(new JsonInteger(node, "IdAccount").Value(), _descriptions["IdAccount"]);
+        entry["IdSubAccount"] = Field(new JsonInteger(node, "IdSubAccount").Value(), _descriptions["IdSubAccount"]);
+        entry["IdRazdel"] = Field(new JsonInteger(node, "IdRazdel").Value(), _descriptions["IdRazdel"]);
+        entry["IdObject"] = Field(new JsonInteger(node, "IdObject").Value(), _descriptions["IdObject"]);
+        entry["IdFiBalance"] = Field(new JsonInteger(node, "IdFiBalance").Value(), _descriptions["IdFiBalance"]);
+        entry["IdBalanceGroup"] = Field(new JsonInteger(node, "IdBalanceGroup").Value(), _descriptions["IdBalanceGroup"]);
+        entry["AssetsPercent"] = Field(new JsonDouble(node, "AssetsPercent").Value(), _descriptions["AssetsPercent"]);
+        entry["PSTNKD"] = Field(new JsonDouble(node, "PSTNKD").Value(), _descriptions["PSTNKD"]);
+        entry["IsMoney"] = Field(new JsonBool(node, "IsMoney").Value(), _descriptions["IsMoney"]);
+        entry["IsRur"] = Field(new JsonBool(node, "IsRur").Value(), _descriptions["IsRur"]);
+        entry["UchPrice"] = Field(new JsonDouble(node, "UchPrice").Value(), _descriptions["UchPrice"]);
+        entry["TorgPos"] = Field(new JsonDouble(node, "TorgPos").Value(), _descriptions["TorgPos"]);
+        entry["Price"] = Field(new JsonDouble(node, "Price").Value(), _descriptions["Price"]);
+        entry["DailyPL"] = Field(new JsonDouble(node, "DailyPL").Value(), _descriptions["DailyPL"]);
+        entry["DailyPLPercentToMarketCurPrice"] = Field(new JsonDouble(node, "DailyPLPercentToMarketCurPrice").Value(), _descriptions["DailyPLPercentToMarketCurPrice"]);
+        entry["BackPos"] = Field(new JsonDouble(node, "BackPos").Value(), _descriptions["BackPos"]);
+        entry["PrevQuote"] = Field(new JsonDouble(node, "PrevQuote").Value(), _descriptions["PrevQuote"]);
+        entry["TrnIn"] = Field(new JsonDouble(node, "TrnIn").Value(), _descriptions["TrnIn"]);
+        entry["TrnOut"] = Field(new JsonDouble(node, "TrnOut").Value(), _descriptions["TrnOut"]);
+        entry["DailyBuyVolume"] = Field(new JsonDouble(node, "DailyBuyVolume").Value(), _descriptions["DailyBuyVolume"]);
+        entry["DailySellVolume"] = Field(new JsonDouble(node, "DailySellVolume").Value(), _descriptions["DailySellVolume"]);
+        entry["DailyBuyQuantity"] = Field(new JsonDouble(node, "DailyBuyQuantity").Value(), _descriptions["DailyBuyQuantity"]);
+        entry["DailySellQuantity"] = Field(new JsonDouble(node, "DailySellQuantity").Value(), _descriptions["DailySellQuantity"]);
+        entry["NKD"] = Field(new JsonDouble(node, "NKD").Value(), _descriptions["NKD"]);
+        entry["PriceStep"] = Field(new JsonDouble(node, "PriceStep").Value(), _descriptions["PriceStep"]);
+        entry["Lot"] = Field(new JsonInteger(node, "Lot").Value(), _descriptions["Lot"]);
+        entry["NPLtoMarketCurPrice"] = Field(new JsonDouble(node, "NPLtoMarketCurPrice").Value(), _descriptions["NPLtoMarketCurPrice"]);
+        entry["NPLPercent"] = Field(new JsonDouble(node, "NPLPercent").Value(), _descriptions["NPLPercent"]);
+        entry["PlanLong"] = Field(new JsonDouble(node, "PlanLong").Value(), _descriptions["PlanLong"]);
+        entry["PlanShort"] = Field(new JsonDouble(node, "PlanShort").Value(), _descriptions["PlanShort"]);
         return entry;
     }
 
@@ -132,44 +132,5 @@ internal sealed class JsonPositionsEntries : IPositionsEntries
         field["value"] = JsonValue.Create(value);
         field["description"] = description;
         return field;
-    }
-
-    private static long Integer(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetInt64();
-    }
-
-    private static double Double(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetDouble();
-    }
-
-    private static bool Bool(JsonElement node, string property)
-    {
-        if (!node.TryGetProperty(property, out JsonElement value))
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        if (value.ValueKind != JsonValueKind.True && value.ValueKind != JsonValueKind.False)
-        {
-            throw new InvalidOperationException($"{property} is missing");
-        }
-        return value.GetBoolean();
     }
 }
