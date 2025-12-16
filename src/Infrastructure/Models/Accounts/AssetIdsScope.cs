@@ -16,7 +16,7 @@ internal sealed class AssetIdsScope : IAssetFilter
     public AssetIdsScope(IEnumerable<long> ids)
     {
         ArgumentNullException.ThrowIfNull(ids);
-        _ids = new HashSet<long>(ids);
+        _ids = [.. ids];
         if (_ids.Count == 0)
         {
             throw new InvalidOperationException("Asset identifiers list is empty");

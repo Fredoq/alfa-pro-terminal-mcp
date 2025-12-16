@@ -5,7 +5,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
 /// Provides terminal endpoint and timeout values backed by configuration.
-/// Usage example: ITerminalProfile profile = new CfgTerminalProfile(configuration.GetSection("Terminal")); Uri uri = profile.Address(); TimeSpan duration = profile.Duration().
+/// Usage example: ITerminalProfile profile = new TrmProfile(configuration.GetSection("Terminal")); Uri uri = profile.Address(); TimeSpan duration = profile.Duration().
 /// </summary>
 public sealed record TrmProfile : ITerminalProfile
 {
@@ -14,7 +14,7 @@ public sealed record TrmProfile : ITerminalProfile
 
     /// <summary>
     /// Creates profile backed by a configuration section.
-    /// Usage example: new CfgTerminalProfile(configuration.GetSection("Terminal")).
+    /// Usage example: new TrmProfile(configuration.GetSection("Terminal")).
     /// </summary>
     /// <param name="config">Configuration section</param>
     public TrmProfile(IConfiguration config)
@@ -25,7 +25,7 @@ public sealed record TrmProfile : ITerminalProfile
 
     /// <summary>
     /// Creates profile backed by default values.
-    /// Usage example: new CfgTerminalProfile().
+    /// Usage example: new TrmProfile().
     /// </summary>
     public TrmProfile() : this("ws://127.0.0.1:3366/router/", "5000")
     {
@@ -33,7 +33,7 @@ public sealed record TrmProfile : ITerminalProfile
 
     /// <summary>
     /// Creates profile backed by textual endpoint and millisecond timeout values.
-    /// Usage example: new CfgTerminalProfile("ws://127.0.0.1:3366/router/", "5000").
+    /// Usage example: new TrmProfile("ws://127.0.0.1:3366/router/", "5000").
     /// </summary>
     /// <param name="endpoint">Absolute router WebSocket endpoint</param>
     /// <param name="timeout">Timeout in milliseconds</param>
