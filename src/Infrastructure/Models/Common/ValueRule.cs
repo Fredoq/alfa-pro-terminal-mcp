@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common;
 
@@ -9,26 +10,17 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common;
 /// <typeparam name="T">Scalar value type.</typeparam>
 internal sealed class ValueRule<T> : IJsonRule where T : notnull
 {
-    private readonly IJsonItem<T> _item;
+    private readonly IJsonValue<T> _value;
     private readonly string _name;
-    private readonly string _prop;
     private readonly string _text;
 
     /// <summary>
-    /// Creates a described rule using the same name for output and input property. Usage example: new ValueRule(item, "Id", description).
+    /// Creates a described rule. Usage example: new ValueRule(new JsonInteger(node, "Id"), "Id", description).
     /// </summary>
-    public ValueRule(IJsonItem<T> item, string name, string text) : this(item, name, name, text)
+    public ValueRule(IJsonValue<T> value, string name, string text)
     {
-    }
-
-    /// <summary>
-    /// Creates a described rule with separate output and input property names. Usage example: new ValueRule(item, "Time", "DT", description).
-    /// </summary>
-    public ValueRule(IJsonItem<T> item, string name, string prop, string text)
-    {
-        _item = item ?? throw new ArgumentNullException(nameof(item));
+        _value = value ?? throw new ArgumentNullException(nameof(value));
         _name = name ?? throw new ArgumentNullException(nameof(name));
-        _prop = prop ?? throw new ArgumentNullException(nameof(prop));
         _text = text ?? throw new ArgumentNullException(nameof(text));
     }
 
@@ -37,7 +29,7 @@ internal sealed class ValueRule<T> : IJsonRule where T : notnull
     /// </summary>
     public void Apply(JsonElement node, JsonObject root)
     {
-        T value = _item.Value(node, _prop).Value();
+        T value = _value.Value();
         JsonObject field = new()
         {
             ["value"] = JsonValue.Create(value),
@@ -46,4 +38,3 @@ internal sealed class ValueRule<T> : IJsonRule where T : notnull
         root[_name] = field;
     }
 }
-
