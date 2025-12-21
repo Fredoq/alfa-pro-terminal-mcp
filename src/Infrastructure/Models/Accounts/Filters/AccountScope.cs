@@ -27,6 +27,7 @@ internal sealed class AccountScope : IEntriesFilter
     /// <param name="name">Account field name.</param>
     public AccountScope(long account, string name)
     {
+        ArgumentException.ThrowIfNullOrEmpty(name);
         _account = account;
         _name = name;
     }
@@ -37,10 +38,6 @@ internal sealed class AccountScope : IEntriesFilter
     /// <param name="node">Account payload element.</param>
     public bool Filtered(JsonElement node)
     {
-        if (string.IsNullOrEmpty(_name))
-        {
-            throw new InvalidOperationException("Account field name is missing");
-        }
         long account = new JsonInteger(node, _name).Value();
         return account == _account;
     }

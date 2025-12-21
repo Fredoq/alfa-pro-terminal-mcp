@@ -20,6 +20,8 @@ internal sealed class SchemaEntries : IEntries
     /// <param name="schema">Schema mapping.</param>
     public SchemaEntries(IEntries entries, IJsonSchema schema)
     {
+        ArgumentNullException.ThrowIfNull(entries);
+        ArgumentNullException.ThrowIfNull(schema);
         _entries = entries;
         _schema = schema;
     }
@@ -29,10 +31,6 @@ internal sealed class SchemaEntries : IEntries
     /// </summary>
     public string Json()
     {
-        if (_entries is null || _schema is null)
-        {
-            throw new InvalidOperationException("Entries configuration is missing");
-        }
         string json = _entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement root = document.RootElement;

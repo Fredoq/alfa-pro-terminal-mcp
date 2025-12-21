@@ -18,6 +18,8 @@ internal sealed class RequiredEntries : IEntries
     /// <param name="text">Missing entries message.</param>
     public RequiredEntries(IEntries entries, string text)
     {
+        ArgumentNullException.ThrowIfNull(entries);
+        ArgumentException.ThrowIfNullOrEmpty(text);
         _entries = entries;
         _text = text;
     }
@@ -27,10 +29,6 @@ internal sealed class RequiredEntries : IEntries
     /// </summary>
     public string Json()
     {
-        if (_entries is null || string.IsNullOrEmpty(_text))
-        {
-            throw new InvalidOperationException("Entries configuration is missing");
-        }
         string json = _entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement root = document.RootElement;

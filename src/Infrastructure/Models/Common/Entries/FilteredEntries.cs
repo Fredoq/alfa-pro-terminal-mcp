@@ -21,6 +21,9 @@ internal sealed class FilteredEntries : IEntries
     /// <param name="text">Missing entries message.</param>
     public FilteredEntries(IEntries entries, IEntriesFilter filter, string text)
     {
+        ArgumentNullException.ThrowIfNull(entries);
+        ArgumentNullException.ThrowIfNull(filter);
+        ArgumentException.ThrowIfNullOrEmpty(text);
         _entries = entries;
         _filter = filter;
         _text = text;
@@ -31,10 +34,6 @@ internal sealed class FilteredEntries : IEntries
     /// </summary>
     public string Json()
     {
-        if (_entries is null || _filter is null || string.IsNullOrEmpty(_text))
-        {
-            throw new InvalidOperationException("Entries configuration is missing");
-        }
         string json = _entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement root = document.RootElement;

@@ -17,6 +17,8 @@ internal sealed class FallbackEntries : IEntries
     /// <param name="second">Secondary entries.</param>
     public FallbackEntries(IEntries first, IEntries second)
     {
+        ArgumentNullException.ThrowIfNull(first);
+        ArgumentNullException.ThrowIfNull(second);
         _first = first;
         _second = second;
     }
@@ -26,10 +28,6 @@ internal sealed class FallbackEntries : IEntries
     /// </summary>
     public string Json()
     {
-        if (_first is null || _second is null)
-        {
-            throw new InvalidOperationException("Entries configuration is missing");
-        }
         try
         {
             return _first.Json();

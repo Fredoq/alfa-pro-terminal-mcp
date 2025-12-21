@@ -26,6 +26,8 @@ internal sealed class PayloadArrayEntries : IEntries
     /// <param name="name">Array field name.</param>
     public PayloadArrayEntries(string payload, string name)
     {
+        ArgumentException.ThrowIfNullOrEmpty(payload);
+        ArgumentException.ThrowIfNullOrEmpty(name);
         _payload = payload;
         _name = name;
     }
@@ -35,14 +37,6 @@ internal sealed class PayloadArrayEntries : IEntries
     /// </summary>
     public string Json()
     {
-        if (string.IsNullOrEmpty(_payload))
-        {
-            throw new InvalidOperationException("Payload is empty");
-        }
-        if (string.IsNullOrEmpty(_name))
-        {
-            throw new InvalidOperationException("Payload field name is empty");
-        }
         using JsonDocument document = JsonDocument.Parse(_payload);
         JsonElement root = document.RootElement;
         if (!root.TryGetProperty(_name, out JsonElement data) || data.ValueKind != JsonValueKind.Array)
