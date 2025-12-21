@@ -29,5 +29,5 @@ public sealed class WsPositions : IPositions
     /// Returns positions entries for the given account. Usage example: string json = (await positions.Positions(123)).Json();.
     /// </summary>
     public async Task<IPositionsEntries> Entries(long accountId, CancellationToken cancellationToken = default)
-        => new JsonPositionsEntries(await _outbound.NextMessage(cancellationToken), accountId);
+        => new DescribedPositionsEntries(new AccountFilteredPositionsEntries(new AccountPositionsEntries(await _outbound.NextMessage(cancellationToken)), accountId), new PositionSchema());
 }

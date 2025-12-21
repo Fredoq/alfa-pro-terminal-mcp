@@ -7,14 +7,14 @@ using System.Security.Cryptography;
 using System.Text.Json;
 
 /// <summary>
-/// Verifies JsonPositionsEntries transformation from router payloads. Usage example: executed by xUnit runner.
+/// Verifies described positions transformation from router payloads. Usage example: executed by xUnit runner.
 /// </summary>
-public sealed class JsonPositionsEntriesTests
+public sealed class DescribedPositionsEntriesTests
 {
     /// <summary>
-    /// Ensures that JsonPositionsEntries extracts described positions for target account. Usage example: new JsonPositionsEntries(payload, account).Json().
+    /// Ensures that described positions entries extract described positions for target account. Usage example: new DescribedPositionsEntries(...).Json().
     /// </summary>
-    [Fact(DisplayName = "JsonPositionsEntries returns described positions for account")]
+    [Fact(DisplayName = "DescribedPositionsEntries returns described positions for account")]
     public void Given_json_with_positions_when_parsed_then_filters_and_describes()
     {
         long account = RandomNumberGenerator.GetInt32(10_000, 99_999);
@@ -29,6 +29,7 @@ public sealed class JsonPositionsEntriesTests
                 {
                     IdPosition = account + 1,
                     IdAccount = account,
+                    Note = "ночь",
                     IdSubAccount = account + 2,
                     IdRazdel = 1,
                     IdObject = 777,
@@ -95,18 +96,18 @@ public sealed class JsonPositionsEntriesTests
                 }
             }
         });
-        JsonPositionsEntries entries = new(payload, account);
+        DescribedPositionsEntries entries = new(new AccountFilteredPositionsEntries(new AccountPositionsEntries(payload), account), new PositionSchema());
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("IdAccount").GetProperty("value").GetInt64() == account && entry.GetProperty("Lot").GetProperty("value").GetInt64() == lot && entry.GetProperty("Price").GetProperty("description").GetString()?.Length > 0;
-        Assert.True(result, "JsonPositionsEntries does not filter and describe positions");
+        Assert.True(result, "DescribedPositionsEntries does not filter and describe positions");
     }
 
     /// <summary>
-    /// Checks that JsonPositionsEntries yields consistent output in parallel calls. Usage example: entries.Json().
+    /// Checks that described positions entries yield consistent output in parallel calls. Usage example: entries.Json().
     /// </summary>
-    [Fact(DisplayName = "JsonPositionsEntries remains consistent under concurrency")]
+    [Fact(DisplayName = "DescribedPositionsEntries remains consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
     {
         long account = RandomNumberGenerator.GetInt32(100_000, 199_999);
@@ -151,18 +152,18 @@ public sealed class JsonPositionsEntriesTests
                 }
             }
         });
-        JsonPositionsEntries entries = new(payload, account);
+        DescribedPositionsEntries entries = new(new AccountFilteredPositionsEntries(new AccountPositionsEntries(payload), account), new PositionSchema());
         ConcurrentBag<string> results = new();
         Parallel.For(0, 5, _ => results.Add(entries.Json()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
-        Assert.True(identical, "JsonPositionsEntries does not remain consistent under concurrency");
+        Assert.True(identical, "DescribedPositionsEntries does not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Confirms that JsonPositionsEntries fails when account positions are missing. Usage example: entries.Json().
+    /// Confirms that described positions entries fail when account positions are missing. Usage example: entries.Json().
     /// </summary>
-    [Fact(DisplayName = "JsonPositionsEntries throws when positions are missing")]
+    [Fact(DisplayName = "DescribedPositionsEntries throws when positions are missing")]
     public void Given_missing_positions_when_parsed_then_throws()
     {
         long account = RandomNumberGenerator.GetInt32(201_000, 299_999);
@@ -206,7 +207,7 @@ public sealed class JsonPositionsEntriesTests
                 }
             }
         });
-        JsonPositionsEntries entries = new(payload, account);
+        DescribedPositionsEntries entries = new(new AccountFilteredPositionsEntries(new AccountPositionsEntries(payload), account), new PositionSchema());
         Assert.Throws<InvalidOperationException>(() => entries.Json());
     }
 }
