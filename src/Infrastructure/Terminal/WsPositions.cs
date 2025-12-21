@@ -1,9 +1,12 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Filters;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Microsoft.Extensions.Logging;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -28,6 +31,6 @@ public sealed class WsPositions : IPositions
     /// <summary>
     /// Returns positions entries for the given account. Usage example: string json = (await positions.Positions(123)).Json();.
     /// </summary>
-    public async Task<IPositionsEntries> Entries(long accountId, CancellationToken cancellationToken = default)
-        => new DescribedPositionsEntries(new AccountFilteredPositionsEntries(new AccountPositionsEntries(await _outbound.NextMessage(cancellationToken)), accountId), new PositionSchema());
+    public async Task<IEntries> Entries(long accountId, CancellationToken cancellationToken = default)
+        => new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AccountScope(accountId), "Account positions are missing"), new PositionSchema());
 }

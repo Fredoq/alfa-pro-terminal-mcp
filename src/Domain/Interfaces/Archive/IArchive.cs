@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Archive;
 
 /// <summary>
@@ -16,5 +18,5 @@ public interface IArchive
     /// <param name="lastDay">Last requested day (inclusive).</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Archive entries builder.</returns>
-    Task<IArchiveEntries> History(long idFi, int candleType, string interval, int period, DateTime firstDay, DateTime lastDay, CancellationToken cancellationToken = default);
+    Task<IEntries> History(long idFi, int candleType, string interval, int period, DateTime firstDay, DateTime lastDay, CancellationToken cancellationToken = default);
 }
