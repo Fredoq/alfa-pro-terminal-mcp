@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 
 /// <summary>
@@ -10,5 +12,5 @@ public interface IAccounts
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns>Collection of client accounts.</returns>
-    Task<IAccountsEntries> Entries(CancellationToken cancellationToken = default);
+    Task<IEntries> Entries(CancellationToken cancellationToken = default);
 }

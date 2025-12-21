@@ -7,7 +7,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 /// <summary>
 /// Sends outbound messages to the terminal by draining a channel into a WebSocket.
-/// Usage example: IOutbox outbox = new Outbox(socket); Task task = outbox.Pump(CancellationToken.None); await outbox.Send("{\"Command\":\"ping\"}", token); await outbox.Close(token); await task.
+/// Usage example: IOutbox outbox = new TrmOutbox(socket); Task task = outbox.Pump(CancellationToken.None); await outbox.Send("{\"Command\":\"ping\"}", token); await outbox.Close(token); await task.
 /// </summary>
 public sealed class TrmOutbox : IOutbox
 {
@@ -16,7 +16,7 @@ public sealed class TrmOutbox : IOutbox
 
     /// <summary>
     /// Creates an outbound stream for a given WebSocket.
-    /// Usage example: IOutbox outbox = new Outbox(socket).
+    /// Usage example: IOutbox outbox = new TrmOutbox(socket).
     /// </summary>
     /// <param name="socket">WebSocket used for sending messages</param>
     public TrmOutbox(WebSocket socket)

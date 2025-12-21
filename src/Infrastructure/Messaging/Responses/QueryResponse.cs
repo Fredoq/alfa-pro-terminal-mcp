@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
 
@@ -33,15 +34,15 @@ internal sealed class QueryResponse : IResponse
         ArgumentNullException.ThrowIfNull(id);
         using JsonDocument document = JsonDocument.Parse(message);
         JsonElement root = document.RootElement;
-        if (root.String("Id") != id.Value())
+        if (new JsonString(root, "Id").Value() != id.Value())
         {
             return false;
         }
-        if (root.String("Command") != "response")
+        if (new JsonString(root, "Command").Value() != "response")
         {
             return false;
         }
-        if (root.String("Channel") != _channel)
+        if (new JsonString(root, "Channel").Value() != _channel)
         {
             return false;
         }
@@ -57,6 +58,6 @@ internal sealed class QueryResponse : IResponse
         ArgumentException.ThrowIfNullOrEmpty(message);
         using JsonDocument document = JsonDocument.Parse(message);
         JsonElement root = document.RootElement;
-        return root.String("Payload").Trim('"');
+        return new JsonString(root, "Payload").Value().Trim('"');
     }
 }

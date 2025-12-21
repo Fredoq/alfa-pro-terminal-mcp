@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 
 /// <summary>
@@ -11,7 +13,7 @@ public interface IAssetInfos
     /// <param name="ids">Collection of asset identifiers.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Asset infos entries.</returns>
-    Task<IAssetInfosEntries> Info(IEnumerable<long> ids, CancellationToken cancellationToken = default);
+    Task<IEntries> Info(IEnumerable<long> ids, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns asset infos for given tickers. Usage example: var assets = await infos.InfoByTickers(tickers, token);.
@@ -19,5 +21,5 @@ public interface IAssetInfos
     /// <param name="tickers">Collection of asset tickers.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Asset infos entries.</returns>
-    Task<IAssetInfosEntries> InfoByTickers(IEnumerable<string> tickers, CancellationToken cancellationToken = default);
+    Task<IEntries> InfoByTickers(IEnumerable<string> tickers, CancellationToken cancellationToken = default);
 }

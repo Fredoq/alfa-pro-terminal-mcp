@@ -49,7 +49,7 @@ public sealed class WsArchiveTests
     }
 
     /// <summary>
-    /// Ensures that WsArchive returns MPV levels through JsonArchiveEntries. Usage example: await archive.History(...).
+    /// Ensures that WsArchive returns MPV levels through archive entries. Usage example: await archive.History(...).
     /// </summary>
     [Fact(DisplayName = "WsArchive returns mpv levels")]
     public async Task Given_mpv_response_when_requested_then_returns_levels()
