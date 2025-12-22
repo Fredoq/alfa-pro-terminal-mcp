@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Sockets;
 using System.Net.WebSockets;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
@@ -12,6 +11,8 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 /// </summary>
 public sealed class AlfaProTerminalTests
 {
+    private readonly Port port = new(IPAddress.Loopback);
+
     /// <summary>
     /// Ensures that AlfaProTerminal connects to host on start and issues close on stop. Usage example: await terminal.StartAsync(token).
     /// </summary>
@@ -19,7 +20,7 @@ public sealed class AlfaProTerminalTests
     public async Task Given_host_when_started_and_stopped_then_connects_and_closes()
     {
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(5));
-        Uri http = new($"http://127.0.0.1:{Pick()}/terminal/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/terminal/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
         Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
@@ -42,7 +43,7 @@ public sealed class AlfaProTerminalTests
     public async Task Given_payload_when_sent_then_reaches_host()
     {
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(5));
-        Uri http = new($"http://127.0.0.1:{Pick()}/send/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/send/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
         Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
@@ -65,7 +66,7 @@ public sealed class AlfaProTerminalTests
     public async Task Given_cancelled_startup_token_when_sending_then_pump_runs()
     {
         using CancellationTokenSource startup = new(TimeSpan.FromSeconds(5));
-        Uri http = new($"http://127.0.0.1:{Pick()}/pump/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/pump/");
         await using TestSocketHost host = new(http);
         await host.Start(startup.Token);
         Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
@@ -90,7 +91,7 @@ public sealed class AlfaProTerminalTests
     public async Task Given_incoming_message_when_streamed_then_returns_value()
     {
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(5));
-        Uri http = new($"http://127.0.0.1:{Pick()}/messages/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/messages/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
         Dictionary<string, string?> settings = new() { ["Terminal:Endpoint"] = host.Endpoint().ToString() };
@@ -120,15 +121,4 @@ public sealed class AlfaProTerminalTests
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await terminal.StartAsync(CancellationToken.None));
     }
 
-    /// <summary>
-    /// Generates an available TCP port number for test hosts.
-    /// </summary>
-    private static int Pick()
-    {
-        using TcpListener listener = new(IPAddress.Loopback, 0);
-        listener.Start();
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
-    }
 }

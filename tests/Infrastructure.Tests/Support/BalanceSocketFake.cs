@@ -41,7 +41,7 @@ internal sealed class BalanceSocketFake : ITerminal
     public async IAsyncEnumerable<string> Messages([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         string id = await requestId.Task.WaitAsync(cancellationToken);
-        string message = Build(id, responsePayload);
+        string message = new ResponseText(id, responsePayload, "#Data.Query", "response").Value();
         yield return message;
     }
 
@@ -50,8 +50,4 @@ internal sealed class BalanceSocketFake : ITerminal
     /// </summary>
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    /// <summary>
-    /// Builds serialized router response text. Usage example: Build(id, payload).
-    /// </summary>
-    private static string Build(string id, string payload) => $"{{\"Id\":\"{id}\",\"Command\":\"response\",\"Channel\":\"#Data.Query\",\"Payload\":{JsonSerializer.Serialize(payload)}}}";
 }

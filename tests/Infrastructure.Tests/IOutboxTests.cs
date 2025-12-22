@@ -1,7 +1,6 @@
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Net;
-using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
@@ -15,6 +14,8 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 /// </summary>
 public sealed class IOutboxTests
 {
+    private readonly IPort port = new Port(IPAddress.Loopback);
+
     /// <summary>
     /// Ensures IOutbox supports concurrent Send calls without message loss. Usage example: await Task.WhenAll(sends).
     /// </summary>
@@ -23,7 +24,7 @@ public sealed class IOutboxTests
     {
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(5));
         int count = RandomNumberGenerator.GetInt32(2, 12);
-        Uri http = new($"http://127.0.0.1:{Pick()}/outbox-concurrent/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/outbox-concurrent/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
         using ClientWebSocket socket = new();
@@ -55,17 +56,6 @@ public sealed class IOutboxTests
         Assert.True(expected.SetEquals(received), "IOutbox does not deliver all concurrent payloads");
     }
 
-    /// <summary>
-    /// Generates an available TCP port number for test hosts.
-    /// </summary>
-    private static int Pick()
-    {
-        using TcpListener listener = new(IPAddress.Loopback, 0);
-        listener.Start();
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
-    }
 }
 
 #pragma warning restore CA1859

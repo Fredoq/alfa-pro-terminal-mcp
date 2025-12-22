@@ -38,11 +38,10 @@ internal sealed class ArchiveSocketFake : ITerminal
         {
             yield return "{\"heartbeat\":true}";
         }
-        string message = Build(id, responsePayload);
+        string message = new ResponseText(id, responsePayload, "#Archive.Query", "response").Value();
         yield return message;
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    private static string Build(string id, string payload) => $"{{\"Id\":\"{id}\",\"Command\":\"response\",\"Channel\":\"#Archive.Query\",\"Payload\":{JsonSerializer.Serialize(payload)}}}";
 }
