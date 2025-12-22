@@ -1,7 +1,6 @@
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Net;
-using System.Net.Sockets;
 using System.Net.WebSockets;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
@@ -12,6 +11,8 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 /// </summary>
 public sealed class TrmOutboxTests
 {
+    private readonly Port port = new(IPAddress.Loopback);
+
     /// <summary>
     /// Ensures TrmOutbox rejects empty payloads. Usage example: await outbox.Send(string.Empty, token).
     /// </summary>
@@ -45,7 +46,7 @@ public sealed class TrmOutboxTests
     public async Task Given_payload_when_sent_then_reaches_host()
     {
         using CancellationTokenSource source = new(TimeSpan.FromSeconds(5));
-        Uri http = new($"http://127.0.0.1:{Pick()}/outbox/");
+        Uri http = new($"http://127.0.0.1:{port.Value()}/outbox/");
         await using TestSocketHost host = new(http);
         await host.Start(source.Token);
         using ClientWebSocket socket = new();
@@ -63,15 +64,4 @@ public sealed class TrmOutboxTests
         Assert.True(received == payload, "TrmOutbox does not deliver outbound payloads");
     }
 
-    /// <summary>
-    /// Generates an available TCP port number for test hosts.
-    /// </summary>
-    private static int Pick()
-    {
-        using TcpListener listener = new(IPAddress.Loopback, 0);
-        listener.Start();
-        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
-    }
 }
