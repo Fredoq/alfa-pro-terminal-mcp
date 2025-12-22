@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Filters;
 
@@ -28,23 +29,7 @@ internal sealed class AssetIdsScope : IEntriesFilter
     /// </summary>
     public bool Filtered(JsonElement node)
     {
-        long id = Id(node);
+        long id = new JsonInteger(node, "IdObject").Value();
         return _ids.Contains(id);
-    }
-
-    /// <summary>
-    /// Extracts identifier from payload. Usage example: long id = Id(node);.
-    /// </summary>
-    private static long Id(JsonElement node)
-    {
-        if (!node.TryGetProperty("IdObject", out JsonElement value))
-        {
-            throw new InvalidOperationException("IdObject is missing");
-        }
-        if (value.ValueKind != JsonValueKind.Number)
-        {
-            throw new InvalidOperationException("IdObject is missing");
-        }
-        return value.GetInt64();
     }
 }
