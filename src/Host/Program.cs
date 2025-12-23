@@ -1,29 +1,21 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
-{
-    Args = args,
-    ContentRootPath = AppContext.BaseDirectory
-});
-builder.Configuration
-    .SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false)
-    .AddEnvironmentVariables();
-builder.Logging
-    .AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
-builder.Services.AddSingleton(_ => new AlfaProTerminal(builder.Configuration))
-            .AddSingleton<ITerminal>(sp => sp.GetRequiredService<AlfaProTerminal>())
-            .AddSingleton<IHostedService>(sp => sp.GetRequiredService<AlfaProTerminal>());
-builder.Services
-    .AddMcpServer()
-    .WithStdioServerTransport()
-    .WithToolsFromAssembly();
-IHost host = builder.Build();
-
-await host.RunAsync();
+Signal signal = new(new CancellationTokenSource());
+ServerName name = new("alfa-pro-terminal-mcp");
+await using AlfaProTerminal terminal = new(new Config(new BasePath(),
+                                               new EnvironmentName("DOTNET_ENVIRONMENT", "ASPNETCORE_ENVIRONMENT", "Production")).Root());
+ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace));
+Catalog catalog = new(new ToolSet(terminal, new Log(factory).Logger(), new Content()).Tools());
+await new App(signal, new Scope(factory,
+                new TerminalSession(terminal,
+                    new EndpointSession(new TransportLink(name, factory),
+                        new EndpointGate(new OptionsSet(new ServerInfo(name,
+                            new ApplicationTitle("Alfa Pro Terminal MCP"),
+                            new McpVersion(new ProcessPath())),
+                        new CapabilitiesSet(),
+                        new HooksSet(catalog,
+                        new Calls(catalog))), factory), signal,
+                    new Services(new ServiceCollection().BuildServiceProvider())), signal))).Run();
