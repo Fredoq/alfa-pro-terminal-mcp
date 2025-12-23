@@ -23,15 +23,25 @@ internal sealed class TransportLink : ITransportLink
     private readonly ILoggerFactory _factory;
 
     /// <summary>
+    /// Creates transport wrapper. Usage example: ITransportLink item = new TransportLink(name, journal).
+    /// </summary>
+    /// <param name="name">Server name.</param>
+    /// <param name="journal">Journal instance.</param>
+    public TransportLink(IServerName name, ILog journal) : this(name, journal.Factory())
+    {
+    }
+
+    /// <summary>
     /// Creates transport wrapper. Usage example: ITransportLink item = new TransportLink(name, factory).
     /// </summary>
     /// <param name="name">Server name.</param>
-    /// <param name="factory">Logger factory provider.</param>
+    /// <param name="factory">Logger factory.</param>
     public TransportLink(IServerName name, ILoggerFactory factory)
     {
         _name = name;
         _factory = factory;
     }
+
 
     /// <summary>
     /// Returns transport instance. Usage example: StdioServerTransport transport = item.Transport().

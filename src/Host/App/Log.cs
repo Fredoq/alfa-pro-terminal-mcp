@@ -5,12 +5,17 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 /// <summary>
 /// Defines logger retrieval. Usage example: ILogger log = item.Logger().
 /// </summary>
-internal interface ILog
+internal interface ILog : IDisposable
 {
     /// <summary>
     /// Returns logger. Usage example: ILogger log = item.Logger().
     /// </summary>
     ILogger Logger();
+
+    /// <summary>
+    /// Returns factory. Usage example: ILoggerFactory factory = item.Factory().
+    /// </summary>
+    ILoggerFactory Factory();
 }
 
 /// <summary>
@@ -29,8 +34,15 @@ internal sealed class Log : ILog
         _factory = factory;
     }
 
+    public void Dispose() => _factory.Dispose();
+
     /// <summary>
     /// Returns logger. Usage example: ILogger log = item.Logger().
     /// </summary>
     public ILogger Logger() => _factory.CreateLogger("terminal");
+
+    /// <summary>
+    /// Returns factory. Usage example: ILoggerFactory factory = item.Factory().
+    /// </summary>
+    public ILoggerFactory Factory() => _factory;
 }
