@@ -251,13 +251,26 @@ internal sealed class McpVersion : IMcpVersion
     /// </summary>
     public string Version()
     {
-        string path = _path.Path();
+        string[] args = Environment.GetCommandLineArgs();
+        string path = args.Length > 0 ? args[0] : string.Empty;
+        if (path.Length > 0 && !Path.IsPathRooted(path))
+        {
+            path = Path.Combine(AppContext.BaseDirectory, path);
+        }
+        if (!File.Exists(path))
+        {
+            path = _path.Path();
+        }
+        if (!File.Exists(path))
+        {
+            return "0.0.0.0";
+        }
         FileVersionInfo info = FileVersionInfo.GetVersionInfo(path);
         string text = info.ProductVersion ?? string.Empty;
-        if (text.Length == 0)
+        if (text.Length == 0 || text == "0.0.0.0")
         {
-            throw new InvalidOperationException("Version is missing");
+            text = info.FileVersion ?? string.Empty;
         }
-        return text;
+        return text.Length == 0 ? "0.0.0.0" : text;
     }
 }
