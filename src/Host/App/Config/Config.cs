@@ -26,13 +26,9 @@ internal sealed class Config : IConfig
     /// Returns configuration root. Usage example: IConfigurationRoot root = config.Root().
     /// </summary>
     public IConfigurationRoot Root()
-    {
-        ConfigurationBuilder builder = new();
-        builder.SetBasePath(_path.Path());
-        builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-        builder.AddJsonFile($"appsettings.{_name.Name()}.json", optional: true, reloadOnChange: false);
-        builder.AddEnvironmentVariables();
-        IConfigurationRoot root = builder.Build();
-        return root;
-    }
+        => new ConfigurationBuilder()
+            .SetBasePath(_path.Path())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile($"appsettings.{_name.Name()}.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables().Build();
 }

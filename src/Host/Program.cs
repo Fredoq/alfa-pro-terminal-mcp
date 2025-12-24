@@ -3,11 +3,11 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Microsoft.Extensions.Logging;
 
-Signal signal = new(new CancellationTokenSource());
-ServerName name = new("alfa-pro-terminal-mcp");
-await using AlfaProTerminal terminal = new(new Config(new BasePath(),
+AppSignal signal = new();
+AppServerName name = new();
+await using AlfaProTerminal terminal = new(new Config(new AppBasePath(),
                                                new EnvironmentName("DOTNET_ENVIRONMENT", "ASPNETCORE_ENVIRONMENT", "Production")).Root());
-ILog journal = new Log(LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace)));                                             
+ILog journal = new Log(LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace)));
 Catalog catalog = new(new ToolSet(terminal, journal, new Content()).Tools());
 await new App(signal, new Scope(journal,
                 new TerminalSession(terminal,
