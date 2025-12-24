@@ -1,11 +1,11 @@
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines capabilities retrieval. Usage example: ServerCapabilities caps = item.Capabilities().
 /// </summary>
-public interface ICapabilitiesSet
+internal interface ICapabilitiesSet
 {
     /// <summary>
     /// Returns capabilities. Usage example: ServerCapabilities caps = item.Capabilities().

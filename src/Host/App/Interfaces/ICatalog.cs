@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines tool catalog behavior for MCP handlers. Usage example: ListToolsResult list = await catalog.Tools(request, token).
 /// </summary>
-public interface ICatalog
+internal interface ICatalog
 {
     /// <summary>
     /// Returns list tools response. Usage example: ListToolsResult list = await catalog.Tools(request, token).

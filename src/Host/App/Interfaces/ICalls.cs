@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines MCP tool invocation behavior. Usage example: CallToolResult result = await calls.Result(request, token).
 /// </summary>
-public interface ICalls
+internal interface ICalls
 {
     /// <summary>
     /// Returns tool call result. Usage example: CallToolResult result = await calls.Result(request, token).

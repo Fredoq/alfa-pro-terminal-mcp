@@ -4,12 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines MCP tool metadata and execution contract. Usage example: Tool tool = item.Tool().
 /// </summary>
-public interface IMcpTool
+internal interface IMcpTool
 {
     /// <summary>
     /// Returns the tool name. Usage example: string name = item.Name().

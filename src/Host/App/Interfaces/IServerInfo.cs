@@ -1,11 +1,11 @@
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines server info retrieval. Usage example: Implementation info = item.Info().
 /// </summary>
-public interface IServerInfo
+internal interface IServerInfo
 {
     /// <summary>
     /// Returns server info. Usage example: Implementation info = item.Info().

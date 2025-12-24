@@ -1,11 +1,11 @@
 using ModelContextProtocol.Server;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines transport creation. Usage example: StdioServerTransport transport = item.Transport().
 /// </summary>
-public interface ITransportLink
+internal interface ITransportLink
 {
     /// <summary>
     /// Returns transport instance. Usage example: StdioServerTransport transport = item.Transport().

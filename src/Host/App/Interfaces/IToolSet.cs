@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
 /// Defines tool collection retrieval. Usage example: IReadOnlyList&lt;IMcpTool&gt; list = item.Tools().
 /// </summary>
-public interface IToolSet
+internal interface IToolSet
 {
     /// <summary>
     /// Returns tool collection. Usage example: IReadOnlyList&lt;IMcpTool&gt; list = item.Tools().

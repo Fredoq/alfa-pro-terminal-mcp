@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using ModelContextProtocol.Protocol;
 
