@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;

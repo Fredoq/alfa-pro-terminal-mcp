@@ -1,3 +1,5 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>

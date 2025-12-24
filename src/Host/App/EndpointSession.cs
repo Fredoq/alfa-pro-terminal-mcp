@@ -1,3 +1,4 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using ModelContextProtocol.Server;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
