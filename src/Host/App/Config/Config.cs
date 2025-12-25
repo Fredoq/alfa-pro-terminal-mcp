@@ -1,34 +1,26 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Microsoft.Extensions.Configuration;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
-/// Builds configuration root from files and environment. Usage example: IConfig config = new Config(path, name).
+/// Builds configuration root from parts. Usage example: IConfig config = new Config(part).
 /// </summary>
 internal sealed class Config : IConfig
 {
-    private readonly IBasePath _path;
-    private readonly IEnvironmentName _name;
+    private readonly IConfigPart _part;
 
     /// <summary>
-    /// Creates configuration builder wrapper. Usage example: IConfig config = new Config(path, name).
+    /// Creates configuration root wrapper. Usage example: IConfig config = new Config(part).
     /// </summary>
-    /// <param name="path">Base path provider.</param>
-    /// <param name="name">Environment name provider.</param>
-    public Config(IBasePath path, IEnvironmentName name)
+    /// <param name="part">Configuration builder part.</param>
+    public Config(IConfigPart part)
     {
-        _path = path;
-        _name = name;
+        _part = part;
     }
 
     /// <summary>
     /// Returns configuration root. Usage example: IConfigurationRoot root = config.Root().
     /// </summary>
     public IConfigurationRoot Root()
-        => new ConfigurationBuilder()
-            .SetBasePath(_path.Path())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{_name.Name()}.json", optional: true, reloadOnChange: false)
-            .AddEnvironmentVariables().Build();
+        => _part.AddPart().Build();
 }
