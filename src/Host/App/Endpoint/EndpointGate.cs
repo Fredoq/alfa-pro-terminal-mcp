@@ -1,4 +1,3 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
@@ -11,15 +10,6 @@ internal sealed class EndpointGate : IEndpointGate
 {
     private readonly IOptionsSet _options;
     private readonly ILoggerFactory _factory;
-
-    /// <summary>
-    /// Creates endpoint wrapper. Usage example: IEndpointGate item = new EndpointGate(options, journal).
-    /// </summary>
-    /// <param name="options">Server options provider.</param>
-    /// <param name="journal">Journal instance.</param>
-    public EndpointGate(IOptionsSet options, ILog journal) : this(options, journal.Factory())
-    {
-    }
 
     /// <summary>
     /// Creates endpoint wrapper. Usage example: IEndpointGate item = new EndpointGate(options, factory).

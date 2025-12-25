@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Microsoft.Extensions.Logging;
 
@@ -18,12 +16,12 @@ internal sealed class ToolSet : IToolSet
     /// Creates tool collection wrapper. Usage example: IToolSet tools = new ToolSet(terminal, logger, content).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="journal">Journal instance.</param>
+    /// <param name="loggerFactory">Logger factory.</param>
     /// <param name="content">Response formatter.</param>
-    public ToolSet(ITerminal terminal, ILog journal, IContent content)
+    public ToolSet(ITerminal terminal, ILoggerFactory loggerFactory, IContent content)
     {
         _terminal = terminal;
-        _logger = journal.Logger();
+        _logger = loggerFactory.CreateLogger<ToolSet>();
         _content = content;
     }
 
