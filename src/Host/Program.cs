@@ -2,7 +2,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 
 AppSignal signal = new();
 AppServerName name = new();
@@ -12,20 +11,18 @@ await using AlfaProTerminal terminal = new(new Config
                                                         (new BasePathPart
                                                             (new ConfigurationBuilder(), new AppBasePath()))))
                                         .Root());
-ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace));
-Catalog catalog = new(new ToolSet(terminal, loggerFactory, new Content()).Tools());
+ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace));
 await new App
         (signal, new Scope
-            (loggerFactory, new TerminalSession
+            (factory, new TerminalSession
                 (terminal, new EndpointSession
-                    (new TransportLink(name, loggerFactory), new EndpointGate
+                    (new TransportLink(name, factory), new EndpointGate
                         (new OptionsSet
                             (new ServerInfo
                                 (name, new ApplicationTitle("Alfa Pro Terminal MCP"), new McpVersion(new ProcessPath())),
                             new CapabilitiesSet(),
-                            new HooksSet(catalog,
-                            new Calls(catalog))),
-                        loggerFactory),
+                            new HooksSet(terminal, factory, new Content())),
+                        factory),
                     signal),
                 signal)))
         .Run();
