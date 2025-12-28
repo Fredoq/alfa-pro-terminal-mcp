@@ -15,13 +15,11 @@ await using AlfaProTerminal terminal = new(new Config
 await new App
         (signal, new TerminalSession
             (terminal, new EndpointSession
-                (new TransportLink(name, factory), new EndpointGate
-                    (new OptionsSet
-                        (new ServerInfo
-                            (name, new ApplicationTitle("Alfa Pro Terminal MCP"), new McpVersion(new ProcessPath())),
-                        new CapabilitiesSet(),
-                        new HooksSet(terminal, factory, new Content())),
-                    factory),
+                (name, factory, new OptionsSet
+                    (new ServerInfo
+                        (name, new ApplicationTitle("Alfa Pro Terminal MCP"), new McpVersion(new ProcessPath())),
+                    new CapabilitiesSet(),
+                    new HooksSet(terminal, factory, new Content())),
                 signal),
             signal))
         .Run();
