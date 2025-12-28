@@ -12,14 +12,12 @@ await using AlfaProTerminal terminal = new(new Config
                                                         (new BasePathPart
                                                             (new ConfigurationBuilder(), new AppBasePath()))))
                                         .Root());
-await new App
-        (signal, new TerminalSession
-            (terminal, new EndpointSession
-                (name, factory, new OptionsSet
+await using McpSession mcpSession = new(name, factory, new OptionsSet
                     (new ServerInfo
                         (name, new ApplicationTitle("Alfa Pro Terminal MCP"), new McpVersion(new ProcessPath())),
                     new CapabilitiesSet(),
                     new HooksSet(terminal, factory, new Content())),
-                signal),
-            signal))
-        .Run();
+                signal);
+await using TerminalSession trmSession = new (terminal, mcpSession, signal);
+await using App app = new(signal, trmSession);
+await app.Run();

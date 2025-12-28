@@ -29,4 +29,9 @@ internal sealed class App : IRun
         _signal.Run();
         return _run.Run();
     }
+
+    /// <summary>
+    /// Disposes the workflow. Usage example: await app.DisposeAsync().
+    /// </summary>
+    public ValueTask DisposeAsync() => _run.DisposeAsync();
 }

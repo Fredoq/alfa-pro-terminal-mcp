@@ -41,4 +41,13 @@ internal sealed class TerminalSession : IRun
             await _terminal.StopAsync(CancellationToken.None);
         }
     }
+
+    /// <summary>
+    /// Disposes terminal and inner workflow. Usage example: await run.DisposeAsync().
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await _terminal.DisposeAsync();
+        await _run.DisposeAsync();
+    }
 }
