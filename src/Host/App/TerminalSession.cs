@@ -32,6 +32,13 @@ internal sealed class TerminalSession : IRun
     public async Task Run()
     {
         await _terminal.StartAsync(_token.Token());
-        await _run.Run();
+        try
+        {
+            await _run.Run();
+        }
+        finally
+        {
+            await _terminal.StopAsync(CancellationToken.None);
+        }
     }
 }

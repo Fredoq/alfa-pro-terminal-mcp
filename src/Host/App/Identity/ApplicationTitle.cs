@@ -15,19 +15,12 @@ internal sealed class ApplicationTitle : IApplicationTitle
     /// <param name="title">Title value.</param>
     public ApplicationTitle(string title)
     {
+        ArgumentException.ThrowIfNullOrEmpty(title);
         _title = title;
     }
 
     /// <summary>
     /// Returns application title. Usage example: string title = item.Title().
     /// </summary>
-    public string Title()
-    {
-        string title = _title;
-        if (title.Length == 0)
-        {
-            throw new InvalidOperationException("Server title is missing");
-        }
-        return title;
-    }
+    public string Title() => _title;
 }
