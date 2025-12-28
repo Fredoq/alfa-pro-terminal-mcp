@@ -18,6 +18,6 @@ await using McpSession mcpSession = new(name, factory, new OptionsSet
                     new CapabilitiesSet(),
                     new HooksSet(terminal, factory, new Content())),
                 signal);
-await using TerminalSession trmSession = new (terminal, mcpSession, signal);
+await using TerminalSession trmSession = new(terminal, mcpSession, signal);
 await using App app = new(signal, trmSession);
 await app.Run();
