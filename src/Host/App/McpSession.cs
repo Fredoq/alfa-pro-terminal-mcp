@@ -1,11 +1,11 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 
 /// <summary>
-/// Runs MCP server session. Usage example: IRun run = new McpSession(name, factory, options, token).
+/// Runs MCP server session. Usage example: IRun run = new McpSession(profile, factory, options, token).
 /// </summary>
 internal sealed class McpSession : IRun
 {
@@ -14,15 +14,15 @@ internal sealed class McpSession : IRun
     private readonly IToken _token;
 
     /// <summary>
-    /// Creates MCP session runner. Usage example: IRun run = new McpSession(name, factory, options, token).
+    /// Creates MCP session runner. Usage example: IRun run = new McpSession(profile, factory, options, token).
     /// </summary>
-    /// <param name="name">Server name.</param>
+    /// <param name="profile">Application profile.</param>
     /// <param name="factory">Logger factory.</param>
     /// <param name="options">Options provider.</param>
     /// <param name="token">Token provider.</param>
-    public McpSession(IServerName name, ILoggerFactory factory, IOptionsSet options, IToken token)
+    public McpSession(IApplicationProfile profile, ILoggerFactory factory, IOptionsSet options, IToken token)
     {
-        _transport = new StdioServerTransport(name.Name(), factory);
+        _transport = new StdioServerTransport(profile.ServerName(), factory);
         _mcpServer = McpServer.Create(_transport, options.Options(), factory);
         _token = token;
     }
