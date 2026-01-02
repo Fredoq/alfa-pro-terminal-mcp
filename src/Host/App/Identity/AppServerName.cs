@@ -20,13 +20,6 @@ internal sealed class AppServerName : IServerName
     }
 
     /// <summary>
-    /// Creates server name wrapper with default value. Usage example: IServerName name = new AppServerName().
-    /// </summary>
-    public AppServerName() : this("alfa-pro-terminal-mcp")
-    {
-    }
-
-    /// <summary>
     /// Returns server name. Usage example: string name = item.Name().
     /// </summary>
     public string Name() => _name;
