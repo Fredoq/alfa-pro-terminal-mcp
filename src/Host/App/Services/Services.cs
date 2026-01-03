@@ -1,8 +1,7 @@
-using System.Threading.Tasks;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Services;
 
 /// <summary>
 /// Wraps service provider lifetime. Usage example: IServices services = new Services(provider).

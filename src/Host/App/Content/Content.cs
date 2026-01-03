@@ -1,8 +1,9 @@
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Content;
 
 /// <summary>
 /// Formats tool results with structured payloads and text blocks. Usage example: IContent formatter = new Content().

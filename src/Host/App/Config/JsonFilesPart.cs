@@ -1,7 +1,8 @@
-using System.Collections.Generic;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Identity;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Config;
 
 /// <summary>
 /// Adds json configuration files to the builder. Usage example: IConfigPart part = new JsonFilesPart(basePart, new[] { "appsettings.json" }).

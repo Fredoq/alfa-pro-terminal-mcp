@@ -1,15 +1,13 @@
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 
 /// <summary>
 /// Provides MCP tool metadata and execution for account balance. Usage example: Tool tool = item.Tool().

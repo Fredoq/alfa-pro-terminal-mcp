@@ -1,10 +1,7 @@
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 /// <summary>
 /// Defines MCP tool metadata and execution contract. Usage example: Tool tool = item.Tool().

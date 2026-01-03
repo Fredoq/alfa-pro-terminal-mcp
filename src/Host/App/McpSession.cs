@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
 

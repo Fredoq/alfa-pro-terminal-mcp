@@ -1,4 +1,6 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Identity;
 
 /// <summary>
 /// Provides environment name from variables. Usage example: IEnvironmentName name = new EnvironmentName("DOTNET_ENVIRONMENT", "ASPNETCORE_ENVIRONMENT", "Production").

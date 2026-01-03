@@ -1,6 +1,6 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Signal;
 
 /// <summary>
 /// Hooks console cancellation and provides a token. Usage example: ISignal signal = new AppSignal(source).

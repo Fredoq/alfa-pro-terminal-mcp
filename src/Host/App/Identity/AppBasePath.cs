@@ -1,4 +1,6 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
+
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Identity;
 
 /// <summary>
 /// Provides base path value. Usage example: IBasePath path = new AppBasePath().

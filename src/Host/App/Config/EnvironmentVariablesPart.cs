@@ -1,6 +1,7 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Config;
 
 /// <summary>
 /// Adds environment variables to the configuration builder. Usage example: IConfigPart part = new EnvironmentVariablesPart(basePart).

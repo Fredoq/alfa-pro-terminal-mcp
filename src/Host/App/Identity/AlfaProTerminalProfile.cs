@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.App;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Identity;
 
 /// <summary>
 /// Provides application profile values. Usage example: IApplicationProfile profile = new AlfaProTerminalProfile("alfa-pro-terminal-mcp", "Alfa Pro Terminal MCP").

@@ -1,6 +1,7 @@
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Config;
 
 /// <summary>
 /// Builds configuration root from parts. Usage example: IConfig config = new Config(part).

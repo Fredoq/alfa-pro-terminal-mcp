@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 /// <summary>
 /// Defines configuration root retrieval. Usage example: IConfigurationRoot root = config.Root().

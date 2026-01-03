@@ -1,4 +1,9 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Catalog;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Config;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Content;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Identity;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Signal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

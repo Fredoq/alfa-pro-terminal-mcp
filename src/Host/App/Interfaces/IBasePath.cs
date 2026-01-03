@@ -1,4 +1,4 @@
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 /// <summary>
 /// Defines base path retrieval. Usage example: string path = item.Path().

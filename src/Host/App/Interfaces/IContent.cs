@@ -1,7 +1,7 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using ModelContextProtocol.Protocol;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 /// <summary>
 /// Defines response formatting for MCP tool calls. Usage example: CallToolResult result = formatter.Result(entries).

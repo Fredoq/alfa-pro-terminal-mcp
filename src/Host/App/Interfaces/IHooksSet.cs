@@ -1,6 +1,6 @@
 using ModelContextProtocol.Server;
 
-namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App;
+namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 
 /// <summary>
 /// Defines hook retrieval. Usage example: McpServerHandlers data = item.Hooks().
