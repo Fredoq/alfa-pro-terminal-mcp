@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-01-02
+### Added
+- Explicit MCP tool catalog with per-tool schemas, annotations, and structured responses
+- JSON value wrappers and generic entries/filters with schema-based output mapping for accounts, assets, positions, and archive payloads
+- Application composition primitives (signals, sessions, configuration parts) and expanded schema/description tests
+### Changed
+- Host bootstrap now uses explicit app sessions and tool catalog instead of Host builder discovery
+- Terminal query processing now maps payloads through schema/entries pipelines with fallback handling for archive payloads
+### Removed
+- Attribute-based MCP tool wrappers and legacy JsonElement extensions and entries interfaces in favor of unified entries
+
 ## [0.7.0] - 2025-12-16
 ### Added
 - Terminal endpoint and timeout configuration
@@ -45,4 +56,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - MCP stdio host wired to Alfa PRO Terminal router with configurable endpoint
 - MCP tool for fetching client accounts list
 - CI pipeline and container publish workflow
-
