@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Descriptions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -14,32 +13,31 @@ internal sealed class AccountBalanceSchema : IJsonSchema
     private readonly RulesSchema _schema;
 
     /// <summary>
-    /// Creates a balance schema with described fields. Usage example: var schema = new AccountBalanceSchema().
+    /// Creates a balance schema with fields. Usage example: var schema = new AccountBalanceSchema().
     /// </summary>
     public AccountBalanceSchema()
     {
-        AccountBalanceDescriptions text = new();
         _schema = new RulesSchema([
-            new WholeRule("DataId", text.Text("DataId")),
-            new WholeRule("IdAccount", text.Text("IdAccount")),
-            new WholeRule("IdSubAccount", text.Text("IdSubAccount")),
-            new WholeRule("IdRazdelGroup", text.Text("IdRazdelGroup")),
-            new RealRule("MarginInitial", text.Text("MarginInitial")),
-            new RealRule("MarginMinimum", text.Text("MarginMinimum")),
-            new RealRule("MarginRequirement", text.Text("MarginRequirement")),
-            new RealRule("Money", text.Text("Money")),
-            new RealRule("MoneyInitial", text.Text("MoneyInitial")),
-            new RealRule("Balance", text.Text("Balance")),
-            new RealRule("PrevBalance", text.Text("PrevBalance")),
-            new RealRule("PortfolioCost", text.Text("PortfolioCost")),
-            new RealRule("LiquidBalance", text.Text("LiquidBalance")),
-            new RealRule("Requirements", text.Text("Requirements")),
-            new RealRule("ImmediateRequirements", text.Text("ImmediateRequirements")),
-            new RealRule("NPL", text.Text("NPL")),
-            new RealRule("DailyPL", text.Text("DailyPL")),
-            new RealRule("NPLPercent", text.Text("NPLPercent")),
-            new RealRule("DailyPLPercent", text.Text("DailyPLPercent")),
-            new RealRule("NKD", text.Text("NKD"))
+            new WholeRule("DataId"),
+            new WholeRule("IdAccount"),
+            new WholeRule("IdSubAccount"),
+            new WholeRule("IdRazdelGroup"),
+            new RealRule("MarginInitial"),
+            new RealRule("MarginMinimum"),
+            new RealRule("MarginRequirement"),
+            new RealRule("Money"),
+            new RealRule("MoneyInitial"),
+            new RealRule("Balance"),
+            new RealRule("PrevBalance"),
+            new RealRule("PortfolioCost"),
+            new RealRule("LiquidBalance"),
+            new RealRule("Requirements"),
+            new RealRule("ImmediateRequirements"),
+            new RealRule("NPL"),
+            new RealRule("DailyPL"),
+            new RealRule("NPLPercent"),
+            new RealRule("DailyPLPercent"),
+            new RealRule("NKD")
         ]);
     }
 

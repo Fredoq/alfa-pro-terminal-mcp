@@ -14,10 +14,10 @@ using System.Text.Json;
 public sealed class AssetInfosEntriesTests
 {
     /// <summary>
-    /// Ensures that asset infos entries extract described assets for target identifiers. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that asset infos entries extract assets for target identifiers. Usage example: new SchemaEntries(...).Json().
     /// </summary>
-    [Fact(DisplayName = "Asset infos entries return described assets for identifiers")]
-    public void Given_json_with_assets_when_parsed_then_filters_and_describes()
+    [Fact(DisplayName = "Asset infos entries return assets for identifiers")]
+    public void Given_json_with_assets_when_parsed_then_filters()
     {
         long id = RandomNumberGenerator.GetInt32(10_000, 99_999);
         long other = id + RandomNumberGenerator.GetInt32(3, 9);
@@ -70,8 +70,8 @@ public sealed class AssetInfosEntriesTests
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         JsonElement instruments = entry.GetProperty("Instruments");
-        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && string.IsNullOrEmpty(entry.GetProperty("Description").GetProperty("value").GetString()) && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetProperty("value").GetBoolean();
-        Assert.True(result, "Asset infos entries do not filter and describe assets");
+        bool result = entry.GetProperty("Ticker").GetString() == ticker && string.IsNullOrEmpty(entry.GetProperty("Description").GetString()) && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetBoolean();
+        Assert.True(result, "Asset infos entries do not filter assets");
     }
 
     /// <summary>

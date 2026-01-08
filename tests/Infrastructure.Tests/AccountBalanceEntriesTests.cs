@@ -13,10 +13,10 @@ using System.Text.Json;
 public sealed class AccountBalanceEntriesTests
 {
     /// <summary>
-    /// Ensures that balance entries filter by account and add descriptions. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that balance entries filter by account and return fields. Usage example: new SchemaEntries(...).Json().
     /// </summary>
-    [Fact(DisplayName = "Account balance entries return described fields for a matching account")]
-    public void Given_payload_with_multiple_accounts_when_parsed_then_filters_and_describes()
+    [Fact(DisplayName = "Account balance entries return fields for a matching account")]
+    public void Given_payload_with_multiple_accounts_when_parsed_then_filters()
     {
         long account = RandomNumberGenerator.GetInt32(10_000, 99_999);
         long sub = RandomNumberGenerator.GetInt32(100_000, 199_999);
@@ -80,8 +80,8 @@ public sealed class AccountBalanceEntriesTests
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        bool result = entry.GetProperty("IdAccount").GetProperty("value").GetInt64() == account && entry.GetProperty("IdAccount").GetProperty("description").GetString()?.Length > 0 && entry.TryGetProperty("NPLPercent", out _);
-        Assert.True(result, "Account balance entries do not filter and describe balance fields");
+        bool result = entry.GetProperty("IdAccount").GetInt64() == account && entry.TryGetProperty("NPLPercent", out _);
+        Assert.True(result, "Account balance entries do not filter balance fields");
     }
 
     /// <summary>

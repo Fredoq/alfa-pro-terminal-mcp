@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Descriptions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -14,16 +13,15 @@ internal sealed class InstrumentSchema : IJsonSchema
     private readonly RulesSchema _schema;
 
     /// <summary>
-    /// Creates an instrument schema with described fields. Usage example: var schema = new InstrumentSchema().
+    /// Creates an instrument schema with fields. Usage example: var schema = new InstrumentSchema().
     /// </summary>
     public InstrumentSchema()
     {
-        AssetInfoDescriptions text = new();
         _schema = new RulesSchema([
-            new WholeRule("IdFi", text.Text("IdFi")),
-            new TextRule("RCode", text.Text("RCode")),
-            new FlagRule("IsLiquid", text.Text("IsLiquid")),
-            new WholeRule("IdMarketBoard", text.Text("IdMarketBoard"))
+            new WholeRule("IdFi"),
+            new TextRule("RCode"),
+            new FlagRule("IsLiquid"),
+            new WholeRule("IdMarketBoard")
         ]);
     }
 

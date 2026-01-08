@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Descriptions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -14,43 +13,42 @@ internal sealed class PositionSchema : IJsonSchema
     private readonly RulesSchema _schema;
 
     /// <summary>
-    /// Creates a position schema with described fields. Usage example: var schema = new PositionSchema().
+    /// Creates a position schema with fields. Usage example: var schema = new PositionSchema().
     /// </summary>
     public PositionSchema()
     {
-        PositionDescriptions text = new();
         _schema = new RulesSchema([
-            new WholeRule("IdPosition", text.Text("IdPosition")),
-            new WholeRule("IdAccount", text.Text("IdAccount")),
-            new WholeRule("IdSubAccount", text.Text("IdSubAccount")),
-            new WholeRule("IdRazdel", text.Text("IdRazdel")),
-            new WholeRule("IdObject", text.Text("IdObject")),
-            new WholeRule("IdFiBalance", text.Text("IdFiBalance")),
-            new WholeRule("IdBalanceGroup", text.Text("IdBalanceGroup")),
-            new RealRule("AssetsPercent", text.Text("AssetsPercent")),
-            new RealRule("PSTNKD", text.Text("PSTNKD")),
-            new FlagRule("IsMoney", text.Text("IsMoney")),
-            new FlagRule("IsRur", text.Text("IsRur")),
-            new RealRule("UchPrice", text.Text("UchPrice")),
-            new RealRule("TorgPos", text.Text("TorgPos")),
-            new RealRule("Price", text.Text("Price")),
-            new RealRule("DailyPL", text.Text("DailyPL")),
-            new RealRule("DailyPLPercentToMarketCurPrice", text.Text("DailyPLPercentToMarketCurPrice")),
-            new RealRule("BackPos", text.Text("BackPos")),
-            new RealRule("PrevQuote", text.Text("PrevQuote")),
-            new RealRule("TrnIn", text.Text("TrnIn")),
-            new RealRule("TrnOut", text.Text("TrnOut")),
-            new RealRule("DailyBuyVolume", text.Text("DailyBuyVolume")),
-            new RealRule("DailySellVolume", text.Text("DailySellVolume")),
-            new RealRule("DailyBuyQuantity", text.Text("DailyBuyQuantity")),
-            new RealRule("DailySellQuantity", text.Text("DailySellQuantity")),
-            new RealRule("NKD", text.Text("NKD")),
-            new RealRule("PriceStep", text.Text("PriceStep")),
-            new WholeRule("Lot", text.Text("Lot")),
-            new RealRule("NPLtoMarketCurPrice", text.Text("NPLtoMarketCurPrice")),
-            new RealRule("NPLPercent", text.Text("NPLPercent")),
-            new RealRule("PlanLong", text.Text("PlanLong")),
-            new RealRule("PlanShort", text.Text("PlanShort"))
+            new WholeRule("IdPosition"),
+            new WholeRule("IdAccount"),
+            new WholeRule("IdSubAccount"),
+            new WholeRule("IdRazdel"),
+            new WholeRule("IdObject"),
+            new WholeRule("IdFiBalance"),
+            new WholeRule("IdBalanceGroup"),
+            new RealRule("AssetsPercent"),
+            new RealRule("PSTNKD"),
+            new FlagRule("IsMoney"),
+            new FlagRule("IsRur"),
+            new RealRule("UchPrice"),
+            new RealRule("TorgPos"),
+            new RealRule("Price"),
+            new RealRule("DailyPL"),
+            new RealRule("DailyPLPercentToMarketCurPrice"),
+            new RealRule("BackPos"),
+            new RealRule("PrevQuote"),
+            new RealRule("TrnIn"),
+            new RealRule("TrnOut"),
+            new RealRule("DailyBuyVolume"),
+            new RealRule("DailySellVolume"),
+            new RealRule("DailyBuyQuantity"),
+            new RealRule("DailySellQuantity"),
+            new RealRule("NKD"),
+            new RealRule("PriceStep"),
+            new WholeRule("Lot"),
+            new RealRule("NPLtoMarketCurPrice"),
+            new RealRule("NPLPercent"),
+            new RealRule("PlanLong"),
+            new RealRule("PlanShort")
         ]);
     }
 

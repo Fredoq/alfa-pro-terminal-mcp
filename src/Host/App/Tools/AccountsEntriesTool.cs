@@ -41,8 +41,22 @@ internal sealed class AccountsEntriesTool : IMcpTool
     public Tool Tool()
     {
         JsonElement input = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""");
-        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","description":"Structured tool response","properties":{"data":{"type":"array","description":"Payload entries with field descriptions","items":{"type":"object"}}},"required":["data"]}""");
-        return new Tool { Name = Name(), Title = "Accounts entries", Description = "Returns a collection of client accounts. Each account contains an identifier and IIA type.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
+        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accounts":{"type":"array","description":"List of brokerage accounts available to the user","items":{"type":"object","properties":{"AccountId":{"type":"integer","description":"Unique identifier of the brokerage account used to reference the account in subsequent operations"},"IIAType":{"type":"integer","enum":[0,1,2],"description":"Individual Investment Account type code Values: 0 standard account, 1 IIA Type A, 2 IIA Type B"}},"required":["AccountId","IIAType"],"additionalProperties":false}}},"required":["accounts"],"additionalProperties":false}""");
+        return new Tool
+        {
+            Name = Name(),
+            Title = "Accounts entries",
+            Description = "Returns a collection of client accounts. Each account contains an identifier and IIA type.",
+            InputSchema = input,
+            OutputSchema = output,
+            Annotations = new ToolAnnotations
+            {
+                ReadOnlyHint = true,
+                IdempotentHint = true,
+                OpenWorldHint = false,
+                DestructiveHint = false
+            }
+        };
     }
 
     /// <summary>
@@ -52,6 +66,6 @@ internal sealed class AccountsEntriesTool : IMcpTool
     {
         WsAccounts tool = new(_terminal, _logger);
         IEntries entries = await tool.Entries(token);
-        return _content.Result(entries);
+        return _content.Result(entries, "accounts");
     }
 }

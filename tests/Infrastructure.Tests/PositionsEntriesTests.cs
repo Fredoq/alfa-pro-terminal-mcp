@@ -14,10 +14,10 @@ using System.Text.Json;
 public sealed class PositionsEntriesTests
 {
     /// <summary>
-    /// Ensures that positions entries extract described positions for target account. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that positions entries extract positions for target account. Usage example: new SchemaEntries(...).Json().
     /// </summary>
-    [Fact(DisplayName = "Positions entries return described positions for account")]
-    public void Given_json_with_positions_when_parsed_then_filters_and_describes()
+    [Fact(DisplayName = "Positions entries return positions for account")]
+    public void Given_json_with_positions_when_parsed_then_filters()
     {
         long account = RandomNumberGenerator.GetInt32(10_000, 99_999);
         long other = account + RandomNumberGenerator.GetInt32(3, 9);
@@ -102,8 +102,8 @@ public sealed class PositionsEntriesTests
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        bool result = entry.GetProperty("IdAccount").GetProperty("value").GetInt64() == account && entry.GetProperty("Lot").GetProperty("value").GetInt64() == lot && entry.GetProperty("Price").GetProperty("description").GetString()?.Length > 0;
-        Assert.True(result, "Positions entries do not filter and describe positions");
+        bool result = entry.GetProperty("IdAccount").GetInt64() == account && entry.GetProperty("Lot").GetInt64() == lot && entry.TryGetProperty("Price", out _);
+        Assert.True(result, "Positions entries do not filter positions");
     }
 
     /// <summary>

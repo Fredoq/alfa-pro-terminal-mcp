@@ -48,7 +48,7 @@ public sealed class WsAssetsInfoTests
         string json = (await infos.Info(new[] { id })).Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        bool result = entry.GetProperty("IdObject").GetProperty("value").GetInt64() == id && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetProperty("value").GetInt64() == 7;
+        bool result = entry.GetProperty("IdObject").GetInt64() == id && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 7;
         Assert.True(result, "WsAssetsInfo does not return asset infos json for matching ids");
     }
 
@@ -145,7 +145,7 @@ public sealed class WsAssetsInfoTests
         string json = (await infos.InfoByTickers(new[] { ticker.ToUpperInvariant() })).Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetProperty("value").GetInt64() == 12;
+        bool result = entry.GetProperty("Ticker").GetString() == ticker && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 12;
         Assert.True(result, "WsAssetsInfo does not return asset infos json for matching tickers");
     }
 }

@@ -13,10 +13,10 @@ using System.Text.Json;
 public sealed class ArchiveEntriesTests
 {
     /// <summary>
-    /// Ensures that archive entries describe OHLCV candles. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).Json().
     /// </summary>
-    [Fact(DisplayName = "Archive entries return described ohlcv candles")]
-    public void Given_ohlcv_payload_when_parsed_then_describes_fields()
+    [Fact(DisplayName = "Archive entries return ohlcv candles")]
+    public void Given_ohlcv_payload_when_parsed_then_returns_fields()
     {
         long volume = RandomNumberGenerator.GetInt32(1_000, 9_999);
         double open = RandomNumberGenerator.GetInt32(10, 99) + 0.25;
@@ -43,17 +43,17 @@ public sealed class ArchiveEntriesTests
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        double openValue = entry.GetProperty("Open").GetProperty("value").GetDouble();
-        string timestamp = entry.GetProperty("Time").GetProperty("value").GetString() ?? string.Empty;
-        bool result = Math.Abs(openValue - open) < 0.0001 && timestamp == time;
-        Assert.True(result, "Archive entries do not describe ohlcv candles");
+        double value = entry.GetProperty("Open").GetDouble();
+        string stamp = entry.GetProperty("Time").GetString() ?? string.Empty;
+        bool result = Math.Abs(value - open) < 0.0001 && stamp == time;
+        Assert.True(result, "Archive entries do not return ohlcv candles");
     }
 
     /// <summary>
-    /// Ensures that archive entries describe MPV candles with levels. Usage example: entries.Json().
+    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.Json().
     /// </summary>
-    [Fact(DisplayName = "Archive entries return described mpv candles with levels")]
-    public void Given_mpv_payload_when_parsed_then_describes_levels()
+    [Fact(DisplayName = "Archive entries return mpv candles with levels")]
+    public void Given_mpv_payload_when_parsed_then_returns_levels()
     {
         long volume = RandomNumberGenerator.GetInt32(20_000, 30_000);
         double price = RandomNumberGenerator.GetInt32(100, 200) + 0.75;
@@ -77,10 +77,10 @@ public sealed class ArchiveEntriesTests
         string json = entries.Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement levels = document.RootElement[0].GetProperty("Levels");
-        double firstPrice = levels[0].GetProperty("Price").GetProperty("value").GetDouble();
+        double value = levels[0].GetProperty("Price").GetDouble();
         int count = levels.GetArrayLength();
-        bool result = Math.Abs(firstPrice - price) < 0.0001 && count == 2;
-        Assert.True(result, "Archive entries do not describe mpv candles with levels");
+        bool result = Math.Abs(value - price) < 0.0001 && count == 2;
+        Assert.True(result, "Archive entries do not return mpv candles with levels");
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Descriptions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -14,14 +13,13 @@ internal sealed class AccountsSchema : IJsonSchema
     private readonly RulesSchema _schema;
 
     /// <summary>
-    /// Creates an accounts schema with described fields. Usage example: var schema = new AccountsSchema().
+    /// Creates an accounts schema with fields. Usage example: var schema = new AccountsSchema().
     /// </summary>
     public AccountsSchema()
     {
-        AccountsDescriptions text = new();
         _schema = new RulesSchema([
-            new WholeRule("AccountId", "IdAccount", text.Text("AccountId")),
-            new WholeRule("IIAType", text.Text("IIAType"))
+            new WholeRule("AccountId", "IdAccount"),
+            new WholeRule("IIAType")
         ]);
     }
 

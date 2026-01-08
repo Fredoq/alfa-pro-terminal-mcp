@@ -26,7 +26,7 @@ public sealed class AccountsEntriesTests
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement root = document.RootElement;
         JsonElement node = root[0];
-        bool result = node.GetProperty("AccountId").GetProperty("value").GetInt64() == account && node.GetProperty("IIAType").GetProperty("value").GetInt32() == code;
+        bool result = node.GetProperty("AccountId").GetInt64() == account && node.GetProperty("IIAType").GetInt32() == code;
         Assert.True(result, "Accounts entries do not extract account identifiers and types");
     }
 

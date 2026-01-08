@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive.Descriptions;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
@@ -15,15 +14,14 @@ internal sealed class MpvSchema : IJsonSchema
     private readonly RulesSchema _schema;
 
     /// <summary>
-    /// Creates an MPV schema with described fields. Usage example: var schema = new MpvSchema().
+    /// Creates an MPV schema with fields. Usage example: var schema = new MpvSchema().
     /// </summary>
     public MpvSchema()
     {
-        ArchiveDescriptions text = new();
         _schema = new RulesSchema([
-            new RealRule("Open", text.Text("Open")),
-            new RealRule("Close", text.Text("Close")),
-            new TextRule("Time", "DT", text.Text("Time")),
+            new RealRule("Open"),
+            new RealRule("Close"),
+            new TextRule("Time", "DT"),
             new LevelsRule()
         ]);
     }

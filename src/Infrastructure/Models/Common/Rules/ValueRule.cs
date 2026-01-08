@@ -5,23 +5,21 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 
 /// <summary>
-/// Adds a described scalar property to an output object. Usage example: rule.Apply(element, output).
+/// Adds a scalar property to an output object. Usage example: rule.Apply(element, output).
 /// </summary>
 /// <typeparam name="T">Scalar value type.</typeparam>
 internal sealed class ValueRule<T> : IJsonRule where T : notnull
 {
     private readonly IJsonValue<T> _value;
     private readonly string _name;
-    private readonly string _text;
 
     /// <summary>
-    /// Creates a described rule. Usage example: new ValueRule(new JsonInteger(node, "Id"), "Id", description).
+    /// Creates a scalar rule. Usage example: new ValueRule(new JsonInteger(node, "Id"), "Id").
     /// </summary>
-    public ValueRule(IJsonValue<T> value, string name, string text)
+    public ValueRule(IJsonValue<T> value, string name)
     {
-        _value = value ?? throw new ArgumentNullException(nameof(value));
-        _name = name ?? throw new ArgumentNullException(nameof(name));
-        _text = text ?? throw new ArgumentNullException(nameof(text));
+        _value = value;
+        _name = name;
     }
 
     /// <summary>
@@ -30,11 +28,6 @@ internal sealed class ValueRule<T> : IJsonRule where T : notnull
     public void Apply(JsonElement node, JsonObject root)
     {
         T value = _value.Value();
-        JsonObject field = new()
-        {
-            ["value"] = JsonValue.Create(value),
-            ["description"] = _text
-        };
-        root[_name] = field;
+        root[_name] = JsonValue.Create(value);
     }
 }

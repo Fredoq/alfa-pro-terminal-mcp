@@ -64,8 +64,8 @@ public sealed class WsPositionsTests
         string json = (await positions.Entries(account)).Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        double step = entry.GetProperty("PriceStep").GetProperty("value").GetDouble();
-        bool result = entry.GetProperty("IdAccount").GetProperty("value").GetInt64() == account && Math.Abs(step - 15.0) < 0.0001;
+        double step = entry.GetProperty("PriceStep").GetDouble();
+        bool result = entry.GetProperty("IdAccount").GetInt64() == account && Math.Abs(step - 15.0) < 0.0001;
         Assert.True(result, "WsPositions does not return positions json for matching account");
     }
 

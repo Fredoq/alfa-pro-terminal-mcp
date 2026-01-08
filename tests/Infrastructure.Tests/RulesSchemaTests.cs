@@ -19,12 +19,11 @@ public sealed class RulesSchemaTests
     public void Rules_schema_returns_consistent_output_under_concurrency()
     {
         long id = RandomNumberGenerator.GetInt32(1_000, 9_999);
-        string text = $"note-{Guid.NewGuid():N}-Ω";
         string code = $"code-{Guid.NewGuid():N}-ж";
         string payload = JsonSerializer.Serialize(new { Id = id, Code = code });
         using JsonDocument document = JsonDocument.Parse(payload);
         JsonElement node = document.RootElement;
-        RulesSchema schema = new([new WholeRule("Id", text), new TextRule("Code", text)]);
+        RulesSchema schema = new([new WholeRule("Id"), new TextRule("Code")]);
         int count = RandomNumberGenerator.GetInt32(2, 6);
         int attempt = 0;
         bool match = false;
@@ -35,7 +34,7 @@ public sealed class RulesSchemaTests
             Parallel.For(0, count, _ => items.Add(schema.Node(node).ToJsonString()));
             string sample = items.First();
             using JsonDocument output = JsonDocument.Parse(sample);
-            long value = output.RootElement.GetProperty("Id").GetProperty("value").GetInt64();
+            long value = output.RootElement.GetProperty("Id").GetInt64();
             match = items.All(item => item == sample) && value == id;
         }
         Assert.True(match, "Rules schema does not return consistent output under concurrency");

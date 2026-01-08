@@ -54,7 +54,7 @@ public sealed class WsBalanceTests
         string json = (await balance.Balance(account)).Json();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        bool result = entry.GetProperty("IdAccount").GetProperty("value").GetInt64() == account;
+        bool result = entry.GetProperty("IdAccount").GetInt64() == account;
         Assert.True(result, "WsBalance does not return balance json for matching account");
     }
 

@@ -11,13 +11,20 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Content;
 internal sealed class Content : IContent
 {
     /// <summary>
-    /// Returns a tool result with structured content. Usage example: CallToolResult result = formatter.Result(entries).
+    /// Returns a tool result with structured content wrapped in the provided root property. Usage example: CallToolResult result = formatter.Result(entries, "accounts").
     /// </summary>
-    public CallToolResult Result(IEntries entries)
+    /// <param name="entries">Structured entries payload.</param>
+    /// <param name="name">Root property name.</param>
+    public CallToolResult Result(IEntries entries, string name)
     {
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new InvalidOperationException("Root name is missing");
+        }
         string json = entries.Json() ?? throw new InvalidOperationException("Payload is missing");
         JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
-        JsonObject data = new() { ["data"] = node };
-        return new CallToolResult { StructuredContent = data, Content = [new TextContentBlock { Text = json }] };
+        JsonObject root = new() { [name] = node };
+        string text = root.ToJsonString();
+        return new CallToolResult { StructuredContent = root, Content = [new TextContentBlock { Text = text }] };
     }
 }
