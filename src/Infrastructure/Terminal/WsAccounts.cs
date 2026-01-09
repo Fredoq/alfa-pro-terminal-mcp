@@ -25,5 +25,9 @@ public sealed class WsAccounts : IAccounts
     }
 
     public async Task<IEntries> Entries(CancellationToken cancellationToken = default)
-        => new SchemaEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AccountsSchema());
+        => new RootEntries
+            (new SchemaEntries
+                (new PayloadArrayEntries
+                    (await _outbound.NextMessage(cancellationToken)), new AccountsSchema()),
+             "accounts");
 }

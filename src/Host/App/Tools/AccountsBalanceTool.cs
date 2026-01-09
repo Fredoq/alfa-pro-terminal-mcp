@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,8 +16,16 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AccountsBalanceTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
+    private readonly IBalances _balances;
+
+    /// <summary>
+    /// Creates account balance tool with provided balances implementation. Usage example: IMcpTool tool = new AccountsBalanceTool(balances).
+    /// </summary>
+    /// <param name="balances">Account balances provider.</param>
+    public AccountsBalanceTool(IBalances balances)
+    {
+        _balances = balances;
+    }
 
     /// <summary>
     /// Creates account balance tool. Usage example: IMcpTool tool = new AccountsBalanceTool(terminal, logger).
@@ -25,9 +33,8 @@ internal sealed class AccountsBalanceTool : IMcpTool
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public AccountsBalanceTool(ITerminal terminal, ILogger logger)
+        : this(new WsBalance(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
     }
 
     /// <summary>
@@ -55,9 +62,8 @@ internal sealed class AccountsBalanceTool : IMcpTool
             throw new McpProtocolException("Missing required argument accountId", McpErrorCode.InvalidParams);
         }
         long id = item.GetInt64();
-        WsBalance tool = new(_terminal, _logger);
-        IEntries entries = await tool.Balance(id, token);
-        JsonNode node = new RootEntries(entries, "balances").StructuredContent();
+        IEntries entries = await _balances.Balance(id, token);
+        JsonNode node = entries.StructuredContent();
         string text = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }

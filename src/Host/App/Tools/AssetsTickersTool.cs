@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,8 +16,16 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AssetsTickersTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
+    private readonly IAssetInfos _infos;
+
+    /// <summary>
+    /// Creates asset info tool by tickers with provided asset infos implementation. Usage example: IMcpTool tool = new AssetsTickersTool(infos).
+    /// </summary>
+    /// <param name="infos">Asset infos provider.</param>
+    public AssetsTickersTool(IAssetInfos infos)
+    {
+        _infos = infos;
+    }
 
     /// <summary>
     /// Creates asset info tool by tickers. Usage example: IMcpTool tool = new AssetsTickersTool(terminal, logger).
@@ -25,9 +33,8 @@ internal sealed class AssetsTickersTool : IMcpTool
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public AssetsTickersTool(ITerminal terminal, ILogger logger)
+        : this(new WsAssetsInfo(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
     }
 
     /// <summary>
@@ -60,9 +67,8 @@ internal sealed class AssetsTickersTool : IMcpTool
             string ticker = part.GetString() ?? throw new McpProtocolException("Ticker value is missing", McpErrorCode.InvalidParams);
             list.Add(ticker);
         }
-        WsAssetsInfo tool = new(_terminal, _logger);
-        IEntries entries = await tool.InfoByTickers(list, token);
-        JsonNode node = new RootEntries(entries, "assets").StructuredContent();
+        IEntries entries = await _infos.InfoByTickers(list, token);
+        JsonNode node = entries.StructuredContent();
         string json = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = json }] };
     }

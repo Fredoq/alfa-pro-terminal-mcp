@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Archive;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,8 +16,16 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class ArchiveTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
+    private readonly IArchive _archive;
+
+    /// <summary>
+    /// Creates archive candles tool with provided archive implementation. Usage example: IMcpTool tool = new ArchiveTool(archive).
+    /// </summary>
+    /// <param name="archive">Archive provider.</param>
+    public ArchiveTool(IArchive archive)
+    {
+        _archive = archive;
+    }
 
     /// <summary>
     /// Creates archive candles tool. Usage example: IMcpTool tool = new ArchiveTool(terminal, logger).
@@ -25,9 +33,8 @@ internal sealed class ArchiveTool : IMcpTool
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public ArchiveTool(ITerminal terminal, ILogger logger)
+        : this(new WsArchive(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
     }
 
     /// <summary>
@@ -80,9 +87,8 @@ internal sealed class ArchiveTool : IMcpTool
             throw new McpProtocolException("Missing required argument lastDay", McpErrorCode.InvalidParams);
         }
         DateTime finish = end.GetDateTime();
-        WsArchive tool = new(_terminal, _logger);
-        IEntries entries = await tool.History(id, kind, unit, span, begin, finish, token);
-        JsonNode node = new RootEntries(entries, "candles").StructuredContent();
+        IEntries entries = await _archive.History(id, kind, unit, span, begin, finish, token);
+        JsonNode node = entries.StructuredContent();
         string text = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }

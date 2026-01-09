@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
@@ -15,8 +15,16 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AccountsEntriesTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
+    private readonly IAccounts _accounts;
+
+    /// <summary>
+    /// Creates account entries tool with provided accounts implementation. Usage example: IMcpTool tool = new AccountsEntriesTool(accounts).
+    /// </summary>
+    /// <param name="accounts">Accounts entries provider.</param>
+    public AccountsEntriesTool(IAccounts accounts)
+    {
+        _accounts = accounts;
+    }
 
     /// <summary>
     /// Creates account entries tool. Usage example: IMcpTool tool = new AccountsEntriesTool(terminal, logger).
@@ -24,9 +32,8 @@ internal sealed class AccountsEntriesTool : IMcpTool
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public AccountsEntriesTool(ITerminal terminal, ILogger logger)
+        : this(new WsAccounts(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
     }
 
     /// <summary>
@@ -63,9 +70,8 @@ internal sealed class AccountsEntriesTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        WsAccounts tool = new(_terminal, _logger);
-        IEntries entries = await tool.Entries(token);
-        JsonNode node = new RootEntries(entries, "accounts").StructuredContent();
+        IEntries entries = await _accounts.Entries(token);
+        JsonNode node = entries.StructuredContent();
         string text = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }

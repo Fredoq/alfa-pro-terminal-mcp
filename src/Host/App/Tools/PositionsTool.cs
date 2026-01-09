@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,8 +16,16 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class PositionsTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
+    private readonly IPositions _positions;
+
+    /// <summary>
+    /// Creates account positions tool with provided positions implementation. Usage example: IMcpTool tool = new PositionsTool(positions).
+    /// </summary>
+    /// <param name="positions">Account positions provider.</param>
+    public PositionsTool(IPositions positions)
+    {
+        _positions = positions;
+    }
 
     /// <summary>
     /// Creates account positions tool. Usage example: IMcpTool tool = new PositionsTool(terminal, logger).
@@ -25,9 +33,8 @@ internal sealed class PositionsTool : IMcpTool
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public PositionsTool(ITerminal terminal, ILogger logger)
+        : this(new WsPositions(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
     }
 
     /// <summary>
@@ -55,9 +62,8 @@ internal sealed class PositionsTool : IMcpTool
             throw new McpProtocolException("Missing required argument accountId", McpErrorCode.InvalidParams);
         }
         long id = item.GetInt64();
-        WsPositions tool = new(_terminal, _logger);
-        IEntries entries = await tool.Entries(id, token);
-        JsonNode node = new RootEntries(entries, "positions").StructuredContent();
+        IEntries entries = await _positions.Entries(id, token);
+        JsonNode node = entries.StructuredContent();
         string text = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }
