@@ -18,5 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\\..\\src\\Infrastructure\\Infrastructure.csproj" />
     <ProjectReference Include="..\\..\\src\\Domain\\Domain.csproj" />
+    <ProjectReference Include="..\\..\\src\\Host\\Host.csproj" />
   </ItemGroup>
 </Project>

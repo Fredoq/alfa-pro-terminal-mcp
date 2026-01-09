@@ -14,7 +14,7 @@ using System.Text.Json;
 public sealed class AssetInfosEntriesTests
 {
     /// <summary>
-    /// Ensures that asset infos entries extract assets for target identifiers. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that asset infos entries extract assets for target identifiers. Usage example: new SchemaEntries(...).Text().
     /// </summary>
     [Fact(DisplayName = "Asset infos entries return assets for identifiers")]
     public void Given_json_with_assets_when_parsed_then_filters()
@@ -66,7 +66,7 @@ public sealed class AssetInfosEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope([id]), "Asset infos are missing"), new AssetInfoSchema());
-        string json = entries.Json();
+        string json = entries.Text();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         JsonElement instruments = entry.GetProperty("Instruments");
@@ -75,7 +75,7 @@ public sealed class AssetInfosEntriesTests
     }
 
     /// <summary>
-    /// Checks that asset infos entries yield consistent output in parallel calls. Usage example: entries.Json().
+    /// Checks that asset infos entries yield consistent output in parallel calls. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Asset infos entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -107,14 +107,14 @@ public sealed class AssetInfosEntriesTests
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope([id]), "Asset infos are missing"), new AssetInfoSchema());
         ConcurrentBag<string> results = [];
-        Parallel.For(0, 5, _ => results.Add(entries.Json()));
+        Parallel.For(0, 5, _ => results.Add(entries.Text()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Asset infos entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Confirms that asset infos entries fail when asset infos are missing. Usage example: entries.Json().
+    /// Confirms that asset infos entries fail when asset infos are missing. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Asset infos entries throw when assets are missing")]
     public void Given_missing_assets_when_parsed_then_throws()
@@ -145,6 +145,6 @@ public sealed class AssetInfosEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope(new[] { id }), "Asset infos are missing"), new AssetInfoSchema());
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.Text());
     }
 }

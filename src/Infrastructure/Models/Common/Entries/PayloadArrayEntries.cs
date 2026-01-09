@@ -1,10 +1,10 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 
 /// <summary>
-/// Returns a JSON array stored in a payload field. Usage example: string json = new PayloadArrayEntries(payload, "Data").Json().
+/// Returns a JSON array stored in a payload field. Usage example: JsonNode node = new PayloadArrayEntries(payload, "Data").StructuredContent().
 /// </summary>
 internal sealed class PayloadArrayEntries : IEntries
 {
@@ -33,16 +33,28 @@ internal sealed class PayloadArrayEntries : IEntries
     }
 
     /// <summary>
-    /// Returns the array from the payload field as JSON. Usage example: string json = entries.Json().
+    /// Returns the array from the payload field as structured content. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public string Json()
+    public JsonNode StructuredContent()
     {
-        using JsonDocument document = JsonDocument.Parse(_payload);
-        JsonElement root = document.RootElement;
-        if (!root.TryGetProperty(_name, out JsonElement data) || data.ValueKind != JsonValueKind.Array)
+        JsonNode node = JsonNode.Parse(_payload) ?? throw new MissingEntriesException("Response data array is missing");
+        JsonObject root = node.AsObject();
+        if (!root.TryGetPropertyValue(_name, out JsonNode? data) || data is null)
         {
             throw new MissingEntriesException("Response data array is missing");
         }
-        return data.GetRawText();
+        try
+        {
+            return data.AsArray();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new MissingEntriesException("Response data array is missing");
+        }
     }
+
+    /// <summary>
+    /// Returns the array from the payload field as JSON text. Usage example: string json = entries.Text().
+    /// </summary>
+    public string Text() => StructuredContent().ToJsonString();
 }

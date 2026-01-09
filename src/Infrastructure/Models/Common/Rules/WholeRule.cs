@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
@@ -31,7 +30,7 @@ internal sealed class WholeRule : IJsonRule
     /// <summary>
     /// Applies the rule to the output object. Usage example: rule.Apply(element, output).
     /// </summary>
-    public void Apply(JsonElement node, JsonObject root)
+    public void Apply(JsonObject node, JsonObject root)
     {
         long value = new JsonInteger(node, _prop).Value();
         root[_name] = JsonValue.Create(value);

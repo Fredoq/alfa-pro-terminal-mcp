@@ -1,7 +1,9 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,19 +18,16 @@ internal sealed class ArchiveTool : IMcpTool
 {
     private readonly ITerminal _terminal;
     private readonly ILogger _logger;
-    private readonly IContent _content;
 
     /// <summary>
-    /// Creates archive candles tool. Usage example: IMcpTool tool = new ArchiveTool(terminal, logger, content).
+    /// Creates archive candles tool. Usage example: IMcpTool tool = new ArchiveTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public ArchiveTool(ITerminal terminal, ILogger logger, IContent content)
+    public ArchiveTool(ITerminal terminal, ILogger logger)
     {
         _terminal = terminal;
         _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -83,6 +82,8 @@ internal sealed class ArchiveTool : IMcpTool
         DateTime finish = end.GetDateTime();
         WsArchive tool = new(_terminal, _logger);
         IEntries entries = await tool.History(id, kind, unit, span, begin, finish, token);
-        return _content.Result(entries, "candles");
+        JsonNode node = new RootEntries(entries, "candles").StructuredContent();
+        string text = node.ToJsonString();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }
 }

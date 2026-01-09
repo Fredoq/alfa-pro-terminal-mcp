@@ -14,7 +14,7 @@ using System.Text.Json;
 public sealed class PositionsEntriesTests
 {
     /// <summary>
-    /// Ensures that positions entries extract positions for target account. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that positions entries extract positions for target account. Usage example: new SchemaEntries(...).Text().
     /// </summary>
     [Fact(DisplayName = "Positions entries return positions for account")]
     public void Given_json_with_positions_when_parsed_then_filters()
@@ -99,7 +99,7 @@ public sealed class PositionsEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AccountScope(account), "Account positions are missing"), new PositionSchema());
-        string json = entries.Json();
+        string json = entries.Text();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("IdAccount").GetInt64() == account && entry.GetProperty("Lot").GetInt64() == lot && entry.TryGetProperty("Price", out _);
@@ -107,7 +107,7 @@ public sealed class PositionsEntriesTests
     }
 
     /// <summary>
-    /// Checks that positions entries yield consistent output in parallel calls. Usage example: entries.Json().
+    /// Checks that positions entries yield consistent output in parallel calls. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Positions entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -156,14 +156,14 @@ public sealed class PositionsEntriesTests
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AccountScope(account), "Account positions are missing"), new PositionSchema());
         ConcurrentBag<string> results = new();
-        Parallel.For(0, 5, _ => results.Add(entries.Json()));
+        Parallel.For(0, 5, _ => results.Add(entries.Text()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Positions entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Confirms that positions entries fail when account positions are missing. Usage example: entries.Json().
+    /// Confirms that positions entries fail when account positions are missing. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Positions entries throw when positions are missing")]
     public void Given_missing_positions_when_parsed_then_throws()
@@ -210,6 +210,6 @@ public sealed class PositionsEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AccountScope(account), "Account positions are missing"), new PositionSchema());
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.Text());
     }
 }

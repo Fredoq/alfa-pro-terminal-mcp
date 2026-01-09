@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
@@ -25,7 +24,7 @@ internal sealed class ValueRule<T> : IJsonRule where T : notnull
     /// <summary>
     /// Applies the rule to the output object. Usage example: rule.Apply(element, output).
     /// </summary>
-    public void Apply(JsonElement node, JsonObject root)
+    public void Apply(JsonObject node, JsonObject root)
     {
         T value = _value.Value();
         root[_name] = JsonValue.Create(value);

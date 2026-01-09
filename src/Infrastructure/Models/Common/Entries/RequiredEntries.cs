@@ -1,10 +1,10 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 
 /// <summary>
-/// Ensures that entries contain at least one item. Usage example: string json = new RequiredEntries(entries, "Entries are missing").Json().
+/// Ensures that entries contain at least one item. Usage example: JsonNode node = new RequiredEntries(entries, "Entries are missing").StructuredContent().
 /// </summary>
 internal sealed class RequiredEntries : IEntries
 {
@@ -25,21 +25,29 @@ internal sealed class RequiredEntries : IEntries
     }
 
     /// <summary>
-    /// Returns entries when at least one item exists. Usage example: string json = entries.Json().
+    /// Returns entries when at least one item exists. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public string Json()
+    public JsonNode StructuredContent()
     {
-        string json = _entries.Json();
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement root = document.RootElement;
-        if (root.ValueKind != JsonValueKind.Array)
+        JsonNode node = _entries.StructuredContent();
+        JsonArray array;
+        try
+        {
+            array = node.AsArray();
+        }
+        catch (InvalidOperationException)
         {
             throw new InvalidOperationException("Entries array is missing");
         }
-        if (root.GetArrayLength() == 0)
+        if (array.Count == 0)
         {
             throw new InvalidOperationException(_text);
         }
-        return json;
+        return node;
     }
+
+    /// <summary>
+    /// Returns entries as JSON text. Usage example: string json = entries.Text().
+    /// </summary>
+    public string Text() => StructuredContent().ToJsonString();
 }

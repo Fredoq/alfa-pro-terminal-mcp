@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
@@ -19,9 +20,9 @@ public sealed class JsonBoolTests
         bool flag = RandomNumberGenerator.GetInt32(0, 2) == 1;
         string name = $"ключ-{Guid.NewGuid()}-ξ";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = flag });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonBool item = new(node, name);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonBool item = new(root, name);
         ConcurrentBag<bool> list = [];
         Parallel.For(0, 5, _ => list.Add(item.Value()));
         bool result = list.All(value => value == flag);
@@ -38,9 +39,9 @@ public sealed class JsonBoolTests
         string name = $"ключ-{Guid.NewGuid()}-ξ";
         string miss = $"нет-{Guid.NewGuid()}-ω";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = flag });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonBool item = new(node, miss);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonBool item = new(root, miss);
         Assert.Throws<InvalidOperationException>(() => item.Value());
     }
 }

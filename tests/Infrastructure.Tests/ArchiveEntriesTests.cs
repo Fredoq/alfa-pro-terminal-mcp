@@ -13,7 +13,7 @@ using System.Text.Json;
 public sealed class ArchiveEntriesTests
 {
     /// <summary>
-    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).Text().
     /// </summary>
     [Fact(DisplayName = "Archive entries return ohlcv candles")]
     public void Given_ohlcv_payload_when_parsed_then_returns_fields()
@@ -40,7 +40,7 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Json();
+        string json = entries.Text();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         double value = entry.GetProperty("Open").GetDouble();
@@ -50,7 +50,7 @@ public sealed class ArchiveEntriesTests
     }
 
     /// <summary>
-    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.Json().
+    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Archive entries return mpv candles with levels")]
     public void Given_mpv_payload_when_parsed_then_returns_levels()
@@ -74,7 +74,7 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Json();
+        string json = entries.Text();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement levels = document.RootElement[0].GetProperty("Levels");
         double value = levels[0].GetProperty("Price").GetDouble();
@@ -84,7 +84,7 @@ public sealed class ArchiveEntriesTests
     }
 
     /// <summary>
-    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.Json().
+    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Archive entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -110,20 +110,20 @@ public sealed class ArchiveEntriesTests
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
         ConcurrentBag<string> results = new();
-        Parallel.For(0, 5, _ => results.Add(entries.Json()));
+        Parallel.For(0, 5, _ => results.Add(entries.Text()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Archive entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Validates that archive entries fail on missing data. Usage example: entries.Json().
+    /// Validates that archive entries fail on missing data. Usage example: entries.Text().
     /// </summary>
     [Fact(DisplayName = "Archive entries throw when archive candles are missing")]
     public void Given_empty_data_when_parsed_then_throws()
     {
         string payload = JsonSerializer.Serialize(new { LastTradeNo = 0, OHLCV = Array.Empty<object>() });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.Text());
     }
 }

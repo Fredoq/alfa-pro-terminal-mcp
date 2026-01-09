@@ -1,7 +1,9 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,19 +18,16 @@ internal sealed class AccountsBalanceTool : IMcpTool
 {
     private readonly ITerminal _terminal;
     private readonly ILogger _logger;
-    private readonly IContent _content;
 
     /// <summary>
-    /// Creates account balance tool. Usage example: IMcpTool tool = new AccountsBalanceTool(terminal, logger, content).
+    /// Creates account balance tool. Usage example: IMcpTool tool = new AccountsBalanceTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public AccountsBalanceTool(ITerminal terminal, ILogger logger, IContent content)
+    public AccountsBalanceTool(ITerminal terminal, ILogger logger)
     {
         _terminal = terminal;
         _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -58,6 +57,8 @@ internal sealed class AccountsBalanceTool : IMcpTool
         long id = item.GetInt64();
         WsBalance tool = new(_terminal, _logger);
         IEntries entries = await tool.Balance(id, token);
-        return _content.Result(entries, "balances");
+        JsonNode node = new RootEntries(entries, "balances").StructuredContent();
+        string text = node.ToJsonString();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }
 }

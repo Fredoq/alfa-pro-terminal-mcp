@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
@@ -7,7 +6,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive.Schemas;
 
 /// <summary>
-/// Defines an output schema for a single MPV candle entry. Usage example: JsonNode node = new MpvSchema().Node(element).
+/// Defines an output schema for a single MPV candle entry. Usage example: JsonNode node = new MpvSchema().Node(item).
 /// </summary>
 internal sealed class MpvSchema : IJsonSchema
 {
@@ -27,7 +26,7 @@ internal sealed class MpvSchema : IJsonSchema
     }
 
     /// <summary>
-    /// Returns an output node for the candle element. Usage example: JsonNode node = schema.Node(element).
+    /// Returns an output node for the candle element. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    public JsonNode Node(JsonElement node) => _schema.Node(node);
+    public JsonNode Node(JsonObject node) => _schema.Node(node);
 }

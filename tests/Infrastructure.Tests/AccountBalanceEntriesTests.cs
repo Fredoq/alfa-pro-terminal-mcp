@@ -13,7 +13,7 @@ using System.Text.Json;
 public sealed class AccountBalanceEntriesTests
 {
     /// <summary>
-    /// Ensures that balance entries filter by account and return fields. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that balance entries filter by account and return fields. Usage example: new SchemaEntries(...).Text().
     /// </summary>
     [Fact(DisplayName = "Account balance entries return fields for a matching account")]
     public void Given_payload_with_multiple_accounts_when_parsed_then_filters()
@@ -77,7 +77,7 @@ public sealed class AccountBalanceEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AccountScope(account), "Account balance is missing"), new AccountBalanceSchema());
-        string json = entries.Json();
+        string json = entries.Text();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("IdAccount").GetInt64() == account && entry.TryGetProperty("NPLPercent", out _);
@@ -85,7 +85,7 @@ public sealed class AccountBalanceEntriesTests
     }
 
     /// <summary>
-    /// Confirms that balance entries fail when the requested account is absent. Usage example: new SchemaEntries(...).Json().
+    /// Confirms that balance entries fail when the requested account is absent. Usage example: new SchemaEntries(...).Text().
     /// </summary>
     [Fact(DisplayName = "Account balance entries throw when target account is missing")]
     public void Given_payload_without_target_account_when_parsed_then_throws()
@@ -123,6 +123,6 @@ public sealed class AccountBalanceEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AccountScope(account), "Account balance is missing"), new AccountBalanceSchema());
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.Text());
     }
 }

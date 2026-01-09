@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
@@ -6,7 +5,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
 
 /// <summary>
-/// Defines output for account entries. Usage example: JsonNode node = new AccountsSchema().Node(element).
+/// Defines output for account entries. Usage example: JsonNode node = new AccountsSchema().Node(item).
 /// </summary>
 internal sealed class AccountsSchema : IJsonSchema
 {
@@ -24,8 +23,8 @@ internal sealed class AccountsSchema : IJsonSchema
     }
 
     /// <summary>
-    /// Returns an account entry node. Usage example: JsonNode node = schema.Node(element).
+    /// Returns an account entry node. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    /// <param name="node">Source JSON element.</param>
-    public JsonNode Node(JsonElement node) => _schema.Node(node);
+    /// <param name="node">Source JSON object.</param>
+    public JsonNode Node(JsonObject node) => _schema.Node(node);
 }

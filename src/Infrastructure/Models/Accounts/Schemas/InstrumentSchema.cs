@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
@@ -6,7 +5,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
 
 /// <summary>
-/// Defines an output schema for an instrument entry inside asset info payload. Usage example: JsonNode node = new InstrumentSchema().Node(element).
+/// Defines an output schema for an instrument entry inside asset info payload. Usage example: JsonNode node = new InstrumentSchema().Node(item).
 /// </summary>
 internal sealed class InstrumentSchema : IJsonSchema
 {
@@ -26,7 +25,7 @@ internal sealed class InstrumentSchema : IJsonSchema
     }
 
     /// <summary>
-    /// Returns an output node for the instrument element. Usage example: JsonNode node = schema.Node(element).
+    /// Returns an output node for the instrument element. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    public JsonNode Node(JsonElement node) => _schema.Node(node);
+    public JsonNode Node(JsonObject node) => _schema.Node(node);
 }

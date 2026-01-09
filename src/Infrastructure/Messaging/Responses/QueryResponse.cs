@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
@@ -32,8 +32,8 @@ internal sealed class QueryResponse : IResponse
     {
         ArgumentException.ThrowIfNullOrEmpty(message);
         ArgumentNullException.ThrowIfNull(id);
-        using JsonDocument document = JsonDocument.Parse(message);
-        JsonElement root = document.RootElement;
+        JsonNode node = JsonNode.Parse(message) ?? throw new InvalidOperationException("Response payload is missing");
+        JsonObject root = node.AsObject();
         if (new JsonString(root, "Id").Value() != id.Value())
         {
             return false;
@@ -56,8 +56,8 @@ internal sealed class QueryResponse : IResponse
     public string Payload(string message)
     {
         ArgumentException.ThrowIfNullOrEmpty(message);
-        using JsonDocument document = JsonDocument.Parse(message);
-        JsonElement root = document.RootElement;
+        JsonNode node = JsonNode.Parse(message) ?? throw new InvalidOperationException("Response payload is missing");
+        JsonObject root = node.AsObject();
         return new JsonString(root, "Payload").Value().Trim('"');
     }
 }

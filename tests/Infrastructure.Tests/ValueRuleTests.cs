@@ -14,7 +14,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 public sealed class ValueRuleTests
 {
     /// <summary>
-    /// Ensures that value rules return consistent output under concurrency. Usage example: rule.Apply(element, output).
+    /// Ensures that value rules return consistent output under concurrency. Usage example: rule.Apply(item, output).
     /// </summary>
     [Fact(DisplayName = "Value rule returns consistent output under concurrency")]
     public void Value_rule_returns_consistent_output_under_concurrency()
@@ -22,8 +22,8 @@ public sealed class ValueRuleTests
         long id = RandomNumberGenerator.GetInt32(1_000, 9_999);
         string note = $"note-{Guid.NewGuid():N}-μ";
         string payload = JsonSerializer.Serialize(new { Id = id, Note = note });
-        using JsonDocument document = JsonDocument.Parse(payload);
-        JsonElement node = document.RootElement;
+        JsonNode data = JsonNode.Parse(payload) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject node = data.AsObject();
         ValueRule<long> rule = new(new JsonInteger(node, "Id"), "Id");
         int count = RandomNumberGenerator.GetInt32(2, 6);
         int attempt = 0;

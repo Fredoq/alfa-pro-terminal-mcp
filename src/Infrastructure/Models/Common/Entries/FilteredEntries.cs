@@ -1,11 +1,10 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 
 /// <summary>
-/// Filters JSON array entries by a predicate. Usage example: string json = new FilteredEntries(entries, filter, "Entries are missing").Json().
+/// Filters JSON array entries by a predicate. Usage example: JsonNode node = new FilteredEntries(entries, filter, "Entries are missing").StructuredContent().
 /// </summary>
 internal sealed class FilteredEntries : IEntries
 {
@@ -30,31 +29,42 @@ internal sealed class FilteredEntries : IEntries
     }
 
     /// <summary>
-    /// Returns filtered entries as JSON. Usage example: string json = entries.Json().
+    /// Returns filtered entries as structured content. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public string Json()
+    public JsonNode StructuredContent()
     {
-        string json = _entries.Json();
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement root = document.RootElement;
-        if (root.ValueKind != JsonValueKind.Array)
+        JsonNode node = _entries.StructuredContent();
+        JsonArray array;
+        try
+        {
+            array = node.AsArray();
+        }
+        catch (InvalidOperationException)
         {
             throw new InvalidOperationException("Entries array is missing");
         }
         JsonArray list = [];
-        foreach (JsonElement item in root.EnumerateArray())
+        foreach (JsonNode? item in array)
         {
-            if (!_filter.Filtered(item))
+            if (item is null)
+            {
+                throw new InvalidOperationException("Entry node is missing");
+            }
+            if (!_filter.Filtered(item.AsObject()))
             {
                 continue;
             }
-            JsonNode node = JsonNode.Parse(item.GetRawText()) ?? throw new InvalidOperationException("Entry node is missing");
-            list.Add(node);
+            list.Add(item.DeepClone());
         }
         if (list.Count == 0)
         {
             throw new InvalidOperationException(_text);
         }
-        return JsonSerializer.Serialize(list);
+        return list;
     }
+
+    /// <summary>
+    /// Returns filtered entries as JSON text. Usage example: string json = entries.Text().
+    /// </summary>
+    public string Text() => StructuredContent().ToJsonString();
 }

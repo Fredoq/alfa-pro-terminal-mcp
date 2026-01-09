@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 
@@ -17,35 +16,69 @@ internal sealed class LevelsRule : IJsonRule
     }
 
     /// <summary>
-    /// Applies the levels rule by reading Prices, Volumes, and AskVolumes arrays. Usage example: rule.Apply(element, output).
+    /// Applies the levels rule by reading Prices, Volumes, and AskVolumes arrays. Usage example: rule.Apply(item, output).
     /// </summary>
-    public void Apply(JsonElement node, JsonObject root)
+    public void Apply(JsonObject node, JsonObject root)
     {
-        if (!node.TryGetProperty("Prices", out JsonElement prices) || prices.ValueKind != JsonValueKind.Array)
+        if (!node.TryGetPropertyValue("Prices", out JsonNode? price) || price is null)
         {
             throw new InvalidOperationException("Prices is missing");
         }
-        if (!node.TryGetProperty("Volumes", out JsonElement volumes) || volumes.ValueKind != JsonValueKind.Array)
+        if (!node.TryGetPropertyValue("Volumes", out JsonNode? volume) || volume is null)
         {
             throw new InvalidOperationException("Volumes is missing");
         }
-        if (!node.TryGetProperty("AskVolumes", out JsonElement asks) || asks.ValueKind != JsonValueKind.Array)
+        if (!node.TryGetPropertyValue("AskVolumes", out JsonNode? ask) || ask is null)
         {
             throw new InvalidOperationException("AskVolumes is missing");
         }
-        int count = prices.GetArrayLength();
-        if (volumes.GetArrayLength() != count || asks.GetArrayLength() != count)
+        JsonArray prices;
+        try
+        {
+            prices = price.AsArray();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("Prices is missing");
+        }
+        JsonArray volumes;
+        try
+        {
+            volumes = volume.AsArray();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("Volumes is missing");
+        }
+        JsonArray asks;
+        try
+        {
+            asks = ask.AsArray();
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("AskVolumes is missing");
+        }
+        int count = prices.Count;
+        if (volumes.Count != count || asks.Count != count)
         {
             throw new InvalidOperationException("Volume lengths are inconsistent");
         }
         JsonArray list = [];
         for (int index = 0; index < count; index++)
         {
-            JsonObject item = new();
-            item["Price"] = JsonValue.Create(prices[index].GetDouble());
-            item["Volume"] = JsonValue.Create(volumes[index].GetInt64());
-            item["VolumeAsk"] = JsonValue.Create(asks[index].GetInt64());
-            list.Add(item);
+            JsonNode? item = prices[index];
+            JsonNode? size = volumes[index];
+            JsonNode? side = asks[index];
+            if (item is null || size is null || side is null)
+            {
+                throw new InvalidOperationException("Level value is missing");
+            }
+            JsonObject level = new();
+            level["Price"] = JsonValue.Create(item.GetValue<double>());
+            level["Volume"] = JsonValue.Create(size.GetValue<long>());
+            level["VolumeAsk"] = JsonValue.Create(side.GetValue<long>());
+            list.Add(level);
         }
         root["Levels"] = list;
     }

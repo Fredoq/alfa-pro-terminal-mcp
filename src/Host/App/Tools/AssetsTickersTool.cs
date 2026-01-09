@@ -1,7 +1,9 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol;
@@ -16,19 +18,16 @@ internal sealed class AssetsTickersTool : IMcpTool
 {
     private readonly ITerminal _terminal;
     private readonly ILogger _logger;
-    private readonly IContent _content;
 
     /// <summary>
-    /// Creates asset info tool by tickers. Usage example: IMcpTool tool = new AssetsTickersTool(terminal, logger, content).
+    /// Creates asset info tool by tickers. Usage example: IMcpTool tool = new AssetsTickersTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public AssetsTickersTool(ITerminal terminal, ILogger logger, IContent content)
+    public AssetsTickersTool(ITerminal terminal, ILogger logger)
     {
         _terminal = terminal;
         _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -58,11 +57,13 @@ internal sealed class AssetsTickersTool : IMcpTool
         List<string> list = [];
         foreach (JsonElement part in item.EnumerateArray())
         {
-            string text = part.GetString() ?? throw new McpProtocolException("Ticker value is missing", McpErrorCode.InvalidParams);
-            list.Add(text);
+            string ticker = part.GetString() ?? throw new McpProtocolException("Ticker value is missing", McpErrorCode.InvalidParams);
+            list.Add(ticker);
         }
         WsAssetsInfo tool = new(_terminal, _logger);
         IEntries entries = await tool.InfoByTickers(list, token);
-        return _content.Result(entries, "assets");
+        JsonNode node = new RootEntries(entries, "assets").StructuredContent();
+        string json = node.ToJsonString();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = json }] };
     }
 }

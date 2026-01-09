@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
@@ -27,7 +27,7 @@ internal sealed class AssetIdsScope : IEntriesFilter
     /// <summary>
     /// Checks whether payload matches identifier list. Usage example: scope.Filtered(node).
     /// </summary>
-    public bool Filtered(JsonElement node)
+    public bool Filtered(JsonObject node)
     {
         long id = new JsonInteger(node, "IdObject").Value();
         return _ids.Contains(id);

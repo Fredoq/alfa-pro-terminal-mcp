@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Rules;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
@@ -6,7 +5,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Archive.Schemas;
 
 /// <summary>
-/// Defines an output schema for a single OHLCV candle entry. Usage example: JsonNode node = new OhlcvSchema().Node(element).
+/// Defines an output schema for a single OHLCV candle entry. Usage example: JsonNode node = new OhlcvSchema().Node(item).
 /// </summary>
 internal sealed class OhlcvSchema : IJsonSchema
 {
@@ -30,7 +29,7 @@ internal sealed class OhlcvSchema : IJsonSchema
     }
 
     /// <summary>
-    /// Returns an output node for the candle element. Usage example: JsonNode node = schema.Node(element).
+    /// Returns an output node for the candle element. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    public JsonNode Node(JsonElement node) => _schema.Node(node);
+    public JsonNode Node(JsonObject node) => _schema.Node(node);
 }

@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
@@ -36,7 +36,7 @@ internal sealed class AccountScope : IEntriesFilter
     /// Determines whether the node matches the account. Usage example: bool matched = scope.Filtered(node).
     /// </summary>
     /// <param name="node">Account payload element.</param>
-    public bool Filtered(JsonElement node)
+    public bool Filtered(JsonObject node)
     {
         long account = new JsonInteger(node, _name).Value();
         return account == _account;

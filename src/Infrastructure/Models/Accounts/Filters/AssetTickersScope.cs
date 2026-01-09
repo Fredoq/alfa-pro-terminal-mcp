@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts.Filters;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
@@ -32,7 +32,7 @@ internal sealed class AssetTickersScope : IEntriesFilter
     /// <summary>
     /// Checks whether payload matches ticker list. Usage example: scope.Filtered(node).
     /// </summary>
-    public bool Filtered(JsonElement node)
+    public bool Filtered(JsonObject node)
     {
         string value = new JsonString(node, "Ticker").Value();
         return _tickers.Contains(value);
