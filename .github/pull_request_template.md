@@ -2,10 +2,13 @@
 - 
 
 ## Validation
-- [ ] `dotnet test Alfa.ProTerminal.Mcp.sln`
-- [ ] Container publish (SDK) builds: `dotnet publish src/Alfa.ProTerminal.Mcp/Alfa.ProTerminal.Mcp.csproj -c Release /t:PublishContainer -p ContainerRegistry=docker.io`
+- [ ] `dotnet restore Alfa.ProTerminal.Mcp.slnx`
+- [ ] `dotnet format Alfa.ProTerminal.Mcp.slnx --verify-no-changes`
+- [ ] `dotnet build Alfa.ProTerminal.Mcp.slnx -c Release`
+- [ ] `dotnet test Alfa.ProTerminal.Mcp.slnx -c Release`
 
 ## Checklist
 - [ ] Conventional Commit in title
 - [ ] Documentation updated (if needed)
+- [ ] Changelog updated (if needed)
 - [ ] No breaking changes without notes
