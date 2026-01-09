@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -57,18 +56,16 @@ internal sealed class AssetsInfoTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("idObjects", out JsonElement item))
+        if (!data.TryGetValue("idObjects", out _))
         {
             throw new McpProtocolException("Missing required argument idObjects", McpErrorCode.InvalidParams);
         }
         List<long> list = [];
-        foreach (JsonElement part in item.EnumerateArray())
+        foreach (JsonElement part in data["idObjects"].EnumerateArray())
         {
             list.Add(part.GetInt64());
         }
-        IEntries entries = await _infos.Info(list, token);
-        JsonNode node = entries.StructuredContent();
-        string text = node.ToJsonString();
-        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
+        JsonNode node = (await _infos.Info(list, token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

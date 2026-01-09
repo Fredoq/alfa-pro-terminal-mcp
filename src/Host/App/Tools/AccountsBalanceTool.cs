@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -57,12 +56,11 @@ internal sealed class AccountsBalanceTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("accountId", out JsonElement item))
+        if (!data.TryGetValue("accountId", out _))
         {
             throw new McpProtocolException("Missing required argument accountId", McpErrorCode.InvalidParams);
         }
-        JsonNode node = (await _balances.Balance(item.GetInt64(), token)).StructuredContent();
-        string text = node.ToJsonString();
-        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
+        JsonNode node = (await _balances.Balance(data["accountId"].GetInt64(), token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

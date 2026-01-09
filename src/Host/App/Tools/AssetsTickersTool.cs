@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -57,19 +56,17 @@ internal sealed class AssetsTickersTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("tickers", out JsonElement item))
+        if (!data.TryGetValue("tickers", out _))
         {
             throw new McpProtocolException("Missing required argument tickers", McpErrorCode.InvalidParams);
         }
         List<string> list = [];
-        foreach (JsonElement part in item.EnumerateArray())
+        foreach (JsonElement part in data["tickers"].EnumerateArray())
         {
             string ticker = part.GetString() ?? throw new McpProtocolException("Ticker value is missing", McpErrorCode.InvalidParams);
             list.Add(ticker);
         }
-        IEntries entries = await _infos.InfoByTickers(list, token);
-        JsonNode node = entries.StructuredContent();
-        string json = node.ToJsonString();
-        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = json }] };
+        JsonNode node = (await _infos.InfoByTickers(list, token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Archive;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -57,39 +56,31 @@ internal sealed class ArchiveTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("idFi", out JsonElement item))
+        if (!data.TryGetValue("idFi", out _))
         {
             throw new McpProtocolException("Missing required argument idFi", McpErrorCode.InvalidParams);
         }
-        long id = item.GetInt64();
-        if (!data.TryGetValue("candleType", out JsonElement type))
+        if (!data.TryGetValue("candleType", out _))
         {
             throw new McpProtocolException("Missing required argument candleType", McpErrorCode.InvalidParams);
         }
-        int kind = type.GetInt32();
-        if (!data.TryGetValue("interval", out JsonElement part))
+        if (!data.TryGetValue("interval", out _))
         {
             throw new McpProtocolException("Missing required argument interval", McpErrorCode.InvalidParams);
         }
-        string unit = part.GetString() ?? throw new McpProtocolException("Interval value is missing", McpErrorCode.InvalidParams);
-        if (!data.TryGetValue("period", out JsonElement step))
+        if (!data.TryGetValue("period", out _))
         {
             throw new McpProtocolException("Missing required argument period", McpErrorCode.InvalidParams);
         }
-        int span = step.GetInt32();
-        if (!data.TryGetValue("firstDay", out JsonElement start))
+        if (!data.TryGetValue("firstDay", out _))
         {
             throw new McpProtocolException("Missing required argument firstDay", McpErrorCode.InvalidParams);
         }
-        DateTime begin = start.GetDateTime();
-        if (!data.TryGetValue("lastDay", out JsonElement end))
+        if (!data.TryGetValue("lastDay", out _))
         {
             throw new McpProtocolException("Missing required argument lastDay", McpErrorCode.InvalidParams);
         }
-        DateTime finish = end.GetDateTime();
-        IEntries entries = await _archive.History(id, kind, unit, span, begin, finish, token);
-        JsonNode node = entries.StructuredContent();
-        string text = node.ToJsonString();
-        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
+        JsonNode node = (await _archive.History(data["idFi"].GetInt64(), data["candleType"].GetInt32(), data["interval"].GetString() ?? throw new McpProtocolException("Interval value is missing", McpErrorCode.InvalidParams), data["period"].GetInt32(), data["firstDay"].GetDateTime(), data["lastDay"].GetDateTime(), token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }
