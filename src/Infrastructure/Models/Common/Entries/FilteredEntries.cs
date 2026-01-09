@@ -63,8 +63,4 @@ internal sealed class FilteredEntries : IEntries
         return list;
     }
 
-    /// <summary>
-    /// Returns filtered entries as JSON text. Usage example: string json = entries.Text().
-    /// </summary>
-    public string Text() => StructuredContent().ToJsonString();
 }

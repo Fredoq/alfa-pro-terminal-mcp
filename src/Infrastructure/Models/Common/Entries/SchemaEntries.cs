@@ -52,8 +52,4 @@ internal sealed class SchemaEntries : IEntries
         return list;
     }
 
-    /// <summary>
-    /// Returns mapped entries as JSON text. Usage example: string json = entries.Text().
-    /// </summary>
-    public string Text() => StructuredContent().ToJsonString();
 }

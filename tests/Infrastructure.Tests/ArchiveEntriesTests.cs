@@ -13,7 +13,7 @@ using System.Text.Json;
 public sealed class ArchiveEntriesTests
 {
     /// <summary>
-    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).Text().
+    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries return ohlcv candles")]
     public void Given_ohlcv_payload_when_parsed_then_returns_fields()
@@ -40,7 +40,7 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Text();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         double value = entry.GetProperty("Open").GetDouble();
@@ -50,7 +50,7 @@ public sealed class ArchiveEntriesTests
     }
 
     /// <summary>
-    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.Text().
+    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries return mpv candles with levels")]
     public void Given_mpv_payload_when_parsed_then_returns_levels()
@@ -74,7 +74,7 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Text();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement levels = document.RootElement[0].GetProperty("Levels");
         double value = levels[0].GetProperty("Price").GetDouble();
@@ -84,7 +84,7 @@ public sealed class ArchiveEntriesTests
     }
 
     /// <summary>
-    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.Text().
+    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -110,20 +110,20 @@ public sealed class ArchiveEntriesTests
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
         ConcurrentBag<string> results = new();
-        Parallel.For(0, 5, _ => results.Add(entries.Text()));
+        Parallel.For(0, 5, _ => results.Add(entries.StructuredContent().ToJsonString()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Archive entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Validates that archive entries fail on missing data. Usage example: entries.Text().
+    /// Validates that archive entries fail on missing data. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries throw when archive candles are missing")]
     public void Given_empty_data_when_parsed_then_throws()
     {
         string payload = JsonSerializer.Serialize(new { LastTradeNo = 0, OHLCV = Array.Empty<object>() });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        Assert.Throws<InvalidOperationException>(() => entries.Text());
+        Assert.Throws<InvalidOperationException>(() => entries.StructuredContent());
     }
 }

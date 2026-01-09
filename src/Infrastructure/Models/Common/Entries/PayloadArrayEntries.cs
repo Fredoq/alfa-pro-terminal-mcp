@@ -53,8 +53,4 @@ internal sealed class PayloadArrayEntries : IEntries
         }
     }
 
-    /// <summary>
-    /// Returns the array from the payload field as JSON text. Usage example: string json = entries.Text().
-    /// </summary>
-    public string Text() => StructuredContent().ToJsonString();
 }

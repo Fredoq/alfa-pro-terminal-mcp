@@ -61,9 +61,7 @@ internal sealed class AccountsBalanceTool : IMcpTool
         {
             throw new McpProtocolException("Missing required argument accountId", McpErrorCode.InvalidParams);
         }
-        long id = item.GetInt64();
-        IEntries entries = await _balances.Balance(id, token);
-        JsonNode node = entries.StructuredContent();
+        JsonNode node = (await _balances.Balance(item.GetInt64(), token)).StructuredContent();
         string text = node.ToJsonString();
         return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = text }] };
     }

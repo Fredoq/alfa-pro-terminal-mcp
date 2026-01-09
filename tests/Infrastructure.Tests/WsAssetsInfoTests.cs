@@ -45,7 +45,7 @@ public sealed class WsAssetsInfoTests
         await using AssetSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsAssetsInfo infos = new(socket, logger);
-        string json = (await infos.Info(new[] { id })).Text();
+        string json = (await infos.Info(new[] { id })).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("IdObject").GetInt64() == id && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 7;
@@ -86,7 +86,7 @@ public sealed class WsAssetsInfoTests
         await using AssetSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsAssetsInfo infos = new(socket, logger);
-        Task<string> action = Task.Run(async () => (await infos.Info(new[] { id })).Text());
+        Task<string> action = Task.Run(async () => (await infos.Info(new[] { id })).StructuredContent().ToJsonString());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
 
@@ -142,7 +142,7 @@ public sealed class WsAssetsInfoTests
         await using AssetSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsAssetsInfo infos = new(socket, logger);
-        string json = (await infos.InfoByTickers(new[] { ticker.ToUpperInvariant() })).Text();
+        string json = (await infos.InfoByTickers(new[] { ticker.ToUpperInvariant() })).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("Ticker").GetString() == ticker && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 12;

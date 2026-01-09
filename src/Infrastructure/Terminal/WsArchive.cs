@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 
 /// <summary>
-/// Provides archive candles retrieval through the router. Usage example: string json = (await new WsArchive(socket, logger).History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow)).Text();.
+/// Provides archive candles retrieval through the router. Usage example: JsonNode node = (await new WsArchive(socket, logger).History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow)).StructuredContent();.
 /// </summary>
 public sealed class WsArchive : IArchive
 {

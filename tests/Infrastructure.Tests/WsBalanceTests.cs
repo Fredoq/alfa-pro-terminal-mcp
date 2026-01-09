@@ -51,7 +51,7 @@ public sealed class WsBalanceTests
         await using BalanceSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsBalance balance = new(socket, logger);
-        string json = (await balance.Balance(account)).Text();
+        string json = (await balance.Balance(account)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         bool result = entry.GetProperty("IdAccount").GetInt64() == account;
@@ -97,7 +97,7 @@ public sealed class WsBalanceTests
         await using BalanceSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsBalance balance = new(socket, logger);
-        Task<string> action = Task.Run(async () => (await balance.Balance(account)).Text());
+        Task<string> action = Task.Run(async () => (await balance.Balance(account)).StructuredContent().ToJsonString());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
 }

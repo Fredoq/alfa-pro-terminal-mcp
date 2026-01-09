@@ -13,7 +13,7 @@ using System.Text.Json;
 public sealed class AccountsEntriesTests
 {
     /// <summary>
-    /// Ensures that accounts entries extract account id and type. Usage example: new SchemaEntries(...).Text().
+    /// Ensures that accounts entries extract account id and type. Usage example: new SchemaEntries(...).StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Accounts entries extract account identifiers and types")]
     public void Given_json_with_accounts_when_parsed_then_extracts_fields()
@@ -22,7 +22,7 @@ public sealed class AccountsEntriesTests
         int code = RandomNumberGenerator.GetInt32(1, 4);
         string payload = $"{{\"Data\":[{{\"IdAccount\":{account},\"IIAType\":{code},\"Name\":\"ночь\"}}]}}";
         SchemaEntries entries = new(new PayloadArrayEntries(payload), new AccountsSchema());
-        string json = entries.Text();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement root = document.RootElement;
         JsonElement node = root[0];
@@ -31,7 +31,7 @@ public sealed class AccountsEntriesTests
     }
 
     /// <summary>
-    /// Checks that accounts entries yield consistent output in parallel calls. Usage example: entries.Text().
+    /// Checks that accounts entries yield consistent output in parallel calls. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Accounts entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -41,14 +41,14 @@ public sealed class AccountsEntriesTests
         string payload = $"{{\"Data\":[{{\"IdAccount\":{account},\"IIAType\":{code}}}]}}";
         SchemaEntries entries = new(new PayloadArrayEntries(payload), new AccountsSchema());
         ConcurrentBag<string> results = new();
-        Parallel.For(0, 5, _ => results.Add(entries.Text()));
+        Parallel.For(0, 5, _ => results.Add(entries.StructuredContent().ToJsonString()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Accounts entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Confirms that accounts entries fail when account type is missing. Usage example: entries.Text().
+    /// Confirms that accounts entries fail when account type is missing. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Accounts entries throw when account type is missing")]
     public void Given_missing_type_when_parsed_then_throws()
@@ -56,6 +56,6 @@ public sealed class AccountsEntriesTests
         long account = RandomNumberGenerator.GetInt32(101, 1_000);
         string payload = $"{{\"Data\":[{{\"IdAccount\":{account}}}]}}";
         SchemaEntries entries = new(new PayloadArrayEntries(payload), new AccountsSchema());
-        Assert.Throws<InvalidOperationException>(() => entries.Text());
+        Assert.Throws<InvalidOperationException>(() => entries.StructuredContent());
     }
 }

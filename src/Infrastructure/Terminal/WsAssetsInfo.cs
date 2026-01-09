@@ -30,7 +30,7 @@ public sealed class WsAssetsInfo : IAssetInfos
     }
 
     /// <summary>
-    /// Returns asset infos for the given identifiers. Usage example: string json = (await info.Info(ids)).Text();.
+    /// Returns asset infos for the given identifiers. Usage example: JsonNode node = (await info.Info(ids)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> Info([Description("Collection of IdObject values to extract")] IEnumerable<long> ids, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
         => new RootEntries
@@ -43,7 +43,7 @@ public sealed class WsAssetsInfo : IAssetInfos
              "assets");
 
     /// <summary>
-    /// Returns asset infos for the given tickers. Usage example: string json = (await info.InfoByTickers(tickers)).Text();.
+    /// Returns asset infos for the given tickers. Usage example: JsonNode node = (await info.InfoByTickers(tickers)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> InfoByTickers([Description("Tickers of assets to extract")] IEnumerable<string> tickers, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
         => new RootEntries

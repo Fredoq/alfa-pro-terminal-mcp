@@ -27,15 +27,6 @@ public sealed class RootEntries : IEntries
     /// <summary>
     /// Returns entries wrapped into a root property. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public JsonNode StructuredContent()
-    {
-        JsonNode node = _entries.StructuredContent();
-        JsonObject root = new() { [_name] = node };
-        return root;
-    }
+    public JsonNode StructuredContent() => new JsonObject() { [_name] = _entries.StructuredContent() };
 
-    /// <summary>
-    /// Returns entries as JSON text. Usage example: string json = entries.Text().
-    /// </summary>
-    public string Text() => StructuredContent().ToJsonString();
 }

@@ -46,8 +46,4 @@ internal sealed class RequiredEntries : IEntries
         return node;
     }
 
-    /// <summary>
-    /// Returns entries as JSON text. Usage example: string json = entries.Text().
-    /// </summary>
-    public string Text() => StructuredContent().ToJsonString();
 }

@@ -29,7 +29,7 @@ public sealed class WsBalance : IBalances
     }
 
     /// <summary>
-    /// Returns balance entries for the given account. Usage example: string json = (await balance.Balance(123)).Text();.
+    /// Returns balance entries for the given account. Usage example: JsonNode node = (await balance.Balance(123)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> Balance(long accountId, CancellationToken cancellationToken = default)
         => new RootEntries

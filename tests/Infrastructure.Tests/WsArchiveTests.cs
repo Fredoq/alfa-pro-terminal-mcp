@@ -40,7 +40,7 @@ public sealed class WsArchiveTests
         await using ArchiveSocketFake socket = new(payload, true);
         LoggerFake logger = new();
         WsArchive archive = new(socket, logger);
-        string json = (await archive.History(123, 0, "day", 1, DateTime.UtcNow.Date.AddDays(-2), DateTime.UtcNow.Date)).Text();
+        string json = (await archive.History(123, 0, "day", 1, DateTime.UtcNow.Date.AddDays(-2), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         double value = entry.GetProperty("Open").GetDouble();
@@ -75,7 +75,7 @@ public sealed class WsArchiveTests
         await using ArchiveSocketFake socket = new(payload, false);
         LoggerFake logger = new();
         WsArchive archive = new(socket, logger);
-        string json = (await archive.History(321, 2, "hour", 3, DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date)).Text();
+        string json = (await archive.History(321, 2, "hour", 3, DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement level = document.RootElement[0].GetProperty("Levels")[0];
         double value = level.GetProperty("Price").GetDouble();

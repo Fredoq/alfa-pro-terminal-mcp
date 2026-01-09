@@ -61,7 +61,7 @@ public sealed class WsPositionsTests
         await using PositionSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsPositions positions = new(socket, logger);
-        string json = (await positions.Entries(account)).Text();
+        string json = (await positions.Entries(account)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         double step = entry.GetProperty("PriceStep").GetDouble();
@@ -119,7 +119,7 @@ public sealed class WsPositionsTests
         await using PositionSocketFake socket = new(payload);
         LoggerFake logger = new();
         WsPositions positions = new(socket, logger);
-        Task<string> action = Task.Run(async () => (await positions.Entries(account)).Text());
+        Task<string> action = Task.Run(async () => (await positions.Entries(account)).StructuredContent().ToJsonString());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
 }
