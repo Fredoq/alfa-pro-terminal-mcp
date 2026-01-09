@@ -47,7 +47,7 @@ public sealed class WsAssetsInfoTests
         WsAssetsInfo infos = new(socket, logger);
         string json = (await infos.Info(new[] { id })).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement entry = document.RootElement[0];
+        JsonElement entry = document.RootElement.GetProperty("assets")[0];
         bool result = entry.GetProperty("IdObject").GetInt64() == id && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 7;
         Assert.True(result, "WsAssetsInfo does not return asset infos json for matching ids");
     }
@@ -144,7 +144,7 @@ public sealed class WsAssetsInfoTests
         WsAssetsInfo infos = new(socket, logger);
         string json = (await infos.InfoByTickers(new[] { ticker.ToUpperInvariant() })).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement entry = document.RootElement[0];
+        JsonElement entry = document.RootElement.GetProperty("assets")[0];
         bool result = entry.GetProperty("Ticker").GetString() == ticker && entry.GetProperty("Instruments")[0].GetProperty("IdFi").GetInt64() == 12;
         Assert.True(result, "WsAssetsInfo does not return asset infos json for matching tickers");
     }

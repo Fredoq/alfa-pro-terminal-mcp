@@ -42,7 +42,7 @@ public sealed class WsArchiveTests
         WsArchive archive = new(socket, logger);
         string json = (await archive.History(123, 0, "day", 1, DateTime.UtcNow.Date.AddDays(-2), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement entry = document.RootElement[0];
+        JsonElement entry = document.RootElement.GetProperty("candles")[0];
         double value = entry.GetProperty("Open").GetDouble();
         bool result = Math.Abs(value - open) < 0.0001;
         Assert.True(result, "WsArchive does not return archive json and ignore heartbeat");
@@ -77,7 +77,7 @@ public sealed class WsArchiveTests
         WsArchive archive = new(socket, logger);
         string json = (await archive.History(321, 2, "hour", 3, DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement level = document.RootElement[0].GetProperty("Levels")[0];
+        JsonElement level = document.RootElement.GetProperty("candles")[0].GetProperty("Levels")[0];
         double value = level.GetProperty("Price").GetDouble();
         bool result = Math.Abs(value - price) < 0.0001;
         Assert.True(result, "WsArchive does not return mpv levels");

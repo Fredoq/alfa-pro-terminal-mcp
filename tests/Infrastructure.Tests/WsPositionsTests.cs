@@ -63,7 +63,7 @@ public sealed class WsPositionsTests
         WsPositions positions = new(socket, logger);
         string json = (await positions.Entries(account)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement entry = document.RootElement[0];
+        JsonElement entry = document.RootElement.GetProperty("positions")[0];
         double step = entry.GetProperty("PriceStep").GetDouble();
         bool result = entry.GetProperty("IdAccount").GetInt64() == account && Math.Abs(step - 15.0) < 0.0001;
         Assert.True(result, "WsPositions does not return positions json for matching account");
