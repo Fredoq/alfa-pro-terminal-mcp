@@ -14,10 +14,10 @@ using System.Text.Json;
 public sealed class AssetInfosEntriesTests
 {
     /// <summary>
-    /// Ensures that asset infos entries extract described assets for target identifiers. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that asset infos entries extract assets for target identifiers. Usage example: new SchemaEntries(...).StructuredContent().
     /// </summary>
-    [Fact(DisplayName = "Asset infos entries return described assets for identifiers")]
-    public void Given_json_with_assets_when_parsed_then_filters_and_describes()
+    [Fact(DisplayName = "Asset infos entries return assets for identifiers")]
+    public void Given_json_with_assets_when_parsed_then_filters()
     {
         long id = RandomNumberGenerator.GetInt32(10_000, 99_999);
         long other = id + RandomNumberGenerator.GetInt32(3, 9);
@@ -66,16 +66,16 @@ public sealed class AssetInfosEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope([id]), "Asset infos are missing"), new AssetInfoSchema());
-        string json = entries.Json();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
         JsonElement instruments = entry.GetProperty("Instruments");
-        bool result = entry.GetProperty("Ticker").GetProperty("value").GetString() == ticker && string.IsNullOrEmpty(entry.GetProperty("Description").GetProperty("value").GetString()) && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetProperty("value").GetBoolean();
-        Assert.True(result, "Asset infos entries do not filter and describe assets");
+        bool result = entry.GetProperty("Ticker").GetString() == ticker && string.IsNullOrEmpty(entry.GetProperty("Description").GetString()) && instruments.GetArrayLength() == 2 && instruments[0].GetProperty("IsLiquid").GetBoolean();
+        Assert.True(result, "Asset infos entries do not filter assets");
     }
 
     /// <summary>
-    /// Checks that asset infos entries yield consistent output in parallel calls. Usage example: entries.Json().
+    /// Checks that asset infos entries yield consistent output in parallel calls. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Asset infos entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -107,14 +107,14 @@ public sealed class AssetInfosEntriesTests
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope([id]), "Asset infos are missing"), new AssetInfoSchema());
         ConcurrentBag<string> results = [];
-        Parallel.For(0, 5, _ => results.Add(entries.Json()));
+        Parallel.For(0, 5, _ => results.Add(entries.StructuredContent().ToJsonString()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Asset infos entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Confirms that asset infos entries fail when asset infos are missing. Usage example: entries.Json().
+    /// Confirms that asset infos entries fail when asset infos are missing. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Asset infos entries throw when assets are missing")]
     public void Given_missing_assets_when_parsed_then_throws()
@@ -145,6 +145,6 @@ public sealed class AssetInfosEntriesTests
             }
         });
         SchemaEntries entries = new(new FilteredEntries(new PayloadArrayEntries(payload), new AssetIdsScope(new[] { id }), "Asset infos are missing"), new AssetInfoSchema());
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.StructuredContent());
     }
 }

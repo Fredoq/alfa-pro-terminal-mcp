@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 
 /// <summary>
-/// Provides archive candles retrieval through the router. Usage example: string json = (await new WsArchive(socket, logger).History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow)).Json();.
+/// Provides archive candles retrieval through the router. Usage example: JsonNode node = (await new WsArchive(socket, logger).History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow)).StructuredContent();.
 /// </summary>
 public sealed class WsArchive : IArchive
 {
@@ -29,10 +29,25 @@ public sealed class WsArchive : IArchive
 
     public async Task<IEntries> History(long idFi, int candleType, string interval, int period, DateTime firstDay, DateTime lastDay, CancellationToken cancellationToken = default)
     {
-        ArchiveQueryPayload payload = new(idFi, candleType, interval, period, firstDay, lastDay);
-        ArchiveQueryRequest routing = new(payload);
-        TerminalOutboundMessages outbound = new(new IncomingMessage(routing, _socket, _logger), _socket, _logger, new HeartbeatResponse(new QueryResponse("#Archive.Query")));
-        string message = await outbound.NextMessage(cancellationToken);
-        return new FallbackEntries(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(message, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(message, "MPV"), new MpvSchema()), "Archive candles are missing"));
+        string message = await new TerminalOutboundMessages
+                                (new IncomingMessage
+                                    (new ArchiveQueryRequest
+                                        (new ArchiveQueryPayload(idFi, candleType, interval, period, firstDay, lastDay)), _socket, _logger),
+                                    _socket, _logger, new HeartbeatResponse
+                                        (new QueryResponse("#Archive.Query")))
+                                .NextMessage(cancellationToken);
+        return new RootEntries
+                (new FallbackEntries
+                    (new RequiredEntries
+                        (new SchemaEntries
+                            (new PayloadArrayEntries(message, "OHLCV"),
+                             new OhlcvSchema()),
+                         "Archive candles are missing"),
+                     new RequiredEntries
+                        (new SchemaEntries
+                            (new PayloadArrayEntries(message, "MPV"),
+                             new MpvSchema()),
+                         "Archive candles are missing")),
+                 "candles");
     }
 }

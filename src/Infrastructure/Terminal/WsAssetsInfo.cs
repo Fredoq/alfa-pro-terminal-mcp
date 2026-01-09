@@ -30,14 +30,27 @@ public sealed class WsAssetsInfo : IAssetInfos
     }
 
     /// <summary>
-    /// Returns asset infos for the given identifiers. Usage example: string json = (await info.Info(ids)).Json();.
+    /// Returns asset infos for the given identifiers. Usage example: JsonNode node = (await info.Info(ids)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> Info([Description("Collection of IdObject values to extract")] IEnumerable<long> ids, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
-        => new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AssetIdsScope(ids), "Asset infos are missing"), new AssetInfoSchema());
+        => new RootEntries
+            (new SchemaEntries
+                (new FilteredEntries
+                    (new PayloadArrayEntries
+                        (await _outbound.NextMessage(cancellationToken)),
+                     new AssetIdsScope(ids), "Asset infos are missing"),
+                 new AssetInfoSchema()),
+             "assets");
 
     /// <summary>
-    /// Returns asset infos for the given tickers. Usage example: string json = (await info.InfoByTickers(tickers)).Json();.
+    /// Returns asset infos for the given tickers. Usage example: JsonNode node = (await info.InfoByTickers(tickers)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> InfoByTickers([Description("Tickers of assets to extract")] IEnumerable<string> tickers, [Description("Cancellation token controlling the query lifecycle")] CancellationToken cancellationToken = default)
-        => new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AssetTickersScope(tickers), "Asset infos are missing"), new AssetInfoSchema());
+        => new RootEntries
+            (new SchemaEntries
+                (new FilteredEntries
+                    (new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)),
+                     new AssetTickersScope(tickers), "Asset infos are missing"),
+                 new AssetInfoSchema()),
+             "assets");
 }

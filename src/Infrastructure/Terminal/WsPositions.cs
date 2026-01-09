@@ -29,8 +29,15 @@ public sealed class WsPositions : IPositions
     }
 
     /// <summary>
-    /// Returns positions entries for the given account. Usage example: string json = (await positions.Positions(123)).Json();.
+    /// Returns positions entries for the given account. Usage example: JsonNode node = (await positions.Entries(123)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> Entries(long accountId, CancellationToken cancellationToken = default)
-        => new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AccountScope(accountId), "Account positions are missing"), new PositionSchema());
+        => new RootEntries
+            (new SchemaEntries
+                (new FilteredEntries
+                    (new PayloadArrayEntries
+                        (await _outbound.NextMessage(cancellationToken)),
+                     new AccountScope(accountId), "Account positions are missing"),
+                 new PositionSchema()),
+             "positions");
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -14,21 +15,25 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AssetsInfoTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
-    private readonly IContent _content;
+    private readonly IAssetInfos _infos;
 
     /// <summary>
-    /// Creates asset info tool. Usage example: IMcpTool tool = new AssetsInfoTool(terminal, logger, content).
+    /// Creates asset info tool with provided asset infos implementation. Usage example: IMcpTool tool = new AssetsInfoTool(infos).
+    /// </summary>
+    /// <param name="infos">Asset infos provider.</param>
+    public AssetsInfoTool(IAssetInfos infos)
+    {
+        _infos = infos;
+    }
+
+    /// <summary>
+    /// Creates asset info tool. Usage example: IMcpTool tool = new AssetsInfoTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public AssetsInfoTool(ITerminal terminal, ILogger logger, IContent content)
+    public AssetsInfoTool(ITerminal terminal, ILogger logger)
+        : this(new WsAssetsInfo(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -42,8 +47,8 @@ internal sealed class AssetsInfoTool : IMcpTool
     public Tool Tool()
     {
         JsonElement input = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"idObjects":{"type":"array","description":"Collection of IdObject values to extract","items":{"type":"integer"}}},"required":["idObjects"]}""");
-        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","description":"Structured tool response","properties":{"data":{"type":"array","description":"Payload entries with field descriptions","items":{"type":"object"}}},"required":["data"]}""");
-        return new Tool { Name = Name(), Title = "Asset info by identifiers", Description = "Returns asset info list for the given object identifiers with field descriptions.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
+        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"assets":{"type":"array","description":"Asset info entries for requested identifiers","items":{"type":"object","properties":{"IdObject":{"type":"integer","description":"Asset identifier"},"Ticker":{"type":"string","description":"Exchange ticker"},"ISIN":{"type":"string","description":"International security identifier"},"Name":{"type":"string","description":"Asset name"},"Description":{"type":"string","description":"Asset description"},"Nominal":{"type":"number","description":"Nominal value"},"IdObjectType":{"type":"integer","description":"Asset type identifier"},"IdObjectGroup":{"type":"integer","description":"Asset group identifier"},"IdObjectBase":{"type":"integer","description":"Base asset identifier"},"IdObjectFaceUnit":{"type":"integer","description":"Face value currency identifier"},"MatDateObject":{"type":"string","description":"Expiration date of asset"},"Instruments":{"type":"array","description":"Trading instrument details","items":{"type":"object","properties":{"IdFi":{"type":"integer","description":"Financial instrument identifier"},"RCode":{"type":"string","description":"Portfolio code"},"IsLiquid":{"type":"boolean","description":"Liquidity flag"},"IdMarketBoard":{"type":"integer","description":"Market identifier"}},"required":["IdFi","RCode","IsLiquid","IdMarketBoard"],"additionalProperties":false}}},"required":["IdObject","Ticker","ISIN","Name","Description","Nominal","IdObjectType","IdObjectGroup","IdObjectBase","IdObjectFaceUnit","MatDateObject","Instruments"],"additionalProperties":false}}},"required":["assets"],"additionalProperties":false}""");
+        return new Tool { Name = Name(), Title = "Asset info by identifiers", Description = "Returns asset info list for the given object identifiers.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
     }
 
     /// <summary>
@@ -51,17 +56,16 @@ internal sealed class AssetsInfoTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("idObjects", out JsonElement item))
+        if (!data.TryGetValue("idObjects", out _))
         {
             throw new McpProtocolException("Missing required argument idObjects", McpErrorCode.InvalidParams);
         }
         List<long> list = [];
-        foreach (JsonElement part in item.EnumerateArray())
+        foreach (JsonElement part in data["idObjects"].EnumerateArray())
         {
             list.Add(part.GetInt64());
         }
-        WsAssetsInfo tool = new(_terminal, _logger);
-        IEntries entries = await tool.Info(list, token);
-        return _content.Result(entries);
+        JsonNode node = (await _infos.Info(list, token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

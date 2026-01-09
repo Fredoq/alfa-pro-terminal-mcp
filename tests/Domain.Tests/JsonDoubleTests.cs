@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
@@ -19,9 +20,9 @@ public sealed class JsonDoubleTests
         double number = RandomNumberGenerator.GetInt32(1, 1000) / 10d;
         string name = $"ключ-{Guid.NewGuid()}-δ";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = number });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonDouble item = new(node, name);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonDouble item = new(root, name);
         ConcurrentBag<double> list = [];
         Parallel.For(0, 5, _ => list.Add(item.Value()));
         bool result = list.All(value => Math.Abs(value - number) < 0.0000001d);
@@ -38,9 +39,9 @@ public sealed class JsonDoubleTests
         string name = $"ключ-{Guid.NewGuid()}-δ";
         string miss = $"нет-{Guid.NewGuid()}-ψ";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = number });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonDouble item = new(node, miss);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonDouble item = new(root, miss);
         Assert.Throws<InvalidOperationException>(() => item.Value());
     }
 }

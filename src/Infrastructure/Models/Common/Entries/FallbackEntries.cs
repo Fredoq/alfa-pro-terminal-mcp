@@ -1,9 +1,10 @@
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 
 /// <summary>
-/// Chooses the first available entries from two sources. Usage example: string json = new FallbackEntries(primary, secondary).Json().
+/// Chooses the first available entries from two sources. Usage example: JsonNode node = new FallbackEntries(primary, secondary).StructuredContent().
 /// </summary>
 internal sealed class FallbackEntries : IEntries
 {
@@ -24,17 +25,18 @@ internal sealed class FallbackEntries : IEntries
     }
 
     /// <summary>
-    /// Returns entries from the first source or falls back to the second. Usage example: string json = entries.Json().
+    /// Returns entries from the first source or falls back to the second. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public string Json()
+    public JsonNode StructuredContent()
     {
         try
         {
-            return _first.Json();
+            return _first.StructuredContent();
         }
         catch (MissingEntriesException)
         {
-            return _second.Json();
+            return _second.StructuredContent();
         }
     }
+
 }

@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
@@ -6,7 +6,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 /// <summary>
 /// Reads a 64-bit integer value from a JSON node by property name. Usage example: long id = new JsonInteger(node, "IdObject").Value().
 /// </summary>
-public sealed record JsonInteger(JsonElement Node, string Name) : IJsonValue<long>
+public sealed record JsonInteger(JsonObject Node, string Name) : IJsonValue<long>
 {
     /// <summary>
     /// Returns the integer value extracted from the JSON node. Usage example: long id = new JsonInteger(node, "IdObject").Value().
@@ -14,14 +14,17 @@ public sealed record JsonInteger(JsonElement Node, string Name) : IJsonValue<lon
     public long Value()
     {
         ArgumentException.ThrowIfNullOrEmpty(Name);
-        if (!Node.TryGetProperty(Name, out JsonElement value))
+        if (!Node.TryGetPropertyValue(Name, out JsonNode? value) || value is null)
         {
             throw new InvalidOperationException($"{Name} is missing");
         }
-        if (value.ValueKind != JsonValueKind.Number)
+        try
+        {
+            return value.GetValue<long>();
+        }
+        catch (Exception)
         {
             throw new InvalidOperationException($"{Name} is missing");
         }
-        return value.GetInt64();
     }
 }

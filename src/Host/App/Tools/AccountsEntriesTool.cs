@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -13,21 +14,25 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AccountsEntriesTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
-    private readonly IContent _content;
+    private readonly IAccounts _accounts;
 
     /// <summary>
-    /// Creates account entries tool. Usage example: IMcpTool tool = new AccountsEntriesTool(terminal, logger, content).
+    /// Creates account entries tool with provided accounts implementation. Usage example: IMcpTool tool = new AccountsEntriesTool(accounts).
+    /// </summary>
+    /// <param name="accounts">Accounts entries provider.</param>
+    public AccountsEntriesTool(IAccounts accounts)
+    {
+        _accounts = accounts;
+    }
+
+    /// <summary>
+    /// Creates account entries tool. Usage example: IMcpTool tool = new AccountsEntriesTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public AccountsEntriesTool(ITerminal terminal, ILogger logger, IContent content)
+    public AccountsEntriesTool(ITerminal terminal, ILogger logger)
+        : this(new WsAccounts(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -41,8 +46,22 @@ internal sealed class AccountsEntriesTool : IMcpTool
     public Tool Tool()
     {
         JsonElement input = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""");
-        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","description":"Structured tool response","properties":{"data":{"type":"array","description":"Payload entries with field descriptions","items":{"type":"object"}}},"required":["data"]}""");
-        return new Tool { Name = Name(), Title = "Accounts entries", Description = "Returns a collection of client accounts. Each account contains an identifier and IIA type.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
+        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accounts":{"type":"array","description":"List of brokerage accounts available to the user","items":{"type":"object","properties":{"AccountId":{"type":"integer","description":"Unique identifier of the brokerage account used to reference the account in subsequent operations"},"IIAType":{"type":"integer","enum":[0,1,2],"description":"Individual Investment Account type code Values: 0 standard account, 1 IIA Type A, 2 IIA Type B"}},"required":["AccountId","IIAType"],"additionalProperties":false}}},"required":["accounts"],"additionalProperties":false}""");
+        return new Tool
+        {
+            Name = Name(),
+            Title = "Accounts entries",
+            Description = "Returns a collection of client accounts. Each account contains an identifier and IIA type.",
+            InputSchema = input,
+            OutputSchema = output,
+            Annotations = new ToolAnnotations
+            {
+                ReadOnlyHint = true,
+                IdempotentHint = true,
+                OpenWorldHint = false,
+                DestructiveHint = false
+            }
+        };
     }
 
     /// <summary>
@@ -50,8 +69,7 @@ internal sealed class AccountsEntriesTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        WsAccounts tool = new(_terminal, _logger);
-        IEntries entries = await tool.Entries(token);
-        return _content.Result(entries);
+        JsonNode node = (await _accounts.Entries(token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

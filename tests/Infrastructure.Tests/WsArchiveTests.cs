@@ -12,7 +12,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 public sealed class WsArchiveTests
 {
     /// <summary>
-    /// Ensures that WsArchive returns described archive candles while skipping heartbeat. Usage example: await archive.History(...).
+    /// Ensures that WsArchive returns archive candles while skipping heartbeat. Usage example: await archive.History(...).
     /// </summary>
     [Fact(DisplayName = "WsArchive returns archive json and ignores heartbeat")]
     public async Task Given_archive_response_with_heartbeat_when_requested_then_returns_json()
@@ -40,11 +40,11 @@ public sealed class WsArchiveTests
         await using ArchiveSocketFake socket = new(payload, true);
         LoggerFake logger = new();
         WsArchive archive = new(socket, logger);
-        string json = (await archive.History(123, 0, "day", 1, DateTime.UtcNow.Date.AddDays(-2), DateTime.UtcNow.Date)).Json();
+        string json = (await archive.History(123, 0, "day", 1, DateTime.UtcNow.Date.AddDays(-2), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement entry = document.RootElement[0];
-        double openValue = entry.GetProperty("Open").GetProperty("value").GetDouble();
-        bool result = Math.Abs(openValue - open) < 0.0001;
+        JsonElement entry = document.RootElement.GetProperty("candles")[0];
+        double value = entry.GetProperty("Open").GetDouble();
+        bool result = Math.Abs(value - open) < 0.0001;
         Assert.True(result, "WsArchive does not return archive json and ignore heartbeat");
     }
 
@@ -75,11 +75,11 @@ public sealed class WsArchiveTests
         await using ArchiveSocketFake socket = new(payload, false);
         LoggerFake logger = new();
         WsArchive archive = new(socket, logger);
-        string json = (await archive.History(321, 2, "hour", 3, DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date)).Json();
+        string json = (await archive.History(321, 2, "hour", 3, DateTime.UtcNow.Date.AddDays(-1), DateTime.UtcNow.Date)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement level = document.RootElement[0].GetProperty("Levels")[0];
-        double priceValue = level.GetProperty("Price").GetProperty("value").GetDouble();
-        bool result = Math.Abs(priceValue - price) < 0.0001;
+        JsonElement level = document.RootElement.GetProperty("candles")[0].GetProperty("Levels")[0];
+        double value = level.GetProperty("Price").GetDouble();
+        bool result = Math.Abs(value - price) < 0.0001;
         Assert.True(result, "WsArchive does not return mpv levels");
     }
 }

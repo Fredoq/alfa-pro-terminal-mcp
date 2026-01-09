@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Common;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
@@ -18,9 +19,9 @@ public sealed class JsonStringTests
         string name = $"ключ-{Guid.NewGuid()}-β";
         string text = $"значение-{Guid.NewGuid()}-π";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = text });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonString item = new(node, name);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonString item = new(root, name);
         ConcurrentBag<string> list = [];
         Parallel.For(0, 5, _ => list.Add(item.Value()));
         bool result = list.All(value => value == text);
@@ -35,9 +36,9 @@ public sealed class JsonStringTests
     {
         string name = $"ключ-{Guid.NewGuid()}-β";
         string json = JsonSerializer.Serialize(new Dictionary<string, object?> { [name] = null });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonString item = new(node, name);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonString item = new(root, name);
         string value = item.Value();
         Assert.True(value.Length == 0, "JsonString does not map null to empty");
     }
@@ -51,9 +52,9 @@ public sealed class JsonStringTests
         string name = $"ключ-{Guid.NewGuid()}-β";
         string miss = $"нет-{Guid.NewGuid()}-η";
         string json = JsonSerializer.Serialize(new Dictionary<string, object> { [name] = $"значение-{Guid.NewGuid()}-σ" });
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement node = document.RootElement;
-        JsonString item = new(node, miss);
+        JsonNode node = JsonNode.Parse(json) ?? throw new InvalidOperationException("Payload is missing");
+        JsonObject root = node.AsObject();
+        JsonString item = new(root, miss);
         Assert.Throws<InvalidOperationException>(() => item.Value());
     }
 }

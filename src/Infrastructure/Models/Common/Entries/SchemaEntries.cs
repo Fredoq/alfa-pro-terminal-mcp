@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
@@ -6,7 +5,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 
 /// <summary>
-/// Maps JSON array entries through a schema. Usage example: string json = new SchemaEntries(entries, schema).Json().
+/// Maps JSON array entries through a schema. Usage example: JsonNode node = new SchemaEntries(entries, schema).StructuredContent().
 /// </summary>
 internal sealed class SchemaEntries : IEntries
 {
@@ -27,22 +26,30 @@ internal sealed class SchemaEntries : IEntries
     }
 
     /// <summary>
-    /// Returns mapped entries as JSON. Usage example: string json = entries.Json().
+    /// Returns mapped entries as structured content. Usage example: JsonNode node = entries.StructuredContent().
     /// </summary>
-    public string Json()
+    public JsonNode StructuredContent()
     {
-        string json = _entries.Json();
-        using JsonDocument document = JsonDocument.Parse(json);
-        JsonElement root = document.RootElement;
-        if (root.ValueKind != JsonValueKind.Array)
+        JsonNode node = _entries.StructuredContent();
+        JsonArray array;
+        try
+        {
+            array = node.AsArray();
+        }
+        catch (InvalidOperationException)
         {
             throw new InvalidOperationException("Entries array is missing");
         }
         JsonArray list = [];
-        foreach (JsonElement item in root.EnumerateArray())
+        foreach (JsonNode? item in array)
         {
-            list.Add(_schema.Node(item));
+            if (item is null)
+            {
+                throw new InvalidOperationException("Entry node is missing");
+            }
+            list.Add(_schema.Node(item.AsObject()));
         }
-        return JsonSerializer.Serialize(list);
+        return list;
     }
+
 }

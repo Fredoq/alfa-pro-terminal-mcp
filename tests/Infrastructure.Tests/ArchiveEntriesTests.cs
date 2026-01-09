@@ -13,10 +13,10 @@ using System.Text.Json;
 public sealed class ArchiveEntriesTests
 {
     /// <summary>
-    /// Ensures that archive entries describe OHLCV candles. Usage example: new SchemaEntries(...).Json().
+    /// Ensures that archive entries return OHLCV candles. Usage example: new SchemaEntries(...).StructuredContent().
     /// </summary>
-    [Fact(DisplayName = "Archive entries return described ohlcv candles")]
-    public void Given_ohlcv_payload_when_parsed_then_describes_fields()
+    [Fact(DisplayName = "Archive entries return ohlcv candles")]
+    public void Given_ohlcv_payload_when_parsed_then_returns_fields()
     {
         long volume = RandomNumberGenerator.GetInt32(1_000, 9_999);
         double open = RandomNumberGenerator.GetInt32(10, 99) + 0.25;
@@ -40,20 +40,20 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Json();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement[0];
-        double openValue = entry.GetProperty("Open").GetProperty("value").GetDouble();
-        string timestamp = entry.GetProperty("Time").GetProperty("value").GetString() ?? string.Empty;
-        bool result = Math.Abs(openValue - open) < 0.0001 && timestamp == time;
-        Assert.True(result, "Archive entries do not describe ohlcv candles");
+        double value = entry.GetProperty("Open").GetDouble();
+        string stamp = entry.GetProperty("Time").GetString() ?? string.Empty;
+        bool result = Math.Abs(value - open) < 0.0001 && stamp == time;
+        Assert.True(result, "Archive entries do not return ohlcv candles");
     }
 
     /// <summary>
-    /// Ensures that archive entries describe MPV candles with levels. Usage example: entries.Json().
+    /// Ensures that archive entries return MPV candles with levels. Usage example: entries.StructuredContent().
     /// </summary>
-    [Fact(DisplayName = "Archive entries return described mpv candles with levels")]
-    public void Given_mpv_payload_when_parsed_then_describes_levels()
+    [Fact(DisplayName = "Archive entries return mpv candles with levels")]
+    public void Given_mpv_payload_when_parsed_then_returns_levels()
     {
         long volume = RandomNumberGenerator.GetInt32(20_000, 30_000);
         double price = RandomNumberGenerator.GetInt32(100, 200) + 0.75;
@@ -74,17 +74,17 @@ public sealed class ArchiveEntriesTests
             }
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        string json = entries.Json();
+        string json = entries.StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement levels = document.RootElement[0].GetProperty("Levels");
-        double firstPrice = levels[0].GetProperty("Price").GetProperty("value").GetDouble();
+        double value = levels[0].GetProperty("Price").GetDouble();
         int count = levels.GetArrayLength();
-        bool result = Math.Abs(firstPrice - price) < 0.0001 && count == 2;
-        Assert.True(result, "Archive entries do not describe mpv candles with levels");
+        bool result = Math.Abs(value - price) < 0.0001 && count == 2;
+        Assert.True(result, "Archive entries do not return mpv candles with levels");
     }
 
     /// <summary>
-    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.Json().
+    /// Confirms that archive entries output consistent JSON under concurrency. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries remain consistent under concurrency")]
     public void Given_concurrent_calls_when_parsed_then_outputs_identical()
@@ -110,20 +110,20 @@ public sealed class ArchiveEntriesTests
         });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
         ConcurrentBag<string> results = new();
-        Parallel.For(0, 5, _ => results.Add(entries.Json()));
+        Parallel.For(0, 5, _ => results.Add(entries.StructuredContent().ToJsonString()));
         string sample = results.First();
         bool identical = results.All(item => item == sample);
         Assert.True(identical, "Archive entries do not remain consistent under concurrency");
     }
 
     /// <summary>
-    /// Validates that archive entries fail on missing data. Usage example: entries.Json().
+    /// Validates that archive entries fail on missing data. Usage example: entries.StructuredContent().
     /// </summary>
     [Fact(DisplayName = "Archive entries throw when archive candles are missing")]
     public void Given_empty_data_when_parsed_then_throws()
     {
         string payload = JsonSerializer.Serialize(new { LastTradeNo = 0, OHLCV = Array.Empty<object>() });
         FallbackEntries entries = new(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(payload, "MPV"), new MpvSchema()), "Archive candles are missing"));
-        Assert.Throws<InvalidOperationException>(() => entries.Json());
+        Assert.Throws<InvalidOperationException>(() => entries.StructuredContent());
     }
 }

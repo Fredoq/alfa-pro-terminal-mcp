@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -33,14 +32,28 @@ internal sealed class ArrayRule : IJsonRule
     /// <summary>
     /// Applies the rule by building an array with nested schema nodes. Usage example: rule.Apply(element, output).
     /// </summary>
-    public void Apply(JsonElement node, JsonObject root)
+    public void Apply(JsonObject node, JsonObject root)
     {
         JsonArray list = [];
-        if (node.TryGetProperty(_prop, out JsonElement data) && data.ValueKind == JsonValueKind.Array)
+        if (node.TryGetPropertyValue(_prop, out JsonNode? data) && data is not null)
         {
-            foreach (JsonElement item in data.EnumerateArray())
+            JsonArray array;
+            try
             {
-                list.Add(_schema.Node(item));
+                array = data.AsArray();
+            }
+            catch (InvalidOperationException)
+            {
+                root[_name] = list;
+                return;
+            }
+            foreach (JsonNode? item in array)
+            {
+                if (item is null)
+                {
+                    throw new InvalidOperationException("Entry node is missing");
+                }
+                list.Add(_schema.Node(item.AsObject()));
             }
         }
         root[_name] = list;

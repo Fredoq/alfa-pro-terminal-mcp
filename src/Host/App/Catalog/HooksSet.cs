@@ -10,25 +10,24 @@ using ModelContextProtocol.Server;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Catalog;
 
 /// <summary>
-/// Provides tool listing, lookup, invocation, and MCP handlers. Usage example: IHooksSet hooks = new Catalog(terminal, factory, content).
+/// Provides tool listing, lookup, invocation, and MCP handlers. Usage example: IHooksSet hooks = new Catalog(terminal, factory).
 /// </summary>
 internal sealed class HooksSet : IHooksSet
 {
     private readonly IList<IMcpTool> _tools;
     /// <summary>
-    /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory, content).
+    /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="factory">Logger factory.</param>
-    /// <param name="content">Response formatter.</param>
-    public HooksSet(ITerminal terminal, ILoggerFactory factory, IContent content) : this(
+    public HooksSet(ITerminal terminal, ILoggerFactory factory) : this(
     [
-        new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>(), content),
-        new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>(), content),
-        new PositionsTool(terminal, factory.CreateLogger<PositionsTool>(), content),
-        new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>(), content),
-        new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>(), content),
-        new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>(), content)
+        new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>()),
+        new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>()),
+        new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
+        new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>()),
+        new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>()),
+        new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>())
     ])
     {
     }

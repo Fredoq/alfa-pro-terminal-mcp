@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-01-09
+### Added
+- Root entries composition for schema-based output mapping
+- Tool-level tests for accounts, assets, positions, archive, and balance tools
+- Schema match helper for infrastructure tests
+### Changed
+- Entries, filters, and schema rules for account, asset, position, and archive responses
+- MCP tools and terminal clients to align with updated entries and schema rules
+- Host composition, hooks, and configuration parts for simpler app wiring
+### Removed
+- Description layer and its tests for accounts, positions, archive, and asset info
+- Legacy app services/content abstractions
+
 ## [0.8.0] - 2026-01-02
 ### Added
 - Explicit MCP tool catalog with per-tool schemas, annotations, and structured responses

@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 
@@ -10,7 +10,7 @@ public interface IEntriesFilter
     /// <summary>
     /// Determines whether the node satisfies the filter. Usage example: filter.Filtered(node).
     /// </summary>
-    /// <param name="node">Entry element.</param>
+    /// <param name="node">Entry object.</param>
     /// <returns>True when the node matches the filter.</returns>
-    bool Filtered(JsonElement node);
+    bool Filtered(JsonObject node);
 }

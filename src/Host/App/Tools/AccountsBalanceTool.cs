@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -14,21 +15,25 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 /// </summary>
 internal sealed class AccountsBalanceTool : IMcpTool
 {
-    private readonly ITerminal _terminal;
-    private readonly ILogger _logger;
-    private readonly IContent _content;
+    private readonly IBalances _balances;
 
     /// <summary>
-    /// Creates account balance tool. Usage example: IMcpTool tool = new AccountsBalanceTool(terminal, logger, content).
+    /// Creates account balance tool with provided balances implementation. Usage example: IMcpTool tool = new AccountsBalanceTool(balances).
+    /// </summary>
+    /// <param name="balances">Account balances provider.</param>
+    public AccountsBalanceTool(IBalances balances)
+    {
+        _balances = balances;
+    }
+
+    /// <summary>
+    /// Creates account balance tool. Usage example: IMcpTool tool = new AccountsBalanceTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <param name="content">Response formatter.</param>
-    public AccountsBalanceTool(ITerminal terminal, ILogger logger, IContent content)
+    public AccountsBalanceTool(ITerminal terminal, ILogger logger)
+        : this(new WsBalance(terminal, logger))
     {
-        _terminal = terminal;
-        _logger = logger;
-        _content = content;
     }
 
     /// <summary>
@@ -42,8 +47,8 @@ internal sealed class AccountsBalanceTool : IMcpTool
     public Tool Tool()
     {
         JsonElement input = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}""");
-        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","description":"Structured tool response","properties":{"data":{"type":"array","description":"Payload entries with field descriptions","items":{"type":"object"}}},"required":["data"]}""");
-        return new Tool { Name = Name(), Title = "Account balance", Description = "Returns account balance with field descriptions for the given account id.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
+        JsonElement output = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"balances":{"type":"array","description":"Account balance entries for the requested account","items":{"type":"object","properties":{"DataId":{"type":"integer","description":"Balance identifier computed as IdSubAccount * 8 + IdRazdelGroup"},"IdAccount":{"type":"integer","description":"Client account id"},"IdSubAccount":{"type":"integer","description":"Client subaccount id"},"IdRazdelGroup":{"type":"integer","description":"Portfolio group code"},"MarginInitial":{"type":"number","description":"Initial margin"},"MarginMinimum":{"type":"number","description":"Minimum margin"},"MarginRequirement":{"type":"number","description":"Margin requirements"},"Money":{"type":"number","description":"Cash in rubles"},"MoneyInitial":{"type":"number","description":"Opening cash in rubles"},"Balance":{"type":"number","description":"Balance value"},"PrevBalance":{"type":"number","description":"Opening balance"},"PortfolioCost":{"type":"number","description":"Portfolio value"},"LiquidBalance":{"type":"number","description":"Liquid portfolio value"},"Requirements":{"type":"number","description":"Requirements"},"ImmediateRequirements":{"type":"number","description":"Immediate requirements"},"NPL":{"type":"number","description":"Nominal profit or loss"},"DailyPL":{"type":"number","description":"Daily profit or loss"},"NPLPercent":{"type":"number","description":"Nominal PnL percent"},"DailyPLPercent":{"type":"number","description":"Daily PnL percent"},"NKD":{"type":"number","description":"Accrued coupon income"}},"required":["DataId","IdAccount","IdSubAccount","IdRazdelGroup","MarginInitial","MarginMinimum","MarginRequirement","Money","MoneyInitial","Balance","PrevBalance","PortfolioCost","LiquidBalance","Requirements","ImmediateRequirements","NPL","DailyPL","NPLPercent","DailyPLPercent","NKD"],"additionalProperties":false}}},"required":["balances"],"additionalProperties":false}""");
+        return new Tool { Name = Name(), Title = "Account balance", Description = "Returns account balance for the given account id.", InputSchema = input, OutputSchema = output, Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } };
     }
 
     /// <summary>
@@ -51,13 +56,11 @@ internal sealed class AccountsBalanceTool : IMcpTool
     /// </summary>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
-        if (!data.TryGetValue("accountId", out JsonElement item))
+        if (!data.TryGetValue("accountId", out _))
         {
             throw new McpProtocolException("Missing required argument accountId", McpErrorCode.InvalidParams);
         }
-        long id = item.GetInt64();
-        WsBalance tool = new(_terminal, _logger);
-        IEntries entries = await tool.Balance(id, token);
-        return _content.Result(entries);
+        JsonNode node = (await _balances.Balance(data["accountId"].GetInt64(), token)).StructuredContent();
+        return new CallToolResult { StructuredContent = node, Content = [new TextContentBlock { Text = node.ToJsonString() }] };
     }
 }

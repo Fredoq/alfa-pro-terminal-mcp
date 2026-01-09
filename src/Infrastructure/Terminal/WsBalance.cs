@@ -29,8 +29,15 @@ public sealed class WsBalance : IBalances
     }
 
     /// <summary>
-    /// Returns balance entries for the given account. Usage example: string json = (await balance.Balance(123)).Json();.
+    /// Returns balance entries for the given account. Usage example: JsonNode node = (await balance.Balance(123)).StructuredContent();.
     /// </summary>
     public async Task<IEntries> Balance(long accountId, CancellationToken cancellationToken = default)
-        => new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(await _outbound.NextMessage(cancellationToken)), new AccountScope(accountId), "Account balance is missing"), new AccountBalanceSchema());
+        => new RootEntries
+            (new SchemaEntries
+                (new FilteredEntries
+                    (new PayloadArrayEntries
+                        (await _outbound.NextMessage(cancellationToken)),
+                     new AccountScope(accountId), "Account balance is missing"),
+                 new AccountBalanceSchema()),
+             "balances");
 }
