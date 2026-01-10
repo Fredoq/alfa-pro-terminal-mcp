@@ -27,6 +27,10 @@ internal sealed class HooksSet : IHooksSet
         new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
         new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>()),
         new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>()),
+        new ObjectTypesTool(terminal, factory.CreateLogger<ObjectTypesTool>()),
+        new ObjectGroupsTool(terminal, factory.CreateLogger<ObjectGroupsTool>()),
+        new MarketBoardsTool(terminal, factory.CreateLogger<MarketBoardsTool>()),
+        new FinInfoParamsTool(terminal, factory.CreateLogger<FinInfoParamsTool>()),
         new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>())
     ])
     {
