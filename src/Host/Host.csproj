@@ -23,6 +23,9 @@
     <None Include="..\\..\\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appsettings*.json" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests" />
   </ItemGroup>
   <ItemGroup>

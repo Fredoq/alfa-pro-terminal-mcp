@@ -12,9 +12,10 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Catalog;
 /// <summary>
 /// Provides tool listing, lookup, invocation, and MCP handlers. Usage example: IHooksSet hooks = new Catalog(terminal, factory).
 /// </summary>
-internal sealed class HooksSet : IHooksSet
+internal sealed class HooksSet : IHooksSet, IAsyncDisposable
 {
     private readonly IList<IMcpTool> _tools;
+    private readonly SemaphoreSlim _gate;
     /// <summary>
     /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
@@ -36,10 +37,15 @@ internal sealed class HooksSet : IHooksSet
     {
     }
 
+    /// <summary>
+    /// Creates a tool catalog with predefined tools. Usage example: IHooksSet hooks = new HooksSet(tools).
+    /// </summary>
+    /// <param name="tools">Tool list.</param>
     public HooksSet(IList<IMcpTool> tools)
     {
         ArgumentNullException.ThrowIfNull(tools);
         _tools = tools;
+        _gate = new SemaphoreSlim(1, 1);
     }
 
 
@@ -51,13 +57,26 @@ internal sealed class HooksSet : IHooksSet
     new()
     {
         ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Select(t => t.Tool())] }),
-        CallToolHandler = (request, token) =>
+        CallToolHandler = async (request, token) =>
         {
-            CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
-            string name = data.Name ?? throw new McpProtocolException("Missing tool name", McpErrorCode.InvalidParams);
-            IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? new Dictionary<string, JsonElement>();
-            IMcpTool tool = _tools.FirstOrDefault(t => t.Tool().Name == name) ?? throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
-            return tool.Result(items, token);
+            await _gate.WaitAsync(token);
+            try
+            {
+                CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
+                string name = data.Name ?? throw new McpProtocolException("Missing tool name", McpErrorCode.InvalidParams);
+                IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? new Dictionary<string, JsonElement>();
+                IMcpTool tool = _tools.FirstOrDefault(t => t.Tool().Name == name) ?? throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
+                return await tool.Result(items, token);
+            }
+            finally
+            {
+                _gate.Release();
+            }
         }
     };
+    public ValueTask DisposeAsync()
+    {
+        _gate.Dispose();
+        return ValueTask.CompletedTask;
+    }
 }

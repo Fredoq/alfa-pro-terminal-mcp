@@ -8,15 +8,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 AppSignal signal = new();
+IConfigurationRoot root = new Config(new EnvironmentVariablesPart(new JsonFilesPart(new BasePathPart(new ConfigurationBuilder(), new AppBasePath())))).Root();
 AlfaProTerminalProfile profile = new("alfa-pro-terminal-mcp", "Alfa Pro Terminal MCP");
-using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace));
-await using AlfaProTerminal terminal = new(new Config
-                                            (new EnvironmentVariablesPart
-                                                    (new JsonFilesPart
-                                                        (new BasePathPart
-                                                            (new ConfigurationBuilder(), new AppBasePath()))))
-                                        .Root());
-await using McpSession mcpSession = new(profile, factory, new HooksSet(terminal, factory), signal);
+using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConfiguration(root.GetSection("Logging")).AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace));
+await using AlfaProTerminal terminal = new(root);
+await using HooksSet hooks = new(terminal, factory);
+await using McpSession mcpSession = new(profile, factory, hooks, signal);
 await using TerminalSession trmSession = new(terminal, mcpSession, signal);
 await using App app = new(signal, trmSession);
 await app.Run();
