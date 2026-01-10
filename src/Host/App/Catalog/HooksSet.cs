@@ -31,7 +31,6 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         new ObjectTypesTool(terminal, factory.CreateLogger<ObjectTypesTool>()),
         new ObjectGroupsTool(terminal, factory.CreateLogger<ObjectGroupsTool>()),
         new MarketBoardsTool(terminal, factory.CreateLogger<MarketBoardsTool>()),
-        new FinInfoParamsTool(terminal, factory.CreateLogger<FinInfoParamsTool>()),
         new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>())
     ])
     {
