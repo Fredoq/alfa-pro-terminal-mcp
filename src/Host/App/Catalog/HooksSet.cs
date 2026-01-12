@@ -20,7 +20,11 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="factory">Logger factory.</param>
+    /// <summary>
+    /// Initializes a HooksSet with the standard catalog of MCP tools created using the provided terminal and per-tool loggers.
+    /// </summary>
+    /// <param name="terminal">Terminal instance supplied to each tool.</param>
+    /// <param name="factory">Logger factory used to create a per-tool logger for each tool.</param>
     public HooksSet(ITerminal terminal, ILoggerFactory factory) : this(
     [
         new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>()),
@@ -39,7 +43,11 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// <summary>
     /// Creates a tool catalog with predefined tools. Usage example: IHooksSet hooks = new HooksSet(tools).
     /// </summary>
-    /// <param name="tools">Tool list.</param>
+    /// <summary>
+    /// Creates a HooksSet that exposes the provided MCP tools and initializes internal synchronization.
+    /// </summary>
+    /// <param name="tools">List of tool implementations to expose; must not be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="tools"/> is null.</exception>
     public HooksSet(IList<IMcpTool> tools)
     {
         ArgumentNullException.ThrowIfNull(tools);
@@ -51,7 +59,16 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
 
     /// <summary>
     /// Returns hooks. Usage example: McpServerHandlers data = catalog.Hooks().
+    /// <summary>
+    /// Provide MCP server handlers for listing available tools and invoking a tool by name.
     /// </summary>
+    /// <returns>
+    /// A <see cref="McpServerHandlers"/> instance whose <c>ListToolsHandler</c> returns the catalog derived from the internal tools list,
+    /// and whose <c>CallToolHandler</c> invokes the requested tool by name and returns that tool's result.
+    /// </returns>
+    /// <exception cref="McpProtocolException">
+    /// Thrown by the <c>CallToolHandler</c> when required call parameters are missing, when the tool name is missing, or when no tool with the specified name exists.
+    /// </exception>
     public McpServerHandlers Hooks() =>
     new()
     {
@@ -73,6 +90,10 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             }
         }
     };
+    /// <summary>
+    /// Asynchronously waits for any in-progress tool invocation to finish and then frees the internal synchronization resource.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask"/> that completes after the internal semaphore has been acquired and disposed.</returns>
     public async ValueTask DisposeAsync()
     {
         await _gate.WaitAsync();

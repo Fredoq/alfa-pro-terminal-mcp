@@ -21,7 +21,12 @@ public sealed class WsObjectTypes : IObjectTypes
     /// Creates object type entries source. Usage example: var source = new WsObjectTypes(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="logger">Logger instance.</param>
+    /// <summary>
+    /// Initializes a WsObjectTypes instance using the provided terminal and logger and constructs the default outbound messaging pipeline used to retrieve object type entries.
+    /// </summary>
+    /// <remarks>
+    /// Builds an outbound message source that queries for ObjectTypeEntity data and supplies responses for the Entries method.
+    /// </remarks>
     public WsObjectTypes(ITerminal terminal, ILogger logger)
         : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ObjectTypeEntity()), terminal, logger), terminal, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
@@ -30,7 +35,10 @@ public sealed class WsObjectTypes : IObjectTypes
     /// <summary>
     /// Creates object type entries source with outbound messages. Usage example: var source = new WsObjectTypes(outbound).
     /// </summary>
-    /// <param name="outbound">Outbound message stream.</param>
+    /// <summary>
+    /// Initializes a WsObjectTypes instance that uses the provided outbound message stream to obtain object type entries.
+    /// </summary>
+    /// <param name="outbound">Outbound message stream used to fetch messages supplying object type data.</param>
     private WsObjectTypes(IOutboundMessages outbound)
     {
         _outbound = outbound;
@@ -38,7 +46,11 @@ public sealed class WsObjectTypes : IObjectTypes
 
     /// <summary>
     /// Returns object type entries. Usage example: JsonNode node = (await source.Entries(token)).StructuredContent();.
-    /// </summary>
+    /// <summary>
+        /// Retrieve object type entries from the outbound message pipeline.
+        /// </summary>
+        /// <param name="token">Cancellation token to cancel waiting for the next outbound message.</param>
+        /// <returns>An IEntries tree containing the payload array wrapped with the object type schema and rooted under "objectTypes".</returns>
     public async Task<IEntries> Entries(CancellationToken token = default)
         => new RootEntries(new SchemaEntries(new PayloadArrayEntries(await _outbound.NextMessage(token)), new ObjectTypeSchema()), "objectTypes");
 }

@@ -11,6 +11,10 @@ public interface IObjectTypes
     /// Returns object type entries. Usage example: var entries = await types.Entries(token);.
     /// </summary>
     /// <param name="token">Cancellation token.</param>
-    /// <returns>Object type entries.</returns>
+    /// <summary>
+/// Gets object type entries.
+/// </summary>
+/// <param name="token">Cancellation token that can be used to cancel the operation.</param>
+/// <returns>An <see cref="IEntries"/> instance representing the object type entries.</returns>
     Task<IEntries> Entries(CancellationToken token = default);
 }

@@ -13,6 +13,8 @@ internal sealed class ObjectTypeSchema : IJsonSchema
 
     /// <summary>
     /// Creates an object type schema with fields. Usage example: var schema = new ObjectTypeSchema().
+    /// <summary>
+    /// Initializes a new ObjectTypeSchema configured with rules for IdObjectType, IdObjectGroup, CodeObjectType, NameObjectType, and ShortNameObjectType.
     /// </summary>
     public ObjectTypeSchema()
     {
@@ -28,6 +30,10 @@ internal sealed class ObjectTypeSchema : IJsonSchema
     /// <summary>
     /// Returns an output node for the object type element. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    /// <param name="node">Source JSON object.</param>
+    /// <summary>
+/// Produce a JsonNode representation of the provided JSON object using the object-type schema.
+/// </summary>
+/// <param name="node">Source JSON object to convert using this schema.</param>
+/// <returns>The JsonNode constructed from the provided JsonObject.</returns>
     public JsonNode Node(JsonObject node) => _schema.Node(node);
 }

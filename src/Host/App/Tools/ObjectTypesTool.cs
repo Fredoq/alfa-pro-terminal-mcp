@@ -19,7 +19,10 @@ internal sealed class ObjectTypesTool : IMcpTool
     /// <summary>
     /// Creates object type tool with provided entries implementation. Usage example: IMcpTool tool = new ObjectTypesTool(types).
     /// </summary>
-    /// <param name="types">Object type entries provider.</param>
+    /// <summary>
+    /// Initializes a new instance of ObjectTypesTool using the specified object types provider.
+    /// </summary>
+    /// <param name="types">Provider used to retrieve object type entries for the tool.</param>
     public ObjectTypesTool(IObjectTypes types)
     {
         _types = types;
@@ -29,7 +32,11 @@ internal sealed class ObjectTypesTool : IMcpTool
     /// Creates object type tool. Usage example: IMcpTool tool = new ObjectTypesTool(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="logger">Logger instance.</param>
+    /// <summary>
+    /// Initializes a new ObjectTypesTool that retrieves object type entries using the provided terminal and logger.
+    /// </summary>
+    /// <param name="terminal">Terminal used to access object type provider services.</param>
+    /// <param name="logger">Logger used for diagnostic and operational logging.</param>
     public ObjectTypesTool(ITerminal terminal, ILogger logger)
         : this(new WsObjectTypes(terminal, logger))
     {
@@ -37,12 +44,26 @@ internal sealed class ObjectTypesTool : IMcpTool
 
     /// <summary>
     /// Returns the tool name. Usage example: string name = tool.Name().
-    /// </summary>
+    /// <summary>
+/// Tool identifier for this MCP tool.
+/// </summary>
+/// <returns>The tool name "object-types".</returns>
     public string Name() => "object-types";
 
     /// <summary>
     /// Returns tool metadata with schemas and annotations. Usage example: Tool tool = toolItem.Tool().
+    /// <summary>
+    /// Builds the MCP tool metadata for "object-types".
     /// </summary>
+    /// <remarks>
+    /// The returned Tool accepts an empty object as input and produces an object with a required
+    /// "objectTypes" property: an array of object entries each containing
+    /// IdObjectType, IdObjectGroup, CodeObjectType, NameObjectType, and ShortNameObjectType.
+    /// The tool is annotated as read-only and idempotent.
+    /// </remarks>
+    /// <returns>
+    /// A Tool configured for the "object-types" operation with the described input/output schemas and annotations.
+    /// </returns>
     public Tool Tool()
     {
         JsonElement input = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""");
@@ -52,7 +73,12 @@ internal sealed class ObjectTypesTool : IMcpTool
 
     /// <summary>
     /// Returns the tool execution result for the provided arguments. Usage example: CallToolResult result = await tool.Result(args, token).
+    /// <summary>
+    /// Retrieve object type dictionary entries and return them as structured JSON and a textual JSON block.
     /// </summary>
+    /// <param name="data">Input values passed to the tool (ignored by this implementation).</param>
+    /// <param name="token">Cancellation token to cancel the retrieval operation.</param>
+    /// <returns>A CallToolResult whose <c>StructuredContent</c> is a JSON node of object type entries and whose <c>Content</c> is a single text block containing the same JSON as a string.</returns>
     public async ValueTask<CallToolResult> Result(IReadOnlyDictionary<string, JsonElement> data, CancellationToken token)
     {
         JsonNode node = (await _types.Entries(token)).StructuredContent();

@@ -12,6 +12,8 @@ public sealed record ObjectGroupEntity : IPayload
 
     /// <summary>
     /// Creates ObjectGroupEntity payload. Usage example: var payload = new ObjectGroupEntity();.
+    /// <summary>
+    /// Initializes a new instance of ObjectGroupEntity with Type set to "ObjectGroupEntity" and Init set to true.
     /// </summary>
     public ObjectGroupEntity() : this("ObjectGroupEntity", true)
     {
@@ -24,7 +26,11 @@ public sealed record ObjectGroupEntity : IPayload
     /// <param name="init">Initialization flag used by ObjectGroupEntity(string type, bool init).</param>
     /// <remarks>
     /// This constructor is private and cannot be called externally; use the public ObjectGroupEntity constructor or factory methods instead.
-    /// </remarks>
+    /// <summary>
+    /// Initializes a new ObjectGroupEntity with the specified payload type name and initialization flag.
+    /// </summary>
+    /// <param name="type">The payload type name to include in the serialized output.</param>
+    /// <param name="init">Indicates whether the payload represents an initialized entity.</param>
     private ObjectGroupEntity(string type, bool init)
     {
         _type = type;
@@ -33,6 +39,9 @@ public sealed record ObjectGroupEntity : IPayload
 
     /// <summary>
     /// Serializes payload into a string. Usage example: string json = payload.AsString();.
-    /// </summary>
+    /// <summary>
+/// Serializes this payload to a JSON string containing the Type and Init properties.
+/// </summary>
+/// <returns>A JSON string with properties Type (payload type name) and Init (initialization flag).</returns>
     public string AsString() => System.Text.Json.JsonSerializer.Serialize(new { Type = _type, Init = _init });
 }

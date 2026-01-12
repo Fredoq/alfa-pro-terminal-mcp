@@ -11,6 +11,10 @@ public interface IMarketBoards
     /// Returns market board entries. Usage example: var entries = await boards.Entries(token);.
     /// </summary>
     /// <param name="token">Cancellation token.</param>
-    /// <returns>Market board entries.</returns>
+    /// <summary>
+/// Retrieves market board entries.
+/// </summary>
+/// <param name="token">Cancellation token to cancel the retrieval operation.</param>
+/// <returns>An <see cref="IEntries"/> instance containing the market board entries.</returns>
     Task<IEntries> Entries(CancellationToken token = default);
 }

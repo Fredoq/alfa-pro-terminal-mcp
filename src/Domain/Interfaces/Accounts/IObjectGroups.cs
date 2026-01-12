@@ -11,6 +11,10 @@ public interface IObjectGroups
     /// Returns object group entries. Usage example: var entries = await groups.Entries(token);.
     /// </summary>
     /// <param name="token">Cancellation token.</param>
-    /// <returns>Object group entries.</returns>
+    /// <summary>
+/// Gets object group entries.
+/// </summary>
+/// <param name="token">Cancellation token to cancel the retrieval operation.</param>
+/// <returns>An <see cref="IEntries"/> containing the object group entries.</returns>
     Task<IEntries> Entries(CancellationToken token = default);
 }

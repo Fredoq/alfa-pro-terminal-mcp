@@ -21,7 +21,11 @@ public sealed class WsMarketBoards : IMarketBoards
     /// Creates market board entries source. Usage example: var source = new WsMarketBoards(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="logger">Logger instance.</param>
+    /// <summary>
+    /// Initializes a WsMarketBoards configured to retrieve market board data via the terminal's outbound messaging pipeline.
+    /// </summary>
+    /// <param name="terminal">Terminal used to construct the outbound message pipeline for querying market board data.</param>
+    /// <param name="logger">Logger supplied to the outbound messaging components.</param>
     public WsMarketBoards(ITerminal terminal, ILogger logger)
         : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new MarketBoardEntity()), terminal, logger), terminal, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
@@ -30,7 +34,10 @@ public sealed class WsMarketBoards : IMarketBoards
     /// <summary>
     /// Creates market board entries source with outbound messages. Usage example: var source = new WsMarketBoards(outbound).
     /// </summary>
-    /// <param name="outbound">Outbound message stream.</param>
+    /// <summary>
+    /// Initializes a new instance using the provided outbound message source used to retrieve market board payloads.
+    /// </summary>
+    /// <param name="outbound">Source of outbound messages that Entries will consume to obtain market board data.</param>
     private WsMarketBoards(IOutboundMessages outbound)
     {
         _outbound = outbound;
@@ -38,7 +45,11 @@ public sealed class WsMarketBoards : IMarketBoards
 
     /// <summary>
     /// Returns market board entries. Usage example: JsonNode node = (await source.Entries(token)).StructuredContent();.
-    /// </summary>
+    /// <summary>
+        /// Fetches the next outbound message and returns it as a structured entries tree representing market boards.
+        /// </summary>
+        /// <param name="token">Token to cancel waiting for the next outbound message.</param>
+        /// <returns>An IEntries rooted at "marketBoards" built from the next outbound message payload using the market board schema.</returns>
     public async Task<IEntries> Entries(CancellationToken token = default)
         => new RootEntries(new SchemaEntries(new PayloadArrayEntries(await _outbound.NextMessage(token)), new MarketBoardSchema()), "marketBoards");
 }

@@ -21,7 +21,11 @@ public sealed class WsObjectGroups : IObjectGroups
     /// Creates object group entries source. Usage example: var source = new WsObjectGroups(terminal, logger).
     /// </summary>
     /// <param name="terminal">Terminal connection.</param>
-    /// <param name="logger">Logger instance.</param>
+    /// <summary>
+    /// Initializes a WsObjectGroups instance wired to the provided terminal and logger using the default outbound message pipeline.
+    /// </summary>
+    /// <param name="terminal">Terminal used to route outbound and inbound messages for querying object group entries.</param>
+    /// <param name="logger">Logger used by the outbound messaging pipeline.</param>
     public WsObjectGroups(ITerminal terminal, ILogger logger)
         : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new ObjectGroupEntity()), terminal, logger), terminal, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
@@ -30,7 +34,10 @@ public sealed class WsObjectGroups : IObjectGroups
     /// <summary>
     /// Creates object group entries source with outbound messages. Usage example: var source = new WsObjectGroups(outbound).
     /// </summary>
-    /// <param name="outbound">Outbound message stream.</param>
+    /// <summary>
+    /// Initializes a new instance that uses the provided outbound message stream.
+    /// </summary>
+    /// <param name="outbound">The outbound message stream used to request and receive object group entries.</param>
     private WsObjectGroups(IOutboundMessages outbound)
     {
         _outbound = outbound;
@@ -38,7 +45,11 @@ public sealed class WsObjectGroups : IObjectGroups
 
     /// <summary>
     /// Returns object group entries. Usage example: JsonNode node = (await source.Entries(token)).StructuredContent();.
-    /// </summary>
+    /// <summary>
+        /// Retrieves the object group entries from the outbound message stream.
+        /// </summary>
+        /// <param name="token">A cancellation token to cancel the retrieval operation.</param>
+        /// <returns>An IEntries representing the "objectGroups" root containing entries that conform to the ObjectGroupSchema.</returns>
     public async Task<IEntries> Entries(CancellationToken token = default)
         => new RootEntries(new SchemaEntries(new PayloadArrayEntries(await _outbound.NextMessage(token)), new ObjectGroupSchema()), "objectGroups");
 }

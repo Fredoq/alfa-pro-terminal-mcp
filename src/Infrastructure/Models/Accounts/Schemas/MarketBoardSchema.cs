@@ -13,6 +13,8 @@ internal sealed class MarketBoardSchema : IJsonSchema
 
     /// <summary>
     /// Creates a market board schema with fields. Usage example: var schema = new MarketBoardSchema().
+    /// <summary>
+    /// Initializes the MarketBoardSchema with the rules for IdMarketBoard, NameMarketBoard, DescMarketBoard, RCode, and IdObjectCurrency.
     /// </summary>
     public MarketBoardSchema()
     {
@@ -28,6 +30,10 @@ internal sealed class MarketBoardSchema : IJsonSchema
     /// <summary>
     /// Returns an output node for the market board element. Usage example: JsonNode node = schema.Node(item).
     /// </summary>
-    /// <param name="node">Source JSON object.</param>
+    /// <summary>
+/// Produce a JsonNode representing a market board entry from the provided JSON object.
+/// </summary>
+/// <param name="node">Source JSON object containing market board fields.</param>
+/// <returns>A JsonNode containing the market board fields as defined by this schema.</returns>
     public JsonNode Node(JsonObject node) => _schema.Node(node);
 }
