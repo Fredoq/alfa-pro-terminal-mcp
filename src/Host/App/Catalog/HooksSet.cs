@@ -73,9 +73,20 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             }
         }
     };
+    /// <summary>
+    /// Disposes the gate after acquiring it to prevent further tool calls during shutdown.
+    /// </summary>
+    /// <remarks>
+    /// This method keeps the semaphore held to block further acquisitions while disposing.
+    /// </remarks>
+    /// <exception cref="TimeoutException">Thrown when the gate cannot be acquired within the shutdown window.</exception>
     public async ValueTask DisposeAsync()
     {
-        await _gate.WaitAsync(TimeSpan.FromSeconds(30));
+        bool result = await _gate.WaitAsync(TimeSpan.FromSeconds(30));
+        if (!result)
+        {
+            throw new TimeoutException("Semaphore wait timed out during shutdown");
+        }
         _gate.Dispose();
     }
 }
