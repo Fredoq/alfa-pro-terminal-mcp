@@ -3,6 +3,7 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -16,6 +17,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
 {
     private readonly IList<IMcpTool> _tools;
     private readonly SemaphoreSlim _gate;
+    private readonly ILogger<HooksSet> _log;
     /// <summary>
     /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
@@ -32,7 +34,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         new ObjectGroupsTool(terminal, factory.CreateLogger<ObjectGroupsTool>()),
         new MarketBoardsTool(terminal, factory.CreateLogger<MarketBoardsTool>()),
         new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>())
-    ])
+    ], factory.CreateLogger<HooksSet>())
     {
     }
 
@@ -40,11 +42,21 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// Creates a tool catalog with predefined tools. Usage example: IHooksSet hooks = new HooksSet(tools).
     /// </summary>
     /// <param name="tools">Tool list.</param>
-    public HooksSet(IList<IMcpTool> tools)
+    public HooksSet(IList<IMcpTool> tools) : this(tools, NullLogger<HooksSet>.Instance)
+    {
+    }
+
+    /// <summary>
+    /// Creates a tool catalog with predefined tools and logging. Usage example: IHooksSet hooks = new HooksSet(tools, log).
+    /// </summary>
+    /// <param name="tools">Tool list.</param>
+    /// <param name="log">Logger.</param>
+    public HooksSet(IList<IMcpTool> tools, ILogger<HooksSet> log)
     {
         ArgumentNullException.ThrowIfNull(tools);
         _tools = tools;
         _gate = new SemaphoreSlim(1, 1);
+        _log = log;
     }
 
 
@@ -77,9 +89,8 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// Disposes the gate after a bounded wait during shutdown. Usage example: await hooks.DisposeAsync().
     /// </summary>
     /// <remarks>
-    /// This method always disposes the gate after the wait, then throws on timeout.
+    /// This method always disposes the gate after the wait, then logs when the wait times out.
     /// </remarks>
-    /// <exception cref="TimeoutException">Thrown when the gate cannot be acquired within the shutdown window.</exception>
     public async ValueTask DisposeAsync()
     {
         bool result = false;
@@ -93,7 +104,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         }
         if (!result)
         {
-            throw new TimeoutException("Semaphore wait timed out during shutdown");
+            _log.LogWarning("Semaphore wait timed out during shutdown");
         }
     }
 }
