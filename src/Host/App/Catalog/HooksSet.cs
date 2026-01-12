@@ -73,9 +73,9 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             }
         }
     };
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        await _gate.WaitAsync();
         _gate.Dispose();
-        return ValueTask.CompletedTask;
     }
 }

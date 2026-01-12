@@ -18,10 +18,13 @@ public sealed record ObjectGroupEntity : IPayload
     }
 
     /// <summary>
-    /// Creates ObjectGroupEntity payload with explicit values. Usage example: var payload = new ObjectGroupEntity();.
+    /// Initializes ObjectGroupEntity with explicit values through a private constructor.
     /// </summary>
-    /// <param name="type">Payload type name.</param>
-    /// <param name="init">Initialization flag.</param>
+    /// <param name="type">Payload type name used by ObjectGroupEntity(string type, bool init).</param>
+    /// <param name="init">Initialization flag used by ObjectGroupEntity(string type, bool init).</param>
+    /// <remarks>
+    /// This constructor is private and cannot be called externally; use the public ObjectGroupEntity constructor or factory methods instead.
+    /// </remarks>
     private ObjectGroupEntity(string type, bool init)
     {
         _type = type;
