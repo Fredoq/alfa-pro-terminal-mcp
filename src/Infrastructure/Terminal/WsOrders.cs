@@ -18,11 +18,20 @@ public sealed class WsOrders : IOrders
 {
     private readonly IOutboundMessages _outbound;
 
+    /// <summary>
+    /// Creates orders retrieval through the router. Usage example: var orders = await new WsOrders(socket, logger).Entries(123, token);.
+    /// </summary>
+    /// <param name="routerSocket">Terminal router socket.</param>
+    /// <param name="logger">Logger.</param>
     public WsOrders(ITerminal routerSocket, ILogger logger)
         : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new OrderEntity()), routerSocket, logger), routerSocket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
     }
 
+    /// <summary>
+    ///  Creates orders retrieval through the given outbound messages. Usage example: var orders = await new WsOrders(socket).Entries(123, token);.
+    /// </summary>
+    /// <param name="outbound">Outbound messages handler.</param>
     private WsOrders(IOutboundMessages outbound)
     {
         _outbound = outbound;
