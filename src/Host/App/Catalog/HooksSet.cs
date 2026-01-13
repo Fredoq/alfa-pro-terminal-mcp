@@ -15,7 +15,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Catalog;
 /// </summary>
 internal sealed class HooksSet : IHooksSet, IAsyncDisposable
 {
-    private readonly IList<IMcpTool> _tools;
+    private readonly IReadOnlyDictionary<string, IMcpTool> _tools;
     private readonly SemaphoreSlim _gate;
     private readonly ILogger<HooksSet> _log;
     /// <summary>
@@ -51,9 +51,21 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// </summary>
     /// <param name="tools">Tool list.</param>
     /// <param name="log">Logger.</param>
-    public HooksSet(IList<IMcpTool> tools, ILogger<HooksSet> log)
+    public HooksSet(IList<IMcpTool> tools, ILogger<HooksSet> log) : this(
+        tools.ToDictionary(t => t.Name(), StringComparer.Ordinal),
+        log)
+    {
+    }
+
+    /// <summary>
+    /// Creates a tool catalog with predefined tools and logging. Usage example: IHooksSet hooks = new HooksSet(tools, log).
+    /// </summary>
+    /// <param name="tools">Tool map.</param>
+    /// <param name="log">Logger.</param>
+    public HooksSet(IReadOnlyDictionary<string, IMcpTool> tools, ILogger<HooksSet> log)
     {
         ArgumentNullException.ThrowIfNull(tools);
+        ArgumentNullException.ThrowIfNull(log);
         _tools = tools;
         _gate = new SemaphoreSlim(1, 1);
         _log = log;
@@ -67,7 +79,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     public McpServerHandlers Hooks() =>
     new()
     {
-        ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Select(t => t.Tool())] }),
+        ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Values.Select(t => t.Tool())] }),
         CallToolHandler = async (request, token) =>
         {
             await _gate.WaitAsync(token);
@@ -76,7 +88,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                 CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
                 string name = data.Name ?? throw new McpProtocolException("Missing tool name", McpErrorCode.InvalidParams);
                 IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? new Dictionary<string, JsonElement>();
-                IMcpTool tool = _tools.FirstOrDefault(t => t.Tool().Name == name) ?? throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
+                IMcpTool tool = _tools.TryGetValue(name, out IMcpTool? item) ? item : throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
                 return await tool.Result(items, token);
             }
             finally
