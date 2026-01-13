@@ -19,6 +19,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     private readonly IReadOnlyDictionary<string, IMcpTool> _tools;
     private readonly SemaphoreSlim _gate;
     private readonly ILogger<HooksSet> _log;
+
     /// <summary>
     /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
@@ -29,6 +30,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>()),
         new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>()),
         new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
+        new OrdersTool(terminal, factory.CreateLogger<OrdersTool>()),
         new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>()),
         new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>()),
         new ObjectTypesTool(terminal, factory.CreateLogger<ObjectTypesTool>()),
