@@ -28,6 +28,9 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     public HooksSet(ITerminal terminal, ILoggerFactory factory) : this(
     [
         new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>()),
+        new ClientSubAccountsTool(terminal, factory.CreateLogger<ClientSubAccountsTool>()),
+        new SubAccountRazdelsTool(terminal, factory.CreateLogger<SubAccountRazdelsTool>()),
+        new AllowedOrderParamsTool(terminal, factory.CreateLogger<AllowedOrderParamsTool>()),
         new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>()),
         new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
         new OrdersTool(terminal, factory.CreateLogger<OrdersTool>()),
