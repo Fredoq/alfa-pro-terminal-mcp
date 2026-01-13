@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
@@ -79,7 +80,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     public McpServerHandlers Hooks() =>
     new()
     {
-        ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Values.Select(t => t.Tool())] }),
+        ListToolsHandler = (_, _) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Values.Select(t => t.Tool())] }),
         CallToolHandler = async (request, token) =>
         {
             await _gate.WaitAsync(token);
@@ -87,7 +88,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             {
                 CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
                 string name = data.Name ?? throw new McpProtocolException("Missing tool name", McpErrorCode.InvalidParams);
-                IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? new Dictionary<string, JsonElement>();
+                IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? ImmutableDictionary<string, JsonElement>.Empty;
                 IMcpTool tool = _tools.TryGetValue(name, out IMcpTool? item) ? item : throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
                 return await tool.Result(items, token);
             }
