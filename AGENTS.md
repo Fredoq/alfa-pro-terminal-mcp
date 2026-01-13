@@ -100,8 +100,8 @@ CI: сборка, тесты, линтеры/анализаторы, SAST (по 
 
   The exceptions are names such as: User, Computer.
 
-* Constructors may not contain any code except assignment statements.
-  Constructors must only create the object without processing the data passed to them.
+* Constructor body may not contain any code except assignment statements.
+  Constructors must only create the object without processing the data passed to them in their body.
 
   Data processing will occur on demand by calling the object's methods.
 
