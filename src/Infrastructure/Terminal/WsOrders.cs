@@ -29,7 +29,7 @@ public sealed class WsOrders : IOrders
     }
 
     /// <summary>
-    ///  Creates orders retrieval through the given outbound messages. Usage example: var orders = await new WsOrders(socket).Entries(123, token);.
+    ///  Creates orders retrieval through the given outbound messages. Usage example: var orders = await new WsOrders(outbound).Entries(123, token);.
     /// </summary>
     /// <param name="outbound">Outbound messages handler.</param>
     private WsOrders(IOutboundMessages outbound)
