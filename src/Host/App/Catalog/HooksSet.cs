@@ -18,6 +18,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     private readonly IList<IMcpTool> _tools;
     private readonly SemaphoreSlim _gate;
     private readonly ILogger<HooksSet> _log;
+    private volatile bool _disposed;
     /// <summary>
     /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
     /// </summary>
@@ -70,7 +71,9 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Select(t => t.Tool())] }),
         CallToolHandler = async (request, token) =>
         {
+            bool permit = false;
             await _gate.WaitAsync(token);
+            permit = true;
             try
             {
                 CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
@@ -81,7 +84,10 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             }
             finally
             {
-                _gate.Release();
+                if (permit && !_disposed)
+                {
+                    _gate.Release();
+                }
             }
         }
     };
@@ -100,6 +106,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         }
         finally
         {
+            _disposed = true;
             _gate.Dispose();
         }
         if (!result)
