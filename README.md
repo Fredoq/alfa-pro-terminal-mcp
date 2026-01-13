@@ -6,6 +6,7 @@ Model Context Protocol server that exposes the Alfa Investments PRO Terminal API
 - Accounts list and balances
 - Positions by account
 - Assets info by ids and tickers
+- Object types, object groups, and market boards
 - Archive candles (OHLCV/MPV)
 
 ## Quick start
