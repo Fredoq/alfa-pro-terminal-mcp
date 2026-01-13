@@ -71,9 +71,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         ListToolsHandler = (_, __) => new ValueTask<ListToolsResult>(new ListToolsResult { Tools = [.. _tools.Select(t => t.Tool())] }),
         CallToolHandler = async (request, token) =>
         {
-            bool permit = false;
             await _gate.WaitAsync(token);
-            permit = true;
             try
             {
                 CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
@@ -84,16 +82,13 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             }
             finally
             {
-                if (permit && !_disposed)
+                try
                 {
-                    try
-                    {
-                        _gate.Release();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        // Semaphore disposed during shutdown - safe to ignore
-                    }
+                    _gate.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Semaphore disposed during shutdown - safe to ignore
                 }
             }
         }
