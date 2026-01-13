@@ -44,7 +44,7 @@ public sealed class LimitRequestToolTests
                     int quantity = RandomNumberGenerator.GetInt32(1, 1_000_000);
                     int own = RandomNumberGenerator.GetInt32(1, 1_000_000);
                     string note = $"note-{Guid.NewGuid()}-naïve";
-                    string payload = JsonSerializer.Serialize(new { Quantity = quantity, QuantityForOwnAssets = own, Note = note });
+                    string payload = JsonSerializer.Serialize(new { Value = new { Quantity = quantity, QuantityForOwnAssets = own, Note = note }, Status = RandomNumberGenerator.GetInt32(0, 2), Message = "limit-response", IsSuccess = true, IsError = false, IsWarning = false, IsNotFound = false });
                     await using LimitSocketFake terminal = new(payload);
                     LoggerFake logger = new();
                     LimitRequestTool tool = new(terminal, logger);

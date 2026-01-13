@@ -47,6 +47,6 @@ public sealed class WsLimit : ILimits
     public async Task<IEntries> Limit(long account, long razdel, long asset, long board, long document, int side, double price, int order, int request, CancellationToken token = default)
     {
         string payload = await new TerminalOutboundMessages(new IncomingMessage(new LimitQueryRequest(new LimitQueryPayload(account, razdel, asset, board, document, side, price, order, request)), _terminal, _logger), _terminal, _logger, new HeartbeatResponse(new QueryResponse("#Order.Limit.Query"))).NextMessage(token);
-        return new RootEntries(new SchemaEntry(new PayloadObjectEntries(payload), new LimitSchema()), "limit");
+        return new RootEntries(new SchemaEntry(new PayloadObjectEntries(payload, "Value"), new LimitSchema()), "limit");
     }
 }
