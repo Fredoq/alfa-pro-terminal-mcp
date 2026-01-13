@@ -34,6 +34,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
         new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>()),
         new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
         new OrdersTool(terminal, factory.CreateLogger<OrdersTool>()),
+        new LimitRequestTool(terminal, factory.CreateLogger<LimitRequestTool>()),
         new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>()),
         new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>()),
         new ObjectTypesTool(terminal, factory.CreateLogger<ObjectTypesTool>()),
