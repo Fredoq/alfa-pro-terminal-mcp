@@ -86,7 +86,14 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             {
                 if (permit && !_disposed)
                 {
-                    _gate.Release();
+                    try
+                    {
+                        _gate.Release();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Semaphore disposed during shutdown - safe to ignore
+                    }
                 }
             }
         }
