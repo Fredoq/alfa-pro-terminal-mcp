@@ -1,11 +1,7 @@
 using System.Collections.Immutable;
 using System.Text.Json;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
-using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
-using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -13,7 +9,7 @@ using ModelContextProtocol.Server;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Catalog;
 
 /// <summary>
-/// Provides tool listing, lookup, invocation, and MCP handlers. Usage example: IHooksSet hooks = new Catalog(terminal, factory).
+/// Provides tool listing, lookup, invocation, and MCP handlers. Usage example: IHooksSet hooks = new HooksSet(tools, log).
 /// </summary>
 internal sealed class HooksSet : IHooksSet, IAsyncDisposable
 {
@@ -22,60 +18,15 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     private readonly ILogger<HooksSet> _log;
 
     /// <summary>
-    /// Creates a tool catalog for MCP operations. Usage example: ICatalog catalog = new Catalog(terminal, factory).
-    /// </summary>
-    /// <param name="terminal">Terminal connection.</param>
-    /// <param name="factory">Logger factory.</param>
-    public HooksSet(ITerminal terminal, ILoggerFactory factory) : this(
-    [
-        new McpTool(new WsAccounts(terminal, factory.CreateLogger<WsAccounts>()), new AccountsEntriesPlan()),
-        new McpTool(new WsClientSubAccounts(terminal, factory.CreateLogger<WsClientSubAccounts>()), new ClientSubAccountsPlan()),
-        new McpTool(new WsSubAccountRazdels(terminal, factory.CreateLogger<WsSubAccountRazdels>()), new SubAccountRazdelsPlan()),
-        new McpTool(new WsAllowedOrderParams(terminal, factory.CreateLogger<WsAllowedOrderParams>()), new AllowedOrderParamsPlan()),
-        new McpTool(new WsBalance(terminal, factory.CreateLogger<WsBalance>()), new AccountsBalancePlan()),
-        new McpTool(new WsPositions(terminal, factory.CreateLogger<WsPositions>()), new PositionsPlan()),
-        new McpTool(new WsOrders(terminal, factory.CreateLogger<WsOrders>()), new OrdersPlan()),
-        new McpTool(new WsOrderEntry(terminal, factory.CreateLogger<WsOrderEntry>()), new OrderEntryPlan()),
-        new McpTool(new WsLimit(terminal, factory.CreateLogger<WsLimit>()), new LimitRequestPlan()),
-        new McpTool(new WsAssetsInfo(terminal, factory.CreateLogger<WsAssetsInfo>()), new AssetsInfoPlan()),
-        new McpTool(new WsAssetsInfo(terminal, factory.CreateLogger<WsAssetsInfo>()), new AssetsTickersPlan()),
-        new McpTool(new WsObjectTypes(terminal, factory.CreateLogger<WsObjectTypes>()), new ObjectTypesPlan()),
-        new McpTool(new WsObjectGroups(terminal, factory.CreateLogger<WsObjectGroups>()), new ObjectGroupsPlan()),
-        new McpTool(new WsMarketBoards(terminal, factory.CreateLogger<WsMarketBoards>()), new MarketBoardsPlan()),
-        new McpTool(new WsArchive(terminal, factory.CreateLogger<WsArchive>()), new ArchivePlan())
-    ], factory.CreateLogger<HooksSet>())
-    {
-    }
-
-    /// <summary>
-    /// Creates a tool catalog with predefined tools. Usage example: IHooksSet hooks = new HooksSet(tools).
-    /// </summary>
-    /// <param name="tools">Tool list.</param>
-    public HooksSet(IList<IMcpTool> tools) : this(tools, NullLogger<HooksSet>.Instance)
-    {
-    }
-
-    /// <summary>
-    /// Creates a tool catalog with predefined tools and logging. Usage example: IHooksSet hooks = new HooksSet(tools, log).
+    /// Creates a tool catalog with predefined tools. Usage example: IHooksSet hooks = new HooksSet(tools, log).
     /// </summary>
     /// <param name="tools">Tool list.</param>
     /// <param name="log">Logger.</param>
-    public HooksSet(IList<IMcpTool> tools, ILogger<HooksSet> log) : this(
-        tools.ToDictionary(t => t.Name(), StringComparer.Ordinal),
-        log)
-    {
-    }
-
-    /// <summary>
-    /// Creates a tool catalog with predefined tools and logging. Usage example: IHooksSet hooks = new HooksSet(tools, log).
-    /// </summary>
-    /// <param name="tools">Tool map.</param>
-    /// <param name="log">Logger.</param>
-    public HooksSet(IReadOnlyDictionary<string, IMcpTool> tools, ILogger<HooksSet> log)
+    public HooksSet(IList<IMcpTool> tools, ILogger<HooksSet> log)
     {
         ArgumentNullException.ThrowIfNull(tools);
         ArgumentNullException.ThrowIfNull(log);
-        _tools = tools;
+        _tools = tools.ToDictionary(t => t.Name(), StringComparer.Ordinal);
         _gate = new SemaphoreSlim(1, 1);
         _log = log;
     }
