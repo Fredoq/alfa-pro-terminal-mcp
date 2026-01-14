@@ -3,6 +3,7 @@ using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Interfaces;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using ModelContextProtocol;
@@ -27,21 +28,21 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
     /// <param name="factory">Logger factory.</param>
     public HooksSet(ITerminal terminal, ILoggerFactory factory) : this(
     [
-        new AccountsEntriesTool(terminal, factory.CreateLogger<AccountsEntriesTool>()),
-        new ClientSubAccountsTool(terminal, factory.CreateLogger<ClientSubAccountsTool>()),
-        new SubAccountRazdelsTool(terminal, factory.CreateLogger<SubAccountRazdelsTool>()),
-        new AllowedOrderParamsTool(terminal, factory.CreateLogger<AllowedOrderParamsTool>()),
-        new AccountsBalanceTool(terminal, factory.CreateLogger<AccountsBalanceTool>()),
-        new PositionsTool(terminal, factory.CreateLogger<PositionsTool>()),
-        new OrdersTool(terminal, factory.CreateLogger<OrdersTool>()),
-        new OrderEntryTool(terminal, factory.CreateLogger<OrderEntryTool>()),
-        new LimitRequestTool(terminal, factory.CreateLogger<LimitRequestTool>()),
-        new AssetsInfoTool(terminal, factory.CreateLogger<AssetsInfoTool>()),
-        new AssetsTickersTool(terminal, factory.CreateLogger<AssetsTickersTool>()),
-        new ObjectTypesTool(terminal, factory.CreateLogger<ObjectTypesTool>()),
-        new ObjectGroupsTool(terminal, factory.CreateLogger<ObjectGroupsTool>()),
-        new MarketBoardsTool(terminal, factory.CreateLogger<MarketBoardsTool>()),
-        new ArchiveTool(terminal, factory.CreateLogger<ArchiveTool>())
+        new McpTool(new WsAccounts(terminal, factory.CreateLogger<WsAccounts>()), new AccountsEntriesPlan()),
+        new McpTool(new WsClientSubAccounts(terminal, factory.CreateLogger<WsClientSubAccounts>()), new ClientSubAccountsPlan()),
+        new McpTool(new WsSubAccountRazdels(terminal, factory.CreateLogger<WsSubAccountRazdels>()), new SubAccountRazdelsPlan()),
+        new McpTool(new WsAllowedOrderParams(terminal, factory.CreateLogger<WsAllowedOrderParams>()), new AllowedOrderParamsPlan()),
+        new McpTool(new WsBalance(terminal, factory.CreateLogger<WsBalance>()), new AccountsBalancePlan()),
+        new McpTool(new WsPositions(terminal, factory.CreateLogger<WsPositions>()), new PositionsPlan()),
+        new McpTool(new WsOrders(terminal, factory.CreateLogger<WsOrders>()), new OrdersPlan()),
+        new McpTool(new WsOrderEntry(terminal, factory.CreateLogger<WsOrderEntry>()), new OrderEntryPlan()),
+        new McpTool(new WsLimit(terminal, factory.CreateLogger<WsLimit>()), new LimitRequestPlan()),
+        new McpTool(new WsAssetsInfo(terminal, factory.CreateLogger<WsAssetsInfo>()), new AssetsInfoPlan()),
+        new McpTool(new WsAssetsInfo(terminal, factory.CreateLogger<WsAssetsInfo>()), new AssetsTickersPlan()),
+        new McpTool(new WsObjectTypes(terminal, factory.CreateLogger<WsObjectTypes>()), new ObjectTypesPlan()),
+        new McpTool(new WsObjectGroups(terminal, factory.CreateLogger<WsObjectGroups>()), new ObjectGroupsPlan()),
+        new McpTool(new WsMarketBoards(terminal, factory.CreateLogger<WsMarketBoards>()), new MarketBoardsPlan()),
+        new McpTool(new WsArchive(terminal, factory.CreateLogger<WsArchive>()), new ArchivePlan())
     ], factory.CreateLogger<HooksSet>())
     {
     }

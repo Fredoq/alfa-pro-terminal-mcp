@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -50,7 +51,8 @@ public sealed class SubAccountRazdelsToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    SubAccountRazdelsTool tool = new(terminal, logger);
+                    SubAccountRazdelsPlan plan = new();
+                    McpTool tool = new(new WsSubAccountRazdels(terminal, logger), plan);
                     Dictionary<string, JsonElement> data = new();
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);

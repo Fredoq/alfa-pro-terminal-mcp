@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -66,7 +67,8 @@ public sealed class AssetsTickersToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    AssetsTickersTool tool = new(terminal, logger);
+                    AssetsTickersPlan plan = new();
+                    McpTool tool = new(new WsAssetsInfo(terminal, logger), plan);
                     Dictionary<string, JsonElement> data = new() { ["tickers"] = JsonSerializer.SerializeToElement(new[] { ticker }) };
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);

@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -49,7 +50,8 @@ public sealed class OrderEntryToolTests
                     string payload = JsonSerializer.Serialize(new { Status = status, Message = (string?)null, Error = (object?)null, Value = new { ClientOrderNum = RandomNumberGenerator.GetInt32(1, 100_000), NumEDocument = (long)RandomNumberGenerator.GetInt32(1, 100_000), ErrorCode = error, ErrorText = (string?)null }, Extra = "ignored" });
                     await using OrderEntrySocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    OrderEntryTool tool = new(terminal, logger);
+                    OrderEntryPlan plan = new();
+                    McpTool tool = new(new WsOrderEntry(terminal, logger), plan);
                     Dictionary<string, JsonElement> data = new()
                     {
                         ["idAccount"] = JsonSerializer.SerializeToElement(account),

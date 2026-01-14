@@ -1,7 +1,6 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Archive;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Archive;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Requests;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Messaging.Responses;
@@ -12,13 +11,18 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 
 /// <summary>
-/// Provides archive candles retrieval through the router. Usage example: JsonNode node = (await new WsArchive(socket, logger).History(1, 0, "hour", 1, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow)).StructuredContent();.
+/// Provides archive candles retrieval through the router. Usage example: JsonNode node = (await new WsArchive(socket, logger).Entries(payload)).StructuredContent();.
 /// </summary>
-public sealed class WsArchive : IArchive
+public sealed class WsArchive : IEntriesSource
 {
     private readonly ITerminal _socket;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Creates archive candles source. Usage example: var source = new WsArchive(terminal, logger).
+    /// </summary>
+    /// <param name="routerSocket">Terminal connection.</param>
+    /// <param name="logger">Logger instance.</param>
     public WsArchive(ITerminal routerSocket, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(routerSocket);
@@ -27,27 +31,16 @@ public sealed class WsArchive : IArchive
         _logger = logger;
     }
 
-    public async Task<IEntries> History(long idFi, int candleType, string interval, int period, DateTime firstDay, DateTime lastDay, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Returns archive entries for the specified payload. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent();.
+    /// </summary>
+    /// <param name="payload">Archive query payload.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>Archive entries.</returns>
+    public async Task<IEntries> Entries(IPayload payload, CancellationToken token = default)
     {
-        string message = await new TerminalOutboundMessages
-                                (new IncomingMessage
-                                    (new ArchiveQueryRequest
-                                        (new ArchiveQueryPayload(idFi, candleType, interval, period, firstDay, lastDay)), _socket, _logger),
-                                    _socket, _logger, new HeartbeatResponse
-                                        (new QueryResponse("#Archive.Query")))
-                                .NextMessage(cancellationToken);
-        return new RootEntries
-                (new FallbackEntries
-                    (new RequiredEntries
-                        (new SchemaEntries
-                            (new PayloadArrayEntries(message, "OHLCV"),
-                             new OhlcvSchema()),
-                         "Archive candles are missing"),
-                     new RequiredEntries
-                        (new SchemaEntries
-                            (new PayloadArrayEntries(message, "MPV"),
-                             new MpvSchema()),
-                         "Archive candles are missing")),
-                 "candles");
+        ArgumentNullException.ThrowIfNull(payload);
+        string message = await new TerminalOutboundMessages(new IncomingMessage(new ArchiveQueryRequest(payload), _socket, _logger), _socket, _logger, new HeartbeatResponse(new QueryResponse("#Archive.Query"))).NextMessage(token);
+        return new RootEntries(new FallbackEntries(new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(message, "OHLCV"), new OhlcvSchema()), "Archive candles are missing"), new RequiredEntries(new SchemaEntries(new PayloadArrayEntries(message, "MPV"), new MpvSchema()), "Archive candles are missing")), "candles");
     }
 }

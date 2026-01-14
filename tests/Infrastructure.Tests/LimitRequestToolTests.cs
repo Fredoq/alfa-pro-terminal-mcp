@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -47,7 +48,8 @@ public sealed class LimitRequestToolTests
                     string payload = JsonSerializer.Serialize(new { Value = new { Quantity = quantity, QuantityForOwnAssets = own, Note = note }, Status = RandomNumberGenerator.GetInt32(0, 2), Message = "limit-response", IsSuccess = true, IsError = false, IsWarning = false, IsNotFound = false });
                     await using LimitSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    LimitRequestTool tool = new(terminal, logger);
+                    LimitRequestPlan plan = new();
+                    McpTool tool = new(new WsLimit(terminal, logger), plan);
                     Dictionary<string, JsonElement> data = new()
                     {
                         ["idAccount"] = JsonSerializer.SerializeToElement(account),

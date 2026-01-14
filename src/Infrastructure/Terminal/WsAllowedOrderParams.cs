@@ -1,8 +1,6 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
@@ -11,11 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 
 /// <summary>
-/// Provides allowed order parameter entries retrieval through the router. Usage example: var entries = await new WsAllowedOrderParams(terminal, logger).Entries(token).
+/// Provides allowed order parameter entries retrieval through the router. Usage example: var entries = await new WsAllowedOrderParams(terminal, logger).Entries(payload).
 /// </summary>
-public sealed class WsAllowedOrderParams : IAllowedOrderParams
+public sealed class WsAllowedOrderParams : IEntriesSource
 {
-    private readonly IOutboundMessages _outbound;
+    private readonly ITerminal _terminal;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Creates allowed order parameter entries source. Usage example: var source = new WsAllowedOrderParams(terminal, logger).
@@ -23,22 +22,21 @@ public sealed class WsAllowedOrderParams : IAllowedOrderParams
     /// <param name="terminal">Terminal connection.</param>
     /// <param name="logger">Logger instance.</param>
     public WsAllowedOrderParams(ITerminal terminal, ILogger logger)
-        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new AllowedOrderParamEntity()), terminal, logger), terminal, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
+        _terminal = terminal;
+        _logger = logger;
     }
 
     /// <summary>
-    /// Creates allowed order parameter entries source with outbound messages. Usage example: var source = new WsAllowedOrderParams(outbound).
+    /// Returns allowed order parameter entries. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent().
     /// </summary>
-    /// <param name="outbound">Outbound message stream.</param>
-    private WsAllowedOrderParams(IOutboundMessages outbound)
+    /// <param name="payload">Allowed order parameter payload.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>Allowed order parameter entries.</returns>
+    public async Task<IEntries> Entries(IPayload payload, CancellationToken token = default)
     {
-        _outbound = outbound;
+        ArgumentNullException.ThrowIfNull(payload);
+        string message = await new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(payload), _terminal, _logger), _terminal, _logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))).NextMessage(token);
+        return new RootEntries(new SchemaEntries(new PayloadArrayEntries(message), new AllowedOrderParamSchema()), "allowedOrderParams");
     }
-
-    /// <summary>
-    /// Returns allowed order parameter entries. Usage example: JsonNode node = (await source.Entries(token)).StructuredContent().
-    /// </summary>
-    public async Task<IEntries> Entries(CancellationToken token = default)
-        => new RootEntries(new SchemaEntries(new PayloadArrayEntries(await _outbound.NextMessage(token)), new AllowedOrderParamSchema()), "allowedOrderParams");
 }

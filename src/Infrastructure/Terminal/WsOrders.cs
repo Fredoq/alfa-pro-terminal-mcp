@@ -1,6 +1,5 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Messaging;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
@@ -8,45 +7,41 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Filters;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 
 /// <summary>
-/// Provides orders retrieval through the router. Usage example: var orders = await new WsOrders(socket, logger).Entries(123, token);.
+/// Provides orders retrieval through the router. Usage example: var orders = await new WsOrders(socket, logger).Entries(payload, token);.
 /// </summary>
-public sealed class WsOrders : IOrders
+public sealed class WsOrders : IEntriesSource
 {
-    private readonly IOutboundMessages _outbound;
+    private readonly ITerminal _terminal;
+    private readonly ILogger _logger;
 
     /// <summary>
-    /// Creates orders retrieval through the router. Usage example: var orders = await new WsOrders(socket, logger).Entries(123, token);.
+    /// Creates orders retrieval through the router. Usage example: var orders = await new WsOrders(socket, logger).Entries(payload, token);.
     /// </summary>
     /// <param name="routerSocket">Terminal router socket.</param>
     /// <param name="logger">Logger.</param>
     public WsOrders(ITerminal routerSocket, ILogger logger)
-        : this(new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new OrderEntity()), routerSocket, logger), routerSocket, logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))))
     {
+        _terminal = routerSocket;
+        _logger = logger;
     }
 
     /// <summary>
-    ///  Creates orders retrieval through the given outbound messages. Usage example: var orders = await new WsOrders(outbound).Entries(123, token);.
+    /// Returns orders entries for the given payload. Usage example: JsonNode node = (await orders.Entries(payload)).StructuredContent();.
     /// </summary>
-    /// <param name="outbound">Outbound messages handler.</param>
-    private WsOrders(IOutboundMessages outbound)
+    /// <param name="payload">Orders query payload.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>Orders entries.</returns>
+    public async Task<IEntries> Entries(IPayload payload, CancellationToken token = default)
     {
-        _outbound = outbound;
+        ArgumentNullException.ThrowIfNull(payload);
+        using JsonDocument document = JsonDocument.Parse(payload.AsString());
+        long account = document.RootElement.GetProperty("AccountId").GetInt64();
+        string message = await new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new OrderEntity()), _terminal, _logger), _terminal, _logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))).NextMessage(token);
+        return new RootEntries(new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(message), new AccountScope(account), "Account orders are missing"), new OrderSchema()), "orders");
     }
-
-    /// <summary>
-    /// Returns orders entries for the given account. Usage example: JsonNode node = (await orders.Entries(123)).StructuredContent();.
-    /// </summary>
-    public async Task<IEntries> Entries(long accountId, CancellationToken cancellationToken = default)
-        => new RootEntries
-            (new SchemaEntries
-                (new FilteredEntries
-                    (new PayloadArrayEntries
-                        (await _outbound.NextMessage(cancellationToken)),
-                     new AccountScope(accountId), "Account orders are missing"),
-                 new OrderSchema()),
-             "orders");
 }

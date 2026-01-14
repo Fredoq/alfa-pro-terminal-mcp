@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -51,7 +52,8 @@ public sealed class ArchiveToolTests
                     });
                     await using ArchiveSocketFake terminal = new(payload, false);
                     LoggerFake logger = new();
-                    ArchiveTool tool = new(terminal, logger);
+                    ArchivePlan plan = new();
+                    McpTool tool = new(new WsArchive(terminal, logger), plan);
                     DateTime first = DateTime.UtcNow.Date.AddDays(-RandomNumberGenerator.GetInt32(3, 10));
                     DateTime last = DateTime.UtcNow.Date.AddDays(-RandomNumberGenerator.GetInt32(1, 2));
                     Dictionary<string, JsonElement> data = new()
