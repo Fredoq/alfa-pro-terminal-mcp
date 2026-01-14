@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -53,7 +53,7 @@ public sealed class SubAccountRazdelsToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    McpTool tool = new(new WsSubAccountRazdels(terminal, logger), new Tool { Name = "subaccount-razdels", Title = "Subaccount portfolios", Description = "Returns subaccount portfolio entries.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"subAccountRazdels":{"type":"array","description":"Subaccount portfolio entries","items":{"type":"object","properties":{"IdRazdel":{"type":"integer","description":"Portfolio identifier"},"IdAccount":{"type":"integer","description":"Client account identifier"},"IdSubAccount":{"type":"integer","description":"Client subaccount identifier"},"IdRazdelGroup":{"type":"integer","description":"Portfolio group identifier"},"RCode":{"type":"string","description":"Portfolio code"}},"required":["IdRazdel","IdAccount","IdSubAccount","IdRazdelGroup","RCode"],"additionalProperties":false}}},"required":["subAccountRazdels"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new FixedPayloadPlan(new EmptyInputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""")), new SubAccountRazdelEntity()));
+                    McpTool tool = new(new WsSubAccountRazdels(terminal, logger), new Tool { Name = "subaccount-razdels", Title = "Subaccount portfolios", Description = "Returns subaccount portfolio entries.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"subAccountRazdels":{"type":"array","description":"Subaccount portfolio entries","items":{"type":"object","properties":{"IdRazdel":{"type":"integer","description":"Portfolio identifier"},"IdAccount":{"type":"integer","description":"Client account identifier"},"IdSubAccount":{"type":"integer","description":"Client subaccount identifier"},"IdRazdelGroup":{"type":"integer","description":"Portfolio group identifier"},"RCode":{"type":"string","description":"Portfolio code"}},"required":["IdRazdel","IdAccount","IdSubAccount","IdRazdelGroup","RCode"],"additionalProperties":false}}},"required":["subAccountRazdels"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new FixedPayloadPlan(new EmptyInputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""")), new EntityPayload("SubAccountRazdelEntity", true)));
                     Dictionary<string, JsonElement> data = new();
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);

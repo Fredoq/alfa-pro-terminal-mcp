@@ -2,7 +2,6 @@ using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Accounts;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Filters;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
@@ -41,7 +40,7 @@ public sealed class WsAssetsInfo : IEntriesSource
         ArgumentNullException.ThrowIfNull(payload);
         using JsonDocument document = JsonDocument.Parse(payload.AsString());
         JsonElement root = document.RootElement;
-        string message = await new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new AssetInfoEntity()), _terminal, _logger), _terminal, _logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))).NextMessage(token);
+        string message = await new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new EntityPayload("AssetInfoEntity", true)), _terminal, _logger), _terminal, _logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))).NextMessage(token);
         if (root.TryGetProperty("IdObjects", out JsonElement ids))
         {
             List<long> items = [];
