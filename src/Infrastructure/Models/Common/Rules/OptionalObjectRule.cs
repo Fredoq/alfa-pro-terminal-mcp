@@ -25,6 +25,10 @@ internal sealed class OptionalObjectRule : IJsonRule
     /// </summary>
     public OptionalObjectRule(string name, string prop, IJsonSchema schema, JsonObject seed)
     {
+        ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(prop);
+        ArgumentNullException.ThrowIfNull(schema);
+        ArgumentNullException.ThrowIfNull(seed);
         _name = name;
         _prop = prop;
         _schema = schema;

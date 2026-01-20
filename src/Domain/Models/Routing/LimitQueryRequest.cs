@@ -29,6 +29,10 @@ public sealed record LimitQueryRequest : IRouting
     /// <param name="payload">Payload instance.</param>
     private LimitQueryRequest(string id, string command, string channel, IPayload payload)
     {
+        ArgumentException.ThrowIfNullOrEmpty(id);
+        ArgumentException.ThrowIfNullOrEmpty(command);
+        ArgumentException.ThrowIfNullOrEmpty(channel);
+        ArgumentNullException.ThrowIfNull(payload);
         _id = id;
         _command = command;
         _channel = channel;

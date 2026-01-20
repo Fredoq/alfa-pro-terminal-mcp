@@ -27,15 +27,8 @@ internal sealed class ChoiceWholeRule : IJsonRule
     /// </summary>
     public void Apply(JsonObject node, JsonObject root)
     {
-        long value;
-        try
-        {
-            value = new JsonInteger(node, _primary).Value();
-        }
-        catch (InvalidOperationException)
-        {
-            value = new JsonInteger(node, _secondary).Value();
-        }
+        string prop = node.ContainsKey(_primary) ? _primary : _secondary;
+        long value = new JsonInteger(node, prop).Value();
         root[_name] = JsonValue.Create(value);
     }
 }

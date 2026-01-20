@@ -65,7 +65,8 @@ public sealed class WsPositionsTests
         InputSchema schema = new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""));
         Dictionary<string, JsonElement> data = new(StringComparer.Ordinal) { ["accountId"] = JsonSerializer.SerializeToElement(account) };
         MappedPayload payload = new(data, schema);
-        string json = (await positions.Entries(payload)).StructuredContent().ToJsonString();
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+        string json = (await positions.Entries(payload, cts.Token)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement.GetProperty("positions")[0];
         double step = entry.GetProperty("PriceStep").GetDouble();

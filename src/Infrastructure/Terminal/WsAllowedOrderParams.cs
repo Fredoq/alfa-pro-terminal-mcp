@@ -28,7 +28,7 @@ public sealed class WsAllowedOrderParams : IEntriesSource
     }
 
     /// <summary>
-    /// Returns allowed order parameter entries. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent().
+    /// Returns allowed order parameter entries. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent();
     /// </summary>
     /// <param name="payload">Allowed order parameter payload.</param>
     /// <param name="token">Cancellation token.</param>

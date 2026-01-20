@@ -1,6 +1,6 @@
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
@@ -17,6 +17,7 @@ internal sealed class LimitSocketFake : ITerminal
     /// </summary>
     public LimitSocketFake(string payload)
     {
+        ArgumentNullException.ThrowIfNull(payload);
         _payload = payload;
         _id = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
@@ -26,6 +27,7 @@ internal sealed class LimitSocketFake : ITerminal
     /// </summary>
     public Task Send(string payload, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(payload);
         using JsonDocument document = JsonDocument.Parse(payload);
         string id = document.RootElement.GetProperty("Id").GetString() ?? string.Empty;
         _id.TrySetResult(id);

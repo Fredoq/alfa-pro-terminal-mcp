@@ -28,7 +28,7 @@ public sealed class WsSubAccountRazdels : IEntriesSource
     }
 
     /// <summary>
-    /// Returns subaccount portfolio entries. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent().
+    /// Returns subaccount portfolio entries. Usage example: JsonNode node = (await source.Entries(payload)).StructuredContent();
     /// </summary>
     /// <param name="payload">Subaccount portfolio payload.</param>
     /// <param name="token">Cancellation token.</param>

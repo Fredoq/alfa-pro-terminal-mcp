@@ -20,6 +20,8 @@ internal sealed class MappedPayload : IPayload
     /// <param name="schema">Input schema validator.</param>
     public MappedPayload(IReadOnlyDictionary<string, JsonElement> data, IInputSchema schema)
     {
+        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(schema);
         _data = data;
         _schema = schema;
     }

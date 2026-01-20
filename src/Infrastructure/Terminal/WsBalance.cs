@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Common;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
@@ -6,7 +7,6 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Filters;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Accounts.Schemas;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Entries;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 

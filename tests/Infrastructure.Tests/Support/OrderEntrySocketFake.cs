@@ -17,6 +17,7 @@ internal sealed class OrderEntrySocketFake : ITerminal
     /// </summary>
     public OrderEntrySocketFake(string payload)
     {
+        ArgumentNullException.ThrowIfNull(payload);
         _payload = payload;
         _id = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
@@ -26,6 +27,7 @@ internal sealed class OrderEntrySocketFake : ITerminal
     /// </summary>
     public Task Send(string payload, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(payload);
         using JsonDocument document = JsonDocument.Parse(payload);
         string id = document.RootElement.GetProperty("Id").GetString() ?? string.Empty;
         _id.TrySetResult(id);
