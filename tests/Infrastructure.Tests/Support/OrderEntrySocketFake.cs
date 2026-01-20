@@ -17,9 +17,8 @@ internal sealed class OrderEntrySocketFake : ITerminal
     /// </summary>
     public OrderEntrySocketFake(string payload)
     {
-        ArgumentNullException.ThrowIfNull(payload);
-        _payload = payload;
-        _id = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        _payload = payload ?? throw new ArgumentNullException(nameof(payload));
+        _id = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
     /// <summary>
