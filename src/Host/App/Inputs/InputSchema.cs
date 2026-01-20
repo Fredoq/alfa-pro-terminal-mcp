@@ -33,6 +33,18 @@ internal sealed class InputSchema : IInputSchema
     public void Ensure(IReadOnlyDictionary<string, JsonElement> data)
     {
         ArgumentNullException.ThrowIfNull(data);
+        bool flag = true;
+        if (_schema.TryGetProperty("additionalProperties", out JsonElement value))
+        {
+            try
+            {
+                flag = value.GetBoolean();
+            }
+            catch (InvalidOperationException)
+            {
+                flag = true;
+            }
+        }
         if (_schema.TryGetProperty("required", out JsonElement list))
         {
             foreach (JsonElement item in list.EnumerateArray())
@@ -46,6 +58,10 @@ internal sealed class InputSchema : IInputSchema
         }
         if (_schema.TryGetProperty("properties", out JsonElement props))
         {
+            if (flag)
+            {
+                return;
+            }
             foreach (string name in data.Keys)
             {
                 if (!props.TryGetProperty(name, out _))
@@ -53,12 +69,8 @@ internal sealed class InputSchema : IInputSchema
                     throw new McpProtocolException($"Unexpected argument {name}", McpErrorCode.InvalidParams);
                 }
             }
-        }
-        if (_schema.TryGetProperty("properties", out _) || !_schema.TryGetProperty("additionalProperties", out _))
-        {
             return;
         }
-        bool flag = _schema.GetProperty("additionalProperties").GetBoolean();
         if (flag || data.Count == 0)
         {
             return;
