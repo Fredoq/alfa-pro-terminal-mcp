@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Models.Common.Schemas;
 
@@ -47,35 +48,30 @@ internal sealed class OptionalObjectRule : IJsonRule
         }
         if (node.TryGetPropertyValue(_prop, out JsonNode? data) && data is not null)
         {
-            if (data is JsonValue value)
+            JsonValueKind kind = data.GetValueKind();
+            if (kind == JsonValueKind.Null)
             {
-                if (value.ToJsonString() != "null")
-                {
-                    throw new InvalidOperationException("Entry object is missing");
-                }
                 root[_name] = _schema.Node(item);
                 return;
             }
-            JsonObject source;
-            try
-            {
-                source = data.AsObject();
-            }
-            catch (InvalidOperationException)
+            if (kind != JsonValueKind.Object)
             {
                 throw new InvalidOperationException("Entry object is missing");
             }
+            JsonObject source = data.AsObject();
             foreach (KeyValuePair<string, JsonNode?> part in source)
             {
                 if (part.Value is null)
                 {
                     continue;
                 }
-                if (part.Value is JsonValue current && current.ToJsonString() == "null")
+                JsonNode value = part.Value;
+                JsonValueKind type = value.GetValueKind();
+                if (type == JsonValueKind.Null)
                 {
                     continue;
                 }
-                item[part.Key] = part.Value.DeepClone();
+                item[part.Key] = value.DeepClone();
             }
         }
         root[_name] = _schema.Node(item);

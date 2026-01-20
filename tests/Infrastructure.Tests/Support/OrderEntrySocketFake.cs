@@ -29,7 +29,15 @@ internal sealed class OrderEntrySocketFake : ITerminal
     {
         ArgumentNullException.ThrowIfNull(payload);
         using JsonDocument document = JsonDocument.Parse(payload);
-        string id = document.RootElement.GetProperty("Id").GetString() ?? string.Empty;
+        if (!document.RootElement.TryGetProperty("Id", out JsonElement element))
+        {
+            throw new ArgumentException("Payload must contain non-empty Id", nameof(payload));
+        }
+        string id = element.GetString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            throw new ArgumentException("Payload must contain non-empty Id", nameof(payload));
+        }
         _id.TrySetResult(id);
         return Task.CompletedTask;
     }
