@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -64,7 +66,7 @@ public sealed class AccountsBalanceToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    AccountsBalanceTool tool = new(terminal, logger);
+                    McpTool tool = new(new WsBalance(terminal, logger), new Tool { Name = "balance", Title = "Account balance", Description = "Returns account balance for the given account id.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"balances":{"type":"array","description":"Account balance entries for the requested account","items":{"type":"object","properties":{"DataId":{"type":"integer","description":"Balance identifier computed as IdSubAccount * 8 + IdRazdelGroup"},"IdAccount":{"type":"integer","description":"Client account id"},"IdSubAccount":{"type":"integer","description":"Client subaccount id"},"IdRazdelGroup":{"type":"integer","description":"Portfolio group code"},"MarginInitial":{"type":"number","description":"Initial margin"},"MarginMinimum":{"type":"number","description":"Minimum margin"},"MarginRequirement":{"type":"number","description":"Margin requirements"},"Money":{"type":"number","description":"Cash in rubles"},"MoneyInitial":{"type":"number","description":"Opening cash in rubles"},"Balance":{"type":"number","description":"Balance value"},"PrevBalance":{"type":"number","description":"Opening balance"},"PortfolioCost":{"type":"number","description":"Portfolio value"},"LiquidBalance":{"type":"number","description":"Liquid portfolio value"},"Requirements":{"type":"number","description":"Requirements"},"ImmediateRequirements":{"type":"number","description":"Immediate requirements"},"NPL":{"type":"number","description":"Nominal profit or loss"},"DailyPL":{"type":"number","description":"Daily profit or loss"},"NPLPercent":{"type":"number","description":"Nominal PnL percent"},"DailyPLPercent":{"type":"number","description":"Daily PnL percent"},"NKD":{"type":"number","description":"Accrued coupon income"}},"required":["DataId","IdAccount","IdSubAccount","IdRazdelGroup","MarginInitial","MarginMinimum","MarginRequirement","Money","MoneyInitial","Balance","PrevBalance","PortfolioCost","LiquidBalance","Requirements","ImmediateRequirements","NPL","DailyPL","NPLPercent","DailyPLPercent","NKD"],"additionalProperties":false}}},"required":["balances"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new MappedPayloadPlan(new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""))));
                     Dictionary<string, JsonElement> data = new() { ["accountId"] = JsonSerializer.SerializeToElement(account) };
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);

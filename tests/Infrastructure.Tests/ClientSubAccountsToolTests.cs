@@ -1,7 +1,10 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -44,7 +47,7 @@ public sealed class ClientSubAccountsToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    ClientSubAccountsTool tool = new(terminal, logger);
+                    McpTool tool = new(new WsClientSubAccounts(terminal, logger), new Tool { Name = "client-subaccounts", Title = "Client subaccounts", Description = "Returns client subaccount entries.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"clientSubAccounts":{"type":"array","description":"Client subaccount entries","items":{"type":"object","properties":{"IdSubAccount":{"type":"integer","description":"Client subaccount identifier"},"IdAccount":{"type":"integer","description":"Client account identifier"}},"required":["IdSubAccount","IdAccount"],"additionalProperties":false}}},"required":["clientSubAccounts"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new FixedPayloadPlan(new EmptyInputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""")), new EntityPayload("ClientSubAccountEntity", true)));
                     Dictionary<string, JsonElement> data = new();
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);

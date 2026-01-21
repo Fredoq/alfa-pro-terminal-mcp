@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
+using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 using ModelContextProtocol.Protocol;
 
@@ -59,7 +61,7 @@ public sealed class OrdersToolTests
                 });
                 await using BalanceSocketFake terminal = new(payload);
                 LoggerFake logger = new();
-                OrdersTool tool = new(terminal, logger);
+                McpTool tool = new(new WsOrders(terminal, logger), new Tool { Name = "orders", Title = "Current orders", Description = "Returns current orders for the given account id.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"orders":{"type":"array","description":"Current orders for the requested account","items":{"type":"object","properties":{"NumEDocument":{"type":"integer","description":"Order identifier"},"ClientOrderNum":{"type":"integer","description":"Client order number"},"IdAccount":{"type":"integer","description":"Client account id"},"IdSubAccount":{"type":"integer","description":"Client subaccount id"},"IdRazdel":{"type":"integer","description":"Client subaccount portfolio id"},"IdAllowedOrderParams":{"type":"integer","description":"Order parameter combination identifier"},"AcceptTime":{"type":"string","description":"Order acceptance time"},"IdOrderType":{"type":"integer","description":"Order type identifier"},"IdObject":{"type":"integer","description":"Security identifier"},"IdMarketBoard":{"type":"integer","description":"Market identifier"},"LimitPrice":{"type":"number","description":"Limit order price"},"BuySell":{"type":"integer","description":"Trade direction: 1 for buy or -1 for sell"},"Quantity":{"type":"integer","description":"Quantity in units"},"Comment":{"type":"string","description":"Order comment"},"Login":{"type":"string","description":"Initiator login"},"IdOrderStatus":{"type":"integer","description":"Order status identifier"},"Rest":{"type":"integer","description":"Remaining quantity"},"Price":{"type":"number","description":"Order price"},"BrokerComment":{"type":"string","description":"Broker comment"}},"required":["NumEDocument","ClientOrderNum","IdAccount","IdSubAccount","IdRazdel","IdAllowedOrderParams","AcceptTime","IdOrderType","IdObject","IdMarketBoard","LimitPrice","BuySell","Quantity","Comment","Login","IdOrderStatus","Rest","Price","BrokerComment"],"additionalProperties":false}}},"required":["orders"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new MappedPayloadPlan(new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""))));
                 Dictionary<string, JsonElement> data = new() { ["accountId"] = JsonSerializer.SerializeToElement(account) };
                 using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                 CallToolResult result = await tool.Result(data, source.Token);

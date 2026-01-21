@@ -1,6 +1,6 @@
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Routing;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Archive;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
+using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests.Support;
 
 namespace Fredoqw.Alfa.ProTerminal.Mcp.Domain.Tests;
 
@@ -19,8 +19,8 @@ public sealed class ArchiveQueryRequestTests
     [Fact(DisplayName = "ArchiveQueryRequest serializes archive routing metadata")]
     public void Given_payload_when_serialized_then_contains_archive_metadata()
     {
-        long idFi = RandomNumberGenerator.GetInt32(30_000, 60_000);
-        ArchiveQueryPayload payload = new(idFi, 0, "day", 1, DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(1));
+        string value = $"café-{RandomNumberGenerator.GetInt32(10_000, 90_000)}";
+        PayloadFake payload = new(value);
         ArchiveQueryRequest request = new(payload);
         string json = request.AsString();
         using JsonDocument document = JsonDocument.Parse(json);
@@ -30,8 +30,8 @@ public sealed class ArchiveQueryRequestTests
         string id = root.GetProperty("Id").GetString() ?? string.Empty;
         string serialized = root.GetProperty("Payload").GetString() ?? string.Empty;
         using JsonDocument payloadDocument = JsonDocument.Parse(serialized);
-        long embedded = payloadDocument.RootElement.GetProperty("IdFi").GetInt64();
-        bool result = channel == "#Archive.Query" && command == "request" && id.Length > 0 && embedded == idFi;
+        string embedded = payloadDocument.RootElement.GetProperty("Content").GetString() ?? string.Empty;
+        bool result = channel == "#Archive.Query" && command == "request" && id.Length > 0 && embedded == value;
         Assert.True(result, "ArchiveQueryRequest does not serialize archive routing metadata");
     }
 
@@ -41,7 +41,7 @@ public sealed class ArchiveQueryRequestTests
     [Fact(DisplayName = "ArchiveQueryRequest generates unique identifiers concurrently")]
     public void Given_multiple_requests_when_created_concurrently_then_ids_unique()
     {
-        IPayload payload = new ArchiveQueryPayload(RandomNumberGenerator.GetInt32(100_000, 999_999), 2, "minute", 5, DateTime.UtcNow.Date.AddDays(-3), DateTime.UtcNow.Date);
+        IPayload payload = new PayloadFake($"café-{RandomNumberGenerator.GetInt32(100_000, 999_999)}");
         int count = 13;
         ConcurrentDictionary<string, byte> ids = new();
         Parallel.For(0, count, _ => ids.TryAdd(new ArchiveQueryRequest(payload).Id(), 0));

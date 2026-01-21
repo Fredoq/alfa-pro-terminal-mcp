@@ -4,6 +4,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
 using System.Text.Json;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 /// <summary>
@@ -12,14 +13,14 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 public sealed class WsBalanceTests
 {
     /// <summary>
-    /// Ensures that WsBalance returns JSON containing requested account balance. Usage example: await balance.Balance(id, token).
+    /// Ensures that WsBalance returns JSON containing requested account balance. Usage example: await balance.Entries(payload, token).
     /// </summary>
     [Fact(DisplayName = "WsBalance returns balance json for matching account")]
     public async Task Given_balance_response_when_requested_then_returns_json()
     {
         long account = RandomNumberGenerator.GetInt32(50_000, 80_000);
         int group = RandomNumberGenerator.GetInt32(1, 4);
-        string payload = JsonSerializer.Serialize(new
+        string text = JsonSerializer.Serialize(new
         {
             Data = new object[]
             {
@@ -48,10 +49,13 @@ public sealed class WsBalanceTests
                 }
             }
         });
-        await using BalanceSocketFake socket = new(payload);
+        await using BalanceSocketFake socket = new(text);
         LoggerFake logger = new();
         WsBalance balance = new(socket, logger);
-        string json = (await balance.Balance(account)).StructuredContent().ToJsonString();
+        InputSchema schema = new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""));
+        Dictionary<string, JsonElement> data = new(StringComparer.Ordinal) { ["accountId"] = JsonSerializer.SerializeToElement(account) };
+        MappedPayload payload = new(data, schema);
+        string json = (await balance.Entries(payload)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement.GetProperty("balances")[0];
         bool result = entry.GetProperty("IdAccount").GetInt64() == account;
@@ -59,13 +63,13 @@ public sealed class WsBalanceTests
     }
 
     /// <summary>
-    /// Confirms that WsBalance fails when requested account is absent. Usage example: await balance.Balance(id, token).
+    /// Confirms that WsBalance fails when requested account is absent. Usage example: await balance.Entries(payload, token).
     /// </summary>
     [Fact(DisplayName = "WsBalance throws when account balance is missing")]
     public async Task Given_response_without_target_account_when_requested_then_throws()
     {
         long account = RandomNumberGenerator.GetInt32(81_000, 90_000);
-        string payload = JsonSerializer.Serialize(new
+        string text = JsonSerializer.Serialize(new
         {
             Data = new object[]
             {
@@ -94,10 +98,13 @@ public sealed class WsBalanceTests
                 }
             }
         });
-        await using BalanceSocketFake socket = new(payload);
+        await using BalanceSocketFake socket = new(text);
         LoggerFake logger = new();
         WsBalance balance = new(socket, logger);
-        Task<string> action = Task.Run(async () => (await balance.Balance(account)).StructuredContent().ToJsonString());
+        InputSchema schema = new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""));
+        Dictionary<string, JsonElement> data = new(StringComparer.Ordinal) { ["accountId"] = JsonSerializer.SerializeToElement(account) };
+        MappedPayload payload = new(data, schema);
+        Task<string> action = Task.Run(async () => (await balance.Entries(payload)).StructuredContent().ToJsonString());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
 }

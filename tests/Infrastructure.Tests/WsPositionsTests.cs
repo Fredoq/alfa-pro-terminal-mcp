@@ -4,6 +4,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests;
 
 using System.Security.Cryptography;
 using System.Text.Json;
+using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 
 /// <summary>
@@ -12,13 +13,13 @@ using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 public sealed class WsPositionsTests
 {
     /// <summary>
-    /// Ensures that WsPositions returns JSON containing requested account positions. Usage example: await positions.Positions(id, token).
+    /// Ensures that WsPositions returns JSON containing requested account positions. Usage example: await positions.Entries(payload, token).
     /// </summary>
     [Fact(DisplayName = "WsPositions returns positions json for matching account")]
     public async Task Given_positions_response_when_requested_then_returns_json()
     {
         long account = RandomNumberGenerator.GetInt32(50_000, 80_000);
-        string payload = JsonSerializer.Serialize(new
+        string text = JsonSerializer.Serialize(new
         {
             Data = new object[]
             {
@@ -58,10 +59,14 @@ public sealed class WsPositionsTests
                 }
             }
         });
-        await using PositionSocketFake socket = new(payload);
+        await using PositionSocketFake socket = new(text);
         LoggerFake logger = new();
         WsPositions positions = new(socket, logger);
-        string json = (await positions.Entries(account)).StructuredContent().ToJsonString();
+        InputSchema schema = new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""));
+        Dictionary<string, JsonElement> data = new(StringComparer.Ordinal) { ["accountId"] = JsonSerializer.SerializeToElement(account) };
+        MappedPayload payload = new(data, schema);
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+        string json = (await positions.Entries(payload, cts.Token)).StructuredContent().ToJsonString();
         using JsonDocument document = JsonDocument.Parse(json);
         JsonElement entry = document.RootElement.GetProperty("positions")[0];
         double step = entry.GetProperty("PriceStep").GetDouble();
@@ -70,13 +75,13 @@ public sealed class WsPositionsTests
     }
 
     /// <summary>
-    /// Confirms that WsPositions fails when requested account is absent. Usage example: await positions.Positions(id, token).
+    /// Confirms that WsPositions fails when requested account is absent. Usage example: await positions.Entries(payload, token).
     /// </summary>
     [Fact(DisplayName = "WsPositions throws when positions are missing")]
     public async Task Given_response_without_target_account_when_requested_then_throws()
     {
         long account = RandomNumberGenerator.GetInt32(81_000, 90_000);
-        string payload = JsonSerializer.Serialize(new
+        string text = JsonSerializer.Serialize(new
         {
             Data = new object[]
             {
@@ -116,10 +121,13 @@ public sealed class WsPositionsTests
                 }
             }
         });
-        await using PositionSocketFake socket = new(payload);
+        await using PositionSocketFake socket = new(text);
         LoggerFake logger = new();
         WsPositions positions = new(socket, logger);
-        Task<string> action = Task.Run(async () => (await positions.Entries(account)).StructuredContent().ToJsonString());
+        InputSchema schema = new InputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"accountId":{"type":"integer","description":"Account identifier"}},"required":["accountId"]}"""));
+        Dictionary<string, JsonElement> data = new(StringComparer.Ordinal) { ["accountId"] = JsonSerializer.SerializeToElement(account) };
+        MappedPayload payload = new(data, schema);
+        Task<string> action = Task.Run(async () => (await positions.Entries(payload)).StructuredContent().ToJsonString());
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await action);
     }
 }
