@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-21
+### Added
+- MCP tools for allowed order parameters, client subaccounts, subaccount portfolios, current orders, limit requests, and order entry
+- Schemas for orders, order entry responses, and limit request payloads
+### Changed
+- Tool execution now uses input schemas and payload plans with explicit confirmation for order entry
+
 ## [1.0.1] - 2026-01-13
 ### Added
 - MCP tools for object types, object groups, and market boards with explicit schemas
