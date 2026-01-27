@@ -10,9 +10,9 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 /// </summary>
 internal sealed class OrderEntryFlowSocketFake : ITerminal
 {
-    private readonly Channel<string> queue = Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleReader = false, SingleWriter = false });
-    private readonly List<string> items = [];
-    private readonly IReadOnlyDictionary<string, string> responses;
+    private readonly Channel<string> _queue = Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleReader = false, SingleWriter = false });
+    private readonly List<string> _items = [];
+    private readonly IReadOnlyDictionary<string, string> _responses;
 
     /// <summary>
     /// Initializes the fake with response payloads. Usage example: var socket = new OrderEntryFlowSocketFake(responses).
@@ -20,14 +20,14 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
     /// <param name="responses">Response payloads by entity name or channel.</param>
     public OrderEntryFlowSocketFake(IReadOnlyDictionary<string, string> responses)
     {
-        this.responses = responses;
+        _responses = responses;
     }
 
     /// <summary>
     /// Returns captured outbound payloads. Usage example: IReadOnlyList<string> list = socket.Items().
     /// </summary>
     /// <returns>Captured payloads.</returns>
-    internal IReadOnlyList<string> Items() => items;
+    internal IReadOnlyList<string> Items() => _items;
 
     /// <summary>
     /// Captures routing request and enqueues a response. Usage example: await socket.Send(json, token).
@@ -38,10 +38,10 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
         using JsonDocument document = JsonDocument.Parse(payload);
         string id = document.RootElement.GetProperty("Id").GetString() ?? string.Empty;
         string channel = document.RootElement.GetProperty("Channel").GetString() ?? string.Empty;
-        items.Add(payload);
+        _items.Add(payload);
         string body = channel == "#Order.Enter.Query" ? Entry() : Data(document.RootElement);
         string text = new ResponseText(id, body, channel, "response").Value();
-        queue.Writer.TryWrite(text);
+        _queue.Writer.TryWrite(text);
         return Task.CompletedTask;
     }
 
@@ -50,9 +50,9 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
     /// </summary>
     public async IAsyncEnumerable<string> Messages([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        while (await queue.Reader.WaitToReadAsync(cancellationToken))
+        while (await _queue.Reader.WaitToReadAsync(cancellationToken))
         {
-            while (queue.Reader.TryRead(out string? message))
+            while (_queue.Reader.TryRead(out string? message))
             {
                 if (message is null)
                 {
@@ -68,7 +68,7 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
     /// </summary>
     public ValueTask DisposeAsync()
     {
-        queue.Writer.TryComplete();
+        _queue.Writer.TryComplete();
         return ValueTask.CompletedTask;
     }
 
@@ -82,7 +82,7 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
         string payload = root.GetProperty("Payload").GetString() ?? string.Empty;
         using JsonDocument document = JsonDocument.Parse(payload);
         string type = document.RootElement.GetProperty("Type").GetString() ?? string.Empty;
-        if (!responses.TryGetValue(type, out string? value))
+        if (!_responses.TryGetValue(type, out string? value))
         {
             throw new InvalidOperationException("Response payload is missing");
         }
@@ -95,7 +95,7 @@ internal sealed class OrderEntryFlowSocketFake : ITerminal
     /// <returns>Response payload.</returns>
     private string Entry()
     {
-        if (!responses.TryGetValue("#Order.Enter.Query", out string? value))
+        if (!_responses.TryGetValue("#Order.Enter.Query", out string? value))
         {
             throw new InvalidOperationException("Response payload is missing");
         }

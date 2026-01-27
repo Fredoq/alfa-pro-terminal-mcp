@@ -13,7 +13,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 /// </summary>
 public sealed class WsSubaccount : ISubaccount
 {
-    private readonly WsClientSubAccounts source;
+    private readonly WsClientSubAccounts _source;
 
     /// <summary>
     /// Creates a subaccount resolver bound to the terminal. Usage example: var resolver = new WsSubaccount(terminal, log).
@@ -22,7 +22,7 @@ public sealed class WsSubaccount : ISubaccount
     /// <param name="log">Logger instance.</param>
     public WsSubaccount(ITerminal terminal, ILogger log)
     {
-        source = new WsClientSubAccounts(terminal, log);
+        _source = new WsClientSubAccounts(terminal, log);
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public sealed class WsSubaccount : ISubaccount
     /// <returns>Subaccount identifier.</returns>
     public async Task<long> Identifier(long account, CancellationToken token = default)
     {
-        IEntries entries = await source.Entries(new EntityPayload("ClientSubAccountEntity", true), token);
+        IEntries entries = await _source.Entries(new EntityPayload("ClientSubAccountEntity", true), token);
         JsonObject root = entries.StructuredContent().AsObject();
         if (!root.TryGetPropertyValue("clientSubAccounts", out JsonNode? data) || data is null)
         {

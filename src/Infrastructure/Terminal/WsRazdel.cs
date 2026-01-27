@@ -13,7 +13,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 /// </summary>
 public sealed class WsRazdel : IRazdel
 {
-    private readonly WsSubAccountRazdels source;
+    private readonly WsSubAccountRazdels _source;
 
     /// <summary>
     /// Creates a portfolio resolver bound to the terminal. Usage example: var resolver = new WsRazdel(terminal, log).
@@ -22,7 +22,7 @@ public sealed class WsRazdel : IRazdel
     /// <param name="log">Logger instance.</param>
     public WsRazdel(ITerminal terminal, ILogger log)
     {
-        source = new WsSubAccountRazdels(terminal, log);
+        _source = new WsSubAccountRazdels(terminal, log);
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public sealed class WsRazdel : IRazdel
     /// <returns>Portfolio identifier.</returns>
     public async Task<long> Identifier(long account, long subaccount, string code, CancellationToken token = default)
     {
-        IEntries entries = await source.Entries(new EntityPayload("SubAccountRazdelEntity", true), token);
+        IEntries entries = await _source.Entries(new EntityPayload("SubAccountRazdelEntity", true), token);
         JsonObject root = entries.StructuredContent().AsObject();
         if (!root.TryGetPropertyValue("subAccountRazdels", out JsonNode? data) || data is null)
         {

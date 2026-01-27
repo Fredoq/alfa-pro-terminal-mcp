@@ -13,7 +13,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 /// </summary>
 public sealed class WsAllowedOrderParam : IAllowedOrderParam
 {
-    private readonly WsAllowedOrderParams source;
+    private readonly WsAllowedOrderParams _source;
 
     /// <summary>
     /// Creates an allowed order parameter resolver bound to the terminal. Usage example: var resolver = new WsAllowedOrderParam(terminal, log).
@@ -22,7 +22,7 @@ public sealed class WsAllowedOrderParam : IAllowedOrderParam
     /// <param name="log">Logger instance.</param>
     public WsAllowedOrderParam(ITerminal terminal, ILogger log)
     {
-        source = new WsAllowedOrderParams(terminal, log);
+        _source = new WsAllowedOrderParams(terminal, log);
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public sealed class WsAllowedOrderParam : IAllowedOrderParam
     /// <returns>Allowed order parameter identifier.</returns>
     public async Task<long> Identifier(long group, long market, double price, CancellationToken token = default)
     {
-        IEntries entries = await source.Entries(new EntityPayload("AllowedOrderParamEntity", true), token);
+        IEntries entries = await _source.Entries(new EntityPayload("AllowedOrderParamEntity", true), token);
         JsonObject root = entries.StructuredContent().AsObject();
         if (!root.TryGetPropertyValue("allowedOrderParams", out JsonNode? data) || data is null)
         {

@@ -15,10 +15,10 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
 /// </summary>
 public sealed class WsInstrument : IInstrument
 {
-    private readonly WsAssetsInfo source;
-    private InstrumentValue item;
-    private long asset;
-    private bool flag;
+    private readonly WsAssetsInfo _source;
+    private InstrumentValue _item;
+    private long _asset;
+    private bool _flag;
 
     /// <summary>
     /// Creates an instrument resolver bound to the terminal. Usage example: var resolver = new WsInstrument(terminal, log).
@@ -27,10 +27,10 @@ public sealed class WsInstrument : IInstrument
     /// <param name="log">Logger instance.</param>
     public WsInstrument(ITerminal terminal, ILogger log)
     {
-        source = new WsAssetsInfo(terminal, log);
-        item = new InstrumentValue(0, 0, string.Empty);
-        asset = 0;
-        flag = false;
+        _source = new WsAssetsInfo(terminal, log);
+        _item = new InstrumentValue(0, 0, string.Empty);
+        _asset = 0;
+        _flag = false;
     }
 
     /// <summary>
@@ -41,12 +41,12 @@ public sealed class WsInstrument : IInstrument
     /// <returns>Instrument details.</returns>
     public async Task<InstrumentValue> Value(long asset, CancellationToken token = default)
     {
-        if (flag && asset == this.asset)
+        if (_flag && asset == _asset)
         {
-            return item;
+            return _item;
         }
         string text = JsonSerializer.Serialize(new { IdObjects = new long[] { asset } });
-        IEntries entries = await source.Entries(new TextPayload(text), token);
+        IEntries entries = await _source.Entries(new TextPayload(text), token);
         JsonObject root = entries.StructuredContent().AsObject();
         if (!root.TryGetPropertyValue("assets", out JsonNode? data) || data is null)
         {
@@ -106,10 +106,10 @@ public sealed class WsInstrument : IInstrument
         long group = new JsonInteger(info, "IdObjectGroup").Value();
         long market = new JsonInteger(node, "IdMarketBoard").Value();
         string code = new JsonString(node, "RCode").Value();
-        item = new InstrumentValue(group, market, code);
-        this.asset = asset;
-        flag = true;
-        return item;
+        _item = new InstrumentValue(group, market, code);
+        _asset = asset;
+        _flag = true;
+        return _item;
     }
 
     /// <summary>
