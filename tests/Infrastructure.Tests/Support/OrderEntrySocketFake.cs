@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Interfaces.Transport;
@@ -7,6 +8,7 @@ namespace Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Tests.Support;
 /// <summary>
 /// Simulates router behavior for order entry requests by echoing a crafted response. Usage example: new OrderEntrySocketFake(payload).
 /// </summary>
+[SuppressMessage("Usage", "CA1812:OrderEntrySocketFake is an internal class that is apparently never instantiated")]
 internal sealed class OrderEntrySocketFake : ITerminal
 {
     private readonly string _payload;
