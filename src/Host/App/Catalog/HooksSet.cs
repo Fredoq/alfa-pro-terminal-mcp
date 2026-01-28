@@ -58,7 +58,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     };
 
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
-                    _log.LogDebug("Elicit answer: {@Answer}", answer);
+                    _log.LogDebug("Elicit answer: a: {Action}, ac: {Accepted}, c: {Content}, m: {Meta}", answer.Action, answer.IsAccepted, JsonSerializer.Serialize(answer.Content),  answer.Meta?.ToJsonString());
                     bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
                     if (!approval)
                     {
