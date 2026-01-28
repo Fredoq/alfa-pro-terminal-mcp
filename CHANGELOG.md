@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-01-28
+### Added
+- MCP tool for order cancellation with routing request, terminal socket client, and test coverage
+### Changed
+- Order entry schema now documents IdPriceControlType values
+- Order-related schemas now document extended IdOrderType codes from the trading table
+- Archive query schema now expects full date-time format for first and last trading days
+
 ## [1.1.0] - 2026-01-21
 ### Added
 - MCP tools for allowed order parameters, client subaccounts, subaccount portfolios, current orders, limit requests, and order entry
