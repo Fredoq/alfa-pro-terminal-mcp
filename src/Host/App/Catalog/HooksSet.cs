@@ -53,7 +53,8 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     string text = JsonSerializer.Serialize(items);
                     ElicitRequestParams prompt = new()
                     {
-                        Message = $"Confirm order entry with parameters: {text}"
+                        Message = $"Confirm order entry with parameters: {text}",
+                        RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition>(), Required = [] }
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
                     if (!answer.IsAccepted)
@@ -66,7 +67,8 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     string text = JsonSerializer.Serialize(items);
                     ElicitRequestParams prompt = new()
                     {
-                        Message = $"Confirm order cancel with parameters: {text}"
+                        Message = $"Confirm order cancel with parameters: {text}",
+                        RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition>(), Required = [] }
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
                     if (!answer.IsAccepted)
