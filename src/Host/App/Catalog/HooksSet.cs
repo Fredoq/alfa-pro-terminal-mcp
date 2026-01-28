@@ -47,7 +47,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
             {
                 CallToolRequestParams data = request.Params ?? throw new McpProtocolException("Missing call parameters", McpErrorCode.InvalidParams);
                 string name = data.Name ?? throw new McpProtocolException("Missing tool name", McpErrorCode.InvalidParams);
-                IReadOnlyDictionary<string, JsonElement> items = data.Arguments ?? ImmutableDictionary<string, JsonElement>.Empty;
+                IDictionary<string, JsonElement> items = data.Arguments ?? ImmutableDictionary<string, JsonElement>.Empty;
                 if (name == "order-enter")
                 {
                     string text = JsonSerializer.Serialize(items);
@@ -72,6 +72,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                         RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition> { ["confirm"] = new ElicitRequestParams.BooleanSchema { Type = "boolean", Title = "Confirm order cancel", Description = "Confirm order cancel with provided parameters", Default = false } }, Required = ["confirm"] }
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
+                    _log.LogDebug("Elicit answer: {@Answer}", answer);
                     bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
                     if (!approval)
                     {
@@ -79,7 +80,7 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     }
                 }
                 IMcpTool tool = _tools.TryGetValue(name, out IMcpTool? item) ? item : throw new McpProtocolException($"Unknown tool: '{name}'", McpErrorCode.InvalidRequest);
-                return await tool.Result(items, token);
+                return await tool.Result(items.AsReadOnly(), token);
             }
             finally
             {
