@@ -41,6 +41,6 @@ public sealed class WsOrders : IEntriesSource
         using JsonDocument document = JsonDocument.Parse(payload.AsString());
         long account = document.RootElement.GetProperty("AccountId").GetInt64();
         string message = await new Messaging.Responses.TerminalOutboundMessages(new Messaging.Requests.IncomingMessage(new DataQueryRequest(new EntityPayload("OrderEntity", true)), _terminal, _logger), _terminal, _logger, new Messaging.Responses.HeartbeatResponse(new Messaging.Responses.QueryResponse("#Data.Query"))).NextMessage(token);
-        return new RootEntries(new SchemaEntries(new FilteredEntries(new PayloadArrayEntries(message), new AccountScope(account), "Account orders are missing"), new OrderSchema()), "orders");
+        return new RootEntries(new SchemaEntries(new SubsetEntries(new FallbackEntries(new PayloadArrayEntries(message), new EmptyEntries()), new AccountScope(account)), new OrderSchema()), "orders");
     }
 }
