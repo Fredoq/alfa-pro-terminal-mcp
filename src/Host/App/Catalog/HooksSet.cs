@@ -57,7 +57,8 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                         RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition> { ["confirm"] = new ElicitRequestParams.BooleanSchema { Type = "boolean", Title = "Confirm order entry", Description = "Confirm order entry with provided parameters", Default = false } }, Required = ["confirm"] }
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
-                    if (!answer.IsAccepted || answer.Content is null || !answer.Content.TryGetValue("confirm", out JsonElement value) || !value.GetBoolean())
+                    bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
+                    if (!approval)
                     {
                         throw new McpProtocolException("Order entry confirmation was rejected", McpErrorCode.InvalidRequest);
                     }
@@ -71,7 +72,8 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                         RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition> { ["confirm"] = new ElicitRequestParams.BooleanSchema { Type = "boolean", Title = "Confirm order cancel", Description = "Confirm order cancel with provided parameters", Default = false } }, Required = ["confirm"] }
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
-                    if (!answer.IsAccepted || answer.Content is null || !answer.Content.TryGetValue("confirm", out JsonElement value) || !value.GetBoolean())
+                    bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
+                    if (!approval)
                     {
                         throw new McpProtocolException("Order cancel confirmation was rejected", McpErrorCode.InvalidRequest);
                     }
