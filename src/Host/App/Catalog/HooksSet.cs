@@ -53,14 +53,10 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     string text = JsonSerializer.Serialize(items);
                     ElicitRequestParams prompt = new()
                     {
-                        Message = $"Confirm order entry with parameters: {text}",
-                        RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition> { ["confirm"] = new ElicitRequestParams.BooleanSchema { Type = "boolean", Title = "Confirm order entry", Description = "Confirm order entry with provided parameters", Default = false } }, Required = ["confirm"] }
+                        Message = $"Confirm order entry with parameters: {text}"
                     };
-
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
-                    _log.LogDebug("Elicit answer: a: {Action}, ac: {Accepted}, c: {Content}, m: {Meta}", answer.Action, answer.IsAccepted, JsonSerializer.Serialize(answer.Content),  answer.Meta?.ToJsonString());
-                    bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
-                    if (!approval)
+                    if (!answer.IsAccepted)
                     {
                         throw new McpProtocolException("Order entry confirmation was rejected", McpErrorCode.InvalidRequest);
                     }
@@ -70,12 +66,10 @@ internal sealed class HooksSet : IHooksSet, IAsyncDisposable
                     string text = JsonSerializer.Serialize(items);
                     ElicitRequestParams prompt = new()
                     {
-                        Message = $"Confirm order cancel with parameters: {text}",
-                        RequestedSchema = new ElicitRequestParams.RequestSchema { Properties = new Dictionary<string, ElicitRequestParams.PrimitiveSchemaDefinition> { ["confirm"] = new ElicitRequestParams.BooleanSchema { Type = "boolean", Title = "Confirm order cancel", Description = "Confirm order cancel with provided parameters", Default = false } }, Required = ["confirm"] }
+                        Message = $"Confirm order cancel with parameters: {text}"
                     };
                     ElicitResult answer = await request.Server.ElicitAsync(prompt, token);
-                    bool approval = answer.IsAccepted && (answer.Content is null || (answer.Content.TryGetValue("confirm", out JsonElement value) && value.GetBoolean()));
-                    if (!approval)
+                    if (!answer.IsAccepted)
                     {
                         throw new McpProtocolException("Order cancel confirmation was rejected", McpErrorCode.InvalidRequest);
                     }
