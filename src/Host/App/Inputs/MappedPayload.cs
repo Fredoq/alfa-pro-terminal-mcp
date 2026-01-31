@@ -31,9 +31,9 @@ internal sealed class MappedPayload : IPayload
     /// <param name="extra">Extra argument dictionary.</param>
     public MappedPayload(IReadOnlyDictionary<string, JsonElement> data, IInputSchema schema, IReadOnlyDictionary<string, JsonElement> extra)
     {
-        ArgumentNullException.ThrowIfNull(_data);
-        ArgumentNullException.ThrowIfNull(_schema);
-        ArgumentNullException.ThrowIfNull(_extra);
+        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(schema);
+        ArgumentNullException.ThrowIfNull(extra);
         _data = data;
         _schema = schema;
         _extra = extra;
