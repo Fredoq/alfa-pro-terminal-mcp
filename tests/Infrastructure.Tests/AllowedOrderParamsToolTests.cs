@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Fredoqw.Alfa.ProTerminal.Mcp.Domain.Models.Routing;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Inputs;
 using Fredoqw.Alfa.ProTerminal.Mcp.Host.App.Tools;
 using Fredoqw.Alfa.ProTerminal.Mcp.Infrastructure.Terminal;
@@ -32,14 +31,16 @@ public sealed class AllowedOrderParamsToolTests
             {
                 tasks[index] = Task.Run(async () =>
                 {
-                    long allowed = RandomNumberGenerator.GetInt32(1, 100_000);
+                    long param = RandomNumberGenerator.GetInt32(1, 100_000);
                     long group = RandomNumberGenerator.GetInt32(1, 100_000) * -1;
                     long board = RandomNumberGenerator.GetInt32(1, 100_000);
-                    long order = RandomNumberGenerator.GetInt32(1, 5);
-                    long document = RandomNumberGenerator.GetInt32(1, 5);
-                    long quantity = RandomNumberGenerator.GetInt32(1, 5);
-                    long price = RandomNumberGenerator.GetInt32(1, 5);
-                    long life = RandomNumberGenerator.GetInt32(1, 20) * -1;
+                    int choice = RandomNumberGenerator.GetInt32(0, 2);
+                    long order = choice == 0 ? 1 : 2;
+                    long document = 1;
+                    long quantity = 1;
+                    long price = 1;
+                    int slot = RandomNumberGenerator.GetInt32(0, 2);
+                    long life = slot == 0 ? 5 : 9;
                     long execution = RandomNumberGenerator.GetInt32(1, 10);
                     string payload = JsonSerializer.Serialize(new
                     {
@@ -47,7 +48,7 @@ public sealed class AllowedOrderParamsToolTests
                         {
                             new
                             {
-                                IdAllowedOrderParams = allowed,
+                                IdAllowedOrderParams = param,
                                 IdObjectGroup = group,
                                 IdMarketBoard = board,
                                 IdOrderType = order,
@@ -61,14 +62,21 @@ public sealed class AllowedOrderParamsToolTests
                     });
                     await using BalanceSocketFake terminal = new(payload);
                     LoggerFake logger = new();
-                    McpTool tool = new(new WsAllowedOrderParams(terminal, logger), new Tool { Name = "allowed-order-params", Title = "Allowed order parameters", Description = "Returns allowed order parameter entries.", InputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}"""), OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"allowedOrderParams":{"type":"array","description":"Allowed order parameter entries","items":{"type":"object","properties":{"IdAllowedOrderParams":{"type":"integer","description":"Allowed order parameter identifier"},"IdObjectGroup":{"type":"integer","description":"Object group identifier"},"IdMarketBoard":{"type":"integer","description":"Market identifier"},"IdOrderType":{"type":"integer","description":"Order type identifier Values: MKT 1 market order, LMT 2 limit order, STP 7 stop market, STL 8 stop limit, TRL 9 trailing limit, TRS 10 trailing stop market, TSL 11 trailing stop limit, RS 12 stop market with take profit, BSL 13 stop limit with take profit, TBRS 28 trailing stop market with take profit"},"IdDocumentType":{"type":"integer","description":"Document type identifier"},"IdQuantityType":{"type":"integer","description":"Quantity type identifier"},"IdPriceType":{"type":"integer","description":"Price type identifier"},"IdLifeTime":{"type":"integer","description":"Order lifetime identifier"},"IdExecutionType":{"type":"integer","description":"Execution type identifier"}},"required":["IdAllowedOrderParams","IdObjectGroup","IdMarketBoard","IdOrderType","IdDocumentType","IdQuantityType","IdPriceType","IdLifeTime","IdExecutionType"],"additionalProperties":false}}},"required":["allowedOrderParams"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new FixedPayloadPlan(new EmptyInputSchema(JsonSerializer.Deserialize<JsonElement>("""{"type":"object"}""")), new EntityPayload("AllowedOrderParamEntity", true)));
-                    Dictionary<string, JsonElement> data = new();
+                    JsonElement schema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"idObjectGroup":{"type":"integer","description":"Object group identifier"},"idMarketBoard":{"type":"integer","description":"Market identifier"},"idOrderType":{"type":"integer","description":"Order type identifier Values: MKT 1 market order, LMT 2 limit order, STP 7 stop market, STL 8 stop limit, TRL 9 trailing limit, TRS 10 trailing stop market, TSL 11 trailing stop limit, RS 12 stop market with take profit, BSL 13 stop limit with take profit, TBRS 28 trailing stop market with take profit"},"idLifeTime":{"type":"integer","description":"Order lifetime identifier Values: 5 end of day, 9 thirty days"}},"required":["idObjectGroup","idMarketBoard","idOrderType","idLifeTime"],"additionalProperties":false}""");
+                    McpTool tool = new(new WsAllowedOrderParams(terminal, logger), new Tool { Name = "allowed-order-params", Title = "Allowed order parameters", Description = "Returns allowed order parameter entries.", InputSchema = schema, OutputSchema = JsonSerializer.Deserialize<JsonElement>("""{"type":"object","properties":{"allowedOrderParams":{"type":"array","description":"Allowed order parameter entries","items":{"type":"object","properties":{"IdAllowedOrderParams":{"type":"integer","description":"Allowed order parameter identifier"},"IdObjectGroup":{"type":"integer","description":"Object group identifier"},"IdMarketBoard":{"type":"integer","description":"Market identifier"},"IdOrderType":{"type":"integer","description":"Order type identifier Values: MKT 1 market order, LMT 2 limit order, STP 7 stop market, STL 8 stop limit, TRL 9 trailing limit, TRS 10 trailing stop market, TSL 11 trailing stop limit, RS 12 stop market with take profit, BSL 13 stop limit with take profit, TBRS 28 trailing stop market with take profit"},"IdDocumentType":{"type":"integer","description":"Document type identifier"},"IdQuantityType":{"type":"integer","description":"Quantity type identifier"},"IdPriceType":{"type":"integer","description":"Price type identifier"},"IdLifeTime":{"type":"integer","description":"Order lifetime identifier"},"IdExecutionType":{"type":"integer","description":"Execution type identifier"}},"required":["IdAllowedOrderParams","IdObjectGroup","IdMarketBoard","IdOrderType","IdDocumentType","IdQuantityType","IdPriceType","IdLifeTime","IdExecutionType"],"additionalProperties":false}}},"required":["allowedOrderParams"],"additionalProperties":false}"""), Annotations = new ToolAnnotations { ReadOnlyHint = true, IdempotentHint = true, OpenWorldHint = false, DestructiveHint = false } }, new MappedPayloadPlan(new InputSchema(schema)));
+                    Dictionary<string, JsonElement> data = new(StringComparer.Ordinal)
+                    {
+                        ["idObjectGroup"] = JsonSerializer.SerializeToElement(group),
+                        ["idMarketBoard"] = JsonSerializer.SerializeToElement(board),
+                        ["idOrderType"] = JsonSerializer.SerializeToElement(order),
+                        ["idLifeTime"] = JsonSerializer.SerializeToElement(life)
+                    };
                     using CancellationTokenSource source = new(TimeSpan.FromSeconds(2));
                     CallToolResult result = await tool.Result(data, source.Token);
                     JsonNode node = result.StructuredContent ?? throw new InvalidOperationException("Structured content is missing");
-                    JsonElement schema = tool.Tool().OutputSchema ?? throw new InvalidOperationException("Output schema is missing");
+                    JsonElement output = tool.Tool().OutputSchema ?? throw new InvalidOperationException("Output schema is missing");
                     SchemaMatch probe = new();
-                    return probe.Match(node, schema);
+                    return probe.Match(node, output);
                 });
             }
             bool[] list = await Task.WhenAll(tasks);
