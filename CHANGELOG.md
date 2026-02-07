@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-02-07
+### Added
+- Criteria-based input schema for the `allowed-order-params` tool (object group, market board, order type, and lifetime)
+- Allowed order parameters scope filter and dedicated entry filtering tests, including concurrency coverage
+### Changed
+- `allowed-order-params` now validates order type and lifetime values before querying terminal data
+- Allowed order parameters output now returns only entries matching requested criteria with standard document, quantity, and price types
+
 ## [1.1.1] - 2026-01-28
 ### Added
 - MCP tool for order cancellation with routing request, terminal socket client, and test coverage
